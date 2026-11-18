@@ -14,6 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,9 @@ fun ManualProductDialog(
     var size by rememberSaveable { mutableStateOf("") }
     var price by rememberSaveable { mutableStateOf("") }
     var shop by rememberSaveable { mutableStateOf("") }
+    // A field the user changed since the last save is no longer shown as wrong.
+    var edited by remember(errors) { mutableStateOf(emptySet<ManualProductField>()) }
+    val shown = errors - edited
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.manual_title)) },
@@ -50,26 +54,35 @@ fun ManualProductDialog(
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = {
+                        name = it
+                        edited = edited + ManualProductField.NAME
+                    },
                     label = { Text(stringResource(R.string.manual_name)) },
-                    isError = ManualProductField.NAME in errors,
+                    isError = ManualProductField.NAME in shown,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 )
                 OutlinedTextField(
                     value = size,
-                    onValueChange = { size = it },
+                    onValueChange = {
+                        size = it
+                        edited = edited + ManualProductField.SIZE
+                    },
                     label = { Text(stringResource(R.string.manual_size)) },
                     placeholder = { Text(stringResource(R.string.manual_size_hint)) },
-                    isError = ManualProductField.SIZE in errors,
-                    supportingText = { if (ManualProductField.SIZE in errors) Text(stringResource(R.string.manual_size_error)) },
+                    isError = ManualProductField.SIZE in shown,
+                    supportingText = { if (ManualProductField.SIZE in shown) Text(stringResource(R.string.manual_size_error)) },
                     singleLine = true,
                 )
                 OutlinedTextField(
                     value = price,
-                    onValueChange = { price = it },
+                    onValueChange = {
+                        price = it
+                        edited = edited + ManualProductField.PRICE
+                    },
                     label = { Text(stringResource(R.string.manual_price)) },
-                    isError = ManualProductField.PRICE in errors,
+                    isError = ManualProductField.PRICE in shown,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
