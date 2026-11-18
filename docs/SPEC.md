@@ -106,7 +106,7 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 
 | Concern | Choice | Notes |
 |---|---|---|
-| Language | Kotlin 2.x (K2), JVM target 17 | |
+| Language | Kotlin 2.4 (K2), JVM target 17 | AGP 9 built-in Kotlin support |
 | UI | Jetpack Compose, Material 3, Navigation Compose with type-safe routes | Dynamic colour on Android 12+, with a green fallback palette |
 | DI | Hilt (KSP) | `hilt-core` in JVM provider modules |
 | DB | Room (KSP) with FTS4 for product search | Schemas exported to `core/data/schemas/` |
@@ -115,12 +115,14 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 | YAML | kaml (kotlinx.serialization YAML) | Only for recipe front matter |
 | Markdown rendering | A small Compose renderer for the subset in RECIPE_FORMAT.md, or a maintained M3 Markdown library (decided in phase 2) | |
 | Images | Coil 3 | Disk cache for product thumbnails |
-| Tests | JUnit 5 + kotlin.test (JVM modules), JUnit 4 + Robolectric (Room/Android), Turbine (Flow), MockWebServer (providers) | |
+| Tests | JUnit Jupiter 6 + kotlin.test (JVM modules), JUnit 4 + Robolectric (Room/Android), Turbine (Flow), MockWebServer (providers) | |
 | Lint/format | Android Lint, ktlint via Spotless | |
 | CI | GitHub Actions: `test` + `lint` on every PR | |
 
-Exact library versions are pinned in `gradle/libs.versions.toml` in phase 1, using the latest
-stable releases at that time.
+Exact versions are pinned in `gradle/libs.versions.toml`. Phase 1 (2026-11-18) started on the
+latest stable releases: Gradle 9.9.1, AGP 9.5.1, Kotlin 2.4.21, KSP 2.3.14, Hilt 2.60.1, Compose
+BOM 2026.09.00, Room 2.8.5, Navigation 2.10.2. Current AndroidX requires **compileSdk 37**;
+targetSdk stays at 36, the test phone's API level.
 
 ### 3.4 Build types and identity
 
@@ -486,16 +488,18 @@ asks for `unitWeightG` or a different product.
 
 | Unit | Rule |
 |---|---|
-| g, ml | < 10: one decimal if not whole; 10–100: whole; > 100: nearest 5 |
-| kg, l | Shown when ≥ 1000 g / ml, with up to 2 decimals ("1,25 kg") |
-| ud and other count units | Nearest 1/4 ("1 1/2 ud") |
-| cdta, cda, taza | Nearest 1/2 |
+| g, ml (and cl, which is shown in ml) | < 10: one decimal if not whole, at least 0,1; 10–100: whole; > 100: nearest 5 |
+| kg, l | Shown when the rounded value is ≥ 1000 g / ml, with up to 2 decimals ("1,25 kg"). Smaller kg/l amounts are shown in g/ml ("0,25 kg" → "250 g") |
+| ud and other count units | Nearest 1/4 ("1 1/2 ud"), never below 1/4 |
+| cdta, cda, taza | Nearest 1/2; 1/4 when it would round to 0 |
+| pizca | Whole number, at least 1. `al_gusto` shows no number |
 
 **Package fraction** for used amount `u` against usable package quantity `p` (same base unit),
 `r = u / p`:
 
 1. `whole = ⌊r + 0.02⌋`, `rest = r − whole` (negative rests are clamped to 0).
-2. Snap `rest` to the nearest of {0, 1/4, 1/3, 1/2, 2/3, 3/4, 1}. If the distance is ≤ 0.02 the
+2. Snap `rest` to the nearest of {0, 1/4, 1/3, 1/2, 2/3, 3/4, 1} (0 is not a candidate when
+   `whole` is 0, so less than one package never shows as "0"). If the distance is ≤ 0.02 the
    fraction is exact; otherwise it is prefixed with "≈".
 3. If `r < 1/8`: show a percentage instead, always with the neutral noun "envase" to avoid
    gender agreement: "≈ 5 % del envase".
@@ -555,8 +559,10 @@ A lot whose unit cannot be converted is listed but needs a manual amount.
 
 ## 6. Data model (Room, first draft)
 
-Final column names are fixed in phase 1 and 2. All ids are `TEXT` UUIDs except provider product
-keys.
+Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient`, exactly as below. The other
+tables arrive with later schema versions and tested migrations; `ingredient_link` comes with
+`product` in phase 3, so until then ingredients are stored without links. All ids are `TEXT`
+UUIDs except provider product keys.
 
 | Table | Key columns |
 |---|---|
@@ -580,8 +586,8 @@ Manual products are `product` rows with `provider_id = 'manual'`.
 
 ## 7. Non-functional requirements
 
-- **Platform**: minSdk 26 (Android 8.0), target and compile SDK 36. Primary test device: OnePlus
-  CPH2645, Android 16 ([DEVICE_SETUP.md](DEVICE_SETUP.md)).
+- **Platform**: minSdk 26 (Android 8.0), targetSdk 36, compileSdk 37. Primary test device:
+  OnePlus CPH2645, Android 16 ([DEVICE_SETUP.md](DEVICE_SETUP.md)).
 - **Performance**: cold start < 1.5 s on the test device. Catalogue search < 100 ms for 10k
   products. Recipe cost recomputation < 50 ms.
 - **Offline-first**: see AC1.1. Network is used only for provider endpoints and product images.
@@ -622,8 +628,8 @@ the phone.
 
 | Phase | Scope | Exit criteria |
 |---|---|---|
-| **0 — Specification** | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
-| **1 — Foundations** | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
+| **0 — Specification** (committed; push waits for the GitHub CLI) | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
+| **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
 | **2 — Recipes, packs and backup** | Recipe list, detail, editor, duplicate, delete, scaling, staples; recipe pack parser/validator/serializer; import via share sheet and picker, with validation and preview (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC7.* |
 | **3 — Providers and catalogue** | `:provider:api`, rate limiter, Mercadona module, postal code → warehouse, catalogue sync, FTS search, product detail, price refresh with fallback, Manual provider, store-brand filter, settings; ingredient linking in the editor; import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |

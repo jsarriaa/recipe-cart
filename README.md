@@ -7,8 +7,9 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: phase 0 (specification).** There is no app code yet. See the
-> [development phases](docs/SPEC.md#9-development-phases).
+> **Status: phase 1 (foundations).** The app shell, database, settings store and the domain core
+> (units, quantities, package fractions, costs) exist and are tested. No user features yet. See
+> the [development phases](docs/SPEC.md#9-development-phases).
 
 ## Features (planned)
 
@@ -51,21 +52,30 @@ version catalog · minSdk 26, target SDK 36.
 
 ## Development setup (Windows)
 
-- **JDK 21** for Gradle: Android Studio's bundled JBR (`C:\Program Files\Android\Android Studio\jbr`).
+- **JDK 21** for Gradle: the Adoptium JDK (`C:\Program Files\Eclipse Adoptium\jdk-21.0.1.12-hotspot`).
   Set `JAVA_HOME` to it, because the `java` on PATH is JDK 11.
-- **Android SDK** in `%LOCALAPPDATA%\Android\Sdk`, with platform 36 installed.
+- **Avast HTTPS scanning**: set `JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` so
+  Java trusts Avast's certificates when Gradle downloads dependencies.
+- **Android SDK** in `%LOCALAPPDATA%\Android\Sdk`, referenced from a gitignored `local.properties`.
 - **adb** from the SDK's `platform-tools` (not the old `C:\Android\adb.exe`).
 - **GitHub CLI** (`gh`) for pull requests.
 
 Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 
-Build commands (available from phase 1):
-
 ```bash
-./gradlew test                 # unit tests
-./gradlew lint                 # Android lint
-./gradlew :app:installDebug    # install the debug build on the connected phone
+./gradlew spotlessApply              # format Kotlin (ktlint)
+./gradlew spotlessCheck test lint    # what CI runs on every PR
+./gradlew :app:installDebug          # install the debug build on the connected phone
 ```
+
+### Modules
+
+| Module | Contents |
+|---|---|
+| `:app` | Compose UI, navigation, ViewModels, Hilt entry points |
+| `:core:domain` | Pure Kotlin business logic: units, quantities, package fractions, money, cost engine, settings model |
+| `:core:data` | Room database (schemas in `core/data/schemas/`), repositories, DataStore settings |
+| `build-logic/` | Gradle convention plugins |
 
 ## Contributing workflow
 
