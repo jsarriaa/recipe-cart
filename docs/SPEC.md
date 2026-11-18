@@ -110,7 +110,7 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 | Language | Kotlin 2.4 (K2), JVM target 17 | AGP 9 built-in Kotlin support |
 | UI | Jetpack Compose, Material 3, Navigation Compose with type-safe routes | Dynamic colour on Android 12+, with a green fallback palette |
 | DI | Hilt (KSP) | `hilt-core` in JVM provider modules |
-| DB | Room (KSP) with FTS4 for product search | Schemas exported to `core/data/schemas/` |
+| DB | Room (KSP); product search with `LIKE` over a normalised key | Schemas exported to `core/data/schemas/` |
 | Settings | DataStore Preferences | |
 | Network | Retrofit + OkHttp + kotlinx.serialization converter | One shared `OkHttpClient` with per-provider interceptors |
 | YAML | kaml (node API only, no serializers) | Only for recipe front matter. Pure Kotlin, so it runs on Android 8 |
@@ -160,8 +160,11 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   provider's food categories at the provider's rate limit, with a progress bar, and can be
   cancelled. Products are upserted into Room. Products missing from a full sync are marked
   `unavailable`, not deleted, so existing links do not break.
-- **Search** runs locally over the cached catalogue (Room FTS4, accent-insensitive,
-  prefix matching). It is instant and works offline.
+- **Search** runs locally over the cached catalogue: every word of the query must appear in
+  the product's `search_key` (name, brand and last category, normalised like § 5.4, so it is
+  accent-insensitive). Shorter names that start with the query rank first. It is instant and
+  works offline. FTS4 was dropped in phase 3a: its tokenizer cannot fold Spanish accents
+  without a custom ICU build, and a few thousand rows scan fast enough with `LIKE`.
 - **Price refresh** ("Actualizar precios") is on demand from a recipe, the shopping list, a
   product, or the catalogue. It refreshes only the products involved, at the rate limit.
 - **Caching and fallback**: the last known price and its `fetchedAt` are always kept. If a
@@ -595,8 +598,8 @@ Used by import and by "Vincular producto". It runs offline against the local cat
 2. **Candidates per active provider**, in this order:
    1. Links present in the imported file whose product exists in the cache.
    2. **Link memory** for the name key (most recently confirmed first).
-   3. FTS search with `match.query` (falling back to the name), top 30.
-3. **Score** for FTS candidates (0–100):
+   3. Catalogue search with `match.query` (falling back to the name), top 30.
+3. **Score** for search candidates (0–100):
    - Text (0–60): share of query tokens found in the product name (accent-insensitive, simple
      Spanish plural folding `-es`/`-s`), with a bonus when the tokens appear in order.
    - Package size (0–25): `25 × (1 − min(1, |ln(candidate / hint)| / ln 4))` when
@@ -624,7 +627,8 @@ A lot whose unit cannot be converted is listed but needs a manual amount.
 Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient` without the three
 `recipe` columns marked *(v2)*. Schema v2 (phase 2) adds them with a tested migration. The other
 tables arrive with later schema versions and tested migrations; `ingredient_link` comes with
-`product` in phase 3, so until then ingredients are stored without links. All ids are `TEXT`
+`product` in phase 3, so until then ingredients are stored without links. Schema v3 (phase 3a)
+adds `product` and `price_snapshot`; `ingredient_link` and `link_memory` follow in v4 (phase 3b). All ids are `TEXT`
 UUIDs except provider product keys.
 
 | Table | Key columns |
@@ -634,9 +638,8 @@ UUIDs except provider product keys.
 | `ingredient` | `id`, `recipe_id`, `position`, `group_label`, `name`, `name_key`, `quantity_milli`, `unit`, `note`, `optional`, `pantry_staple`, `unit_weight_g_milli`, `match_query`, `match_package`, `match_store_brand_ok` |
 | `ingredient_link` | `ingredient_id`, `provider_id`, `product_id`, `preferred`, `position` |
 | `link_memory` | `name_key`, `provider_id`, `product_id`, `last_used_at`, `use_count` |
-| `product` | `provider_id`, `product_id` (PK pair), `name`, `brand`, `brand_kind`, `packaging`, `net_quantity_milli`, `base_unit`, `unit_count`, `drained_milli`, `approx`, `price_cents`, `reference_price_cents`, `reference_unit`, `image_url`, `web_url`, `category_path`, `available`, `fetched_at`, `last_error` |
-| `product_fts` | FTS4 over `name`, `brand`, `category_path` (content = `product`) |
-| `price_snapshot` | `provider_id`, `product_id`, `price_cents`, `fetched_at` |
+| `product` *(v3)* | `provider_id`, `product_id` (PK pair), `name`, `search_key`, `brand`, `brand_kind`, `packaging`, `net_milli`, `base_unit`, `unit_count`, `unit_count_unit`, `drained_milli`, `approx`, `price_cents`, `reference_price_cents`, `reference_format`, `image_url`, `web_url`, `category_path`, `available`, `fetched_at` |
+| `price_snapshot` *(v3)* | `provider_id`, `product_id`, `fetched_at` (PK triple), `price_cents`; one row per new or changed price |
 | `pantry_lot` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `base_unit?`, `package_quantity_milli?`, `opened`, `opened_at`, `added_at`, `best_before`, `location`, `presence_only`, `use_soon_manual`, `use_soon_dismissed_at?`, `opened_shelf_life_days?` |
 | `shelf_life_memory` | `key` (provider product or name key), `opened_shelf_life_days` |
 | `shopping_item` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `needed_milli`, `base_unit`, `packages`, `checked`, `manual`, `provider_override` |
@@ -676,7 +679,7 @@ Manual products are `product` rows with `provider_id = 'manual'`.
 |---|---|---|
 | `:core:domain` | JUnit 5, kotlin.test | Units, quantities, display rounding, package fractions, cost engine, scaling, pantry planning and undo, shopping list building, matching scores, name normalisation, recipe parser/validator/serializer, round-trip and idempotence (property-style tests over generated recipes) |
 | `:provider:*` | JUnit 5, MockWebServer, JSON fixtures | DTO parsing of recorded responses, mapping to `ProviderProduct`, rate limiter (virtual time), retries, 403/429/5xx handling |
-| `:core:data` | Robolectric + Room in-memory, `MigrationTestHelper` | DAOs, FTS search, transactions, migrations N−1 → N, backup/restore |
+| `:core:data` | Robolectric + Room in-memory, `MigrationTestHelper` | DAOs, catalogue search, transactions, migrations N−1 → N, backup/restore |
 | `:app` | Compose UI tests (a few critical flows) and manual device checks | Import "Aceptar todo", cook confirmation, shopping list check-off |
 
 Fixtures recorded from real endpoints are trimmed to the fields we use and stored under
@@ -695,7 +698,7 @@ the phone.
 | **0 — Specification** (committed; push waits for the GitHub CLI) | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
 | **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
 | **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
-| **3 — Providers and catalogue** | `:provider:api`, rate limiter, Mercadona module, postal code → warehouse, catalogue sync, FTS search, product detail, price refresh with fallback, Manual provider, store-brand filter, settings; ingredient linking in the editor; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
+| **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b: Manual provider; ingredient linking in the editor; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |
 | **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |
 | **6 — Shopping list** | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text | AC6.* |

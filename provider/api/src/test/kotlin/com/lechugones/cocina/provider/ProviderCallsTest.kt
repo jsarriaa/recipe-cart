@@ -75,11 +75,22 @@ class ProviderCallsTest {
         }
 
     @Test
-    fun `429 reports Retry-After, other 4xx are plain errors`() =
+    fun `429 waits once for a short Retry-After, other 4xx are plain errors`() =
         runTest {
+            val slept = mutableListOf<Long>()
+            var calls = 0
+            assertEquals(
+                ProviderResult.Success("ok"),
+                providerCall(RateLimiter(0), sleep = { slept += it }) { if (++calls == 1) throw httpError(429, "30") else "ok" },
+            )
+            assertEquals(listOf(30_000L), slept)
             assertEquals(
                 ProviderResult.Failure(ProviderError.RateLimited(30)),
                 providerCall<Unit>(RateLimiter(0), sleep = {}) { throw httpError(429, "30") },
+            )
+            assertEquals(
+                ProviderResult.Failure(ProviderError.RateLimited(600)),
+                providerCall<Unit>(RateLimiter(0), sleep = { error("must not wait 10 minutes") }) { throw httpError(429, "600") },
             )
             assertEquals(
                 ProviderResult.Failure(ProviderError.Http(404)),

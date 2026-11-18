@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- HTTPS only. Provider hosts are documented in docs/providers/. -->
+<!--
+    HTTPS only. The only hosts the app talks to are documented in docs/providers/:
+    tienda.mercadona.es (API) and prod-mercadona.imgix.net (images).
+-->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
 </network-security-config>
