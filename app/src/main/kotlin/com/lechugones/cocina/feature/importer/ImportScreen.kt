@@ -1,5 +1,6 @@
 package com.lechugones.cocina.feature.importer
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -63,10 +64,15 @@ fun ImportScreen(
         }
 
     val preview = state as? ImportUiState.Preview
+    val suggestions = state as? ImportUiState.Suggestions
+    BackHandler(enabled = suggestions != null) { viewModel.backToPreview() }
     ScreenScaffold(
-        title = stringResource(R.string.import_title),
-        onBack = onBack,
+        title = stringResource(if (suggestions != null) R.string.import_match_title else R.string.import_title),
+        onBack = if (suggestions != null) viewModel::backToPreview else onBack,
         bottomBar = {
+            if (suggestions != null) {
+                SuggestionsActions(suggestions, onAcceptAll = viewModel::acceptAll, onWithoutLinks = viewModel::importWithoutLinks)
+            }
             if (preview != null) {
                 val count = preview.rows.count { it.willImport }
                 Button(
@@ -89,6 +95,14 @@ fun ImportScreen(
 
                 ImportUiState.Saving -> {
                     Progress(stringResource(R.string.import_saving))
+                }
+
+                ImportUiState.Matching -> {
+                    Progress(stringResource(R.string.import_matching))
+                }
+
+                is ImportUiState.Suggestions -> {
+                    SuggestionsList(current, onChange = viewModel::openChooser, onClear = { viewModel.select(it, null) })
                 }
 
                 ImportUiState.ReadFailed -> {
@@ -126,6 +140,12 @@ fun ImportScreen(
                     PreviewList(current, viewModel)
                 }
             }
+        }
+    }
+
+    suggestions?.choosing?.let { index ->
+        suggestions.items.getOrNull(index)?.let { item ->
+            SuggestionChooser(item, onPick = { viewModel.select(index, it) }, onDismiss = { viewModel.openChooser(null) })
         }
     }
 

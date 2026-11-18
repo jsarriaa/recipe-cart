@@ -101,6 +101,20 @@ interface ProductDao {
         limit: Int,
     ): Flow<List<ProductEntity>>
 
+    /** One-shot candidates for matching: rows of [providerId] whose key contains [term]. */
+    @Query("SELECT * FROM product WHERE provider_id = :providerId AND search_key LIKE '%' || :term || '%' LIMIT :limit")
+    suspend fun candidates(
+        providerId: String,
+        term: String,
+        limit: Int,
+    ): List<ProductEntity>
+
+    @Query("SELECT * FROM product WHERE provider_id = :providerId AND product_id IN (:productIds)")
+    suspend fun getMany(
+        providerId: String,
+        productIds: List<String>,
+    ): List<ProductEntity>
+
     @Query("SELECT COUNT(*) FROM product WHERE provider_id = :providerId AND available = 1")
     fun observeCount(providerId: String): Flow<Int>
 

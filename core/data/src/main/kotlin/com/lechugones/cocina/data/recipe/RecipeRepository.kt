@@ -1,12 +1,15 @@
 package com.lechugones.cocina.data.recipe
 
 import com.lechugones.cocina.data.db.IngredientEntity
+import com.lechugones.cocina.data.db.IngredientLinkEntity
 import com.lechugones.cocina.data.db.RecipeDao
 import com.lechugones.cocina.data.db.RecipeEntity
 import com.lechugones.cocina.data.db.RecipeTagEntity
+import com.lechugones.cocina.domain.product.ProductKey
 import com.lechugones.cocina.domain.quantity.Amount
 import com.lechugones.cocina.domain.quantity.PackageSize
 import com.lechugones.cocina.domain.recipe.Ingredient
+import com.lechugones.cocina.domain.recipe.IngredientLink
 import com.lechugones.cocina.domain.recipe.MatchHints
 import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
@@ -40,10 +43,7 @@ interface RecipeRepository {
     suspend fun count(): Int
 }
 
-/**
- * Room-backed [RecipeRepository]. Ingredient product links are not stored yet: they arrive with
- * the product tables in phase 3, so [get] returns ingredients without links.
- */
+/** Room-backed [RecipeRepository], including ingredient product links (schema v4). */
 class RoomRecipeRepository
     @Inject
     constructor(
@@ -66,9 +66,21 @@ class RoomRecipeRepository
 
         override suspend fun get(id: String): Recipe? {
             val recipe = dao.getRecipe(id) ?: return null
+            val links = dao.getLinks(id).groupBy { it.ingredientId }
             return recipe.toDomain(
                 tags = dao.getTags(id),
-                ingredients = dao.getIngredients(id).map { it.toDomain() },
+                ingredients =
+                    dao.getIngredients(id).map { entity ->
+                        entity.toDomain().copy(
+                            links =
+                                links[entity.id].orEmpty().map {
+                                    IngredientLink(
+                                        ProductKey(it.providerId, it.productId),
+                                        it.preferred,
+                                    )
+                                },
+                        )
+                    },
             )
         }
 
@@ -79,6 +91,14 @@ class RoomRecipeRepository
                 recipe = recipe.toEntity(),
                 tags = recipe.tags.distinct().mapIndexed { index, tag -> RecipeTagEntity(recipe.id, tag, index) },
                 ingredients = recipe.ingredients.mapIndexed { index, ingredient -> ingredient.toEntity(recipe.id, index) },
+                links =
+                    recipe.ingredients.flatMap { ingredient ->
+                        ingredient.links
+                            .distinctBy { it.product }
+                            .mapIndexed { index, link ->
+                                IngredientLinkEntity(ingredient.id, link.product.providerId, link.product.productId, link.preferred, index)
+                            }
+                    },
             )
         }
 

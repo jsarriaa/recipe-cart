@@ -1,6 +1,9 @@
 package com.lechugones.cocina.data.recipe
 
+import com.lechugones.cocina.data.catalogue.ProductLinker
 import com.lechugones.cocina.data.image.RecipeImageStore
+import com.lechugones.cocina.domain.product.ProductKey
+import com.lechugones.cocina.domain.recipe.IngredientLink
 import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
 import com.lechugones.cocina.domain.recipe.RecipeSummary
@@ -36,6 +39,7 @@ class RecipeLibrary
         private val repository: RecipeRepository,
         private val images: RecipeImageStore,
         private val clock: Clock,
+        private val linker: ProductLinker,
     ) {
         fun observeSummaries(): Flow<List<RecipeSummary>> = repository.observeSummaries()
 
@@ -60,7 +64,35 @@ class RecipeLibrary
                 )
             repository.save(toSave)
             if (original?.imagePath != null && original.imagePath != toSave.imagePath) images.delete(original.imagePath)
+            rememberNewLinks(toSave, original)
             return toSave
+        }
+
+        /**
+         * Replaces the product links of one ingredient (the "Vincular producto" sheet). Saved like
+         * an edit, so an imported recipe is then protected from silent re-import.
+         */
+        suspend fun setLinks(
+            recipeId: String,
+            ingredientId: String,
+            links: List<IngredientLink>,
+        ): Recipe? {
+            val original = repository.get(recipeId) ?: return null
+            if (original.ingredients.none { it.id == ingredientId }) return original
+            val edited =
+                original.copy(ingredients = original.ingredients.map { if (it.id == ingredientId) it.copy(links = links) else it })
+            return saveFromEditor(edited, original)
+        }
+
+        private suspend fun rememberNewLinks(
+            saved: Recipe,
+            original: Recipe?,
+        ) {
+            val before = original?.ingredients?.associate { it.id to it.links.toSet() }.orEmpty()
+            for (ingredient in saved.ingredients) {
+                val added = ingredient.links.filter { it !in before[ingredient.id].orEmpty() }
+                if (added.isNotEmpty()) linker.remember(ingredient.nameKey, added)
+            }
         }
 
         /** Deletes photo files no recipe references (left over by an editor that never saved). */
@@ -96,8 +128,19 @@ class RecipeLibrary
             return copy
         }
 
-        /** Preview candidates for a read pack. Links resolve against the catalogue from phase 3. */
-        suspend fun planImport(pack: PackReadResult): List<ImportCandidate> = ImportPlanner.plan(pack, repository.existing()) { false }
+        /** Preview candidates for a read pack. File links are kept only when the product is cached (`W07`). */
+        suspend fun planImport(pack: PackReadResult): List<ImportCandidate> {
+            val linked =
+                pack.documents
+                    .flatMap {
+                        it.parsed.draft
+                            ?.ingredients
+                            .orEmpty()
+                    }.flatMap { it.links }
+                    .map { IngredientLink(ProductKey(it.provider, it.productId)) }
+            val cached = linker.productsFor(linked).keys
+            return ImportPlanner.plan(pack, repository.existing()) { ProductKey(it.provider, it.productId) in cached }
+        }
 
         /** Imports [choices] (candidate → duplicate choice) and stores their photos. */
         suspend fun import(
@@ -123,6 +166,7 @@ class RecipeLibrary
                 }
                 val previous = repository.get(recipe.id)
                 repository.save(recipe)
+                rememberNewLinks(recipe, null)
                 if (previous?.imagePath != null && previous.imagePath != recipe.imagePath) images.delete(previous.imagePath)
                 imported += recipe.id
             }
@@ -134,7 +178,8 @@ class RecipeLibrary
             val recipes = if (ids == null) repository.getAll() else ids.mapNotNull { repository.get(it) }
             return recipes.map { recipe ->
                 val photo = recipe.imagePath?.let { images.readBytes(it) }
-                ExportItem(RecipeDrafts.fromRecipe(recipe), photo?.let { ExportImage(it, "jpg") })
+                val names = linker.productsFor(recipe.ingredients.flatMap { it.links }).mapValues { it.value.product.name }
+                ExportItem(RecipeDrafts.fromRecipe(recipe, linkNames = names), photo?.let { ExportImage(it, "jpg") })
             }
         }
 

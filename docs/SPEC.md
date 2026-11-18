@@ -155,7 +155,10 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
     Implemented only if the feasibility check in [providers/dia.md](providers/dia.md) passes.
   - **Manual**: built in, always available. The user types a product (name, brand, store-brand
     flag, package size, price, shop name). This covers shops without an API and providers that
-    are down or refuse us.
+    are down or refuse us. Manual products are stored in the catalogue table with provider id
+    `manual` (the shop name as their category), are always searchable whatever supermarkets are
+    active, and have no price refresh. Since phase 3b they are added from "Vincular producto"
+    ("Añadir un producto a mano").
 - **Catalogue sync** ("Actualizar catálogo") is on demand and per provider. It downloads the
   provider's food categories at the provider's rate limit, with a progress bar, and can be
   cancelled. Products are upserted into Room. Products missing from a full sync are marked
@@ -215,9 +218,13 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   `pizca` and `al_gusto`. The scaled view drives costs, "Lo he cocinado" and "Añadir a la
   lista". It is not saved unless the user picks "Guardar raciones" or "Guardar como receta
   nueva".
-- **Linking**: from an ingredient, "Vincular producto" opens a catalogue search pre-filled
-  with the match query (or the name). Picking a product stores the link and updates the
-  **link memory** for the ingredient's normalised name (§ 5.4).
+- **Linking**: tapping an ingredient in the recipe detail opens "Vincular producto": the
+  current link (with "Quitar vínculo"), suggestions from link memory and the cached catalogue
+  (§ 5.4, primary supermarket), a search box, and "Añadir un producto a mano". Picking a product
+  stores it as the preferred link of its provider, first in the list, so it is the product the
+  recipe shows; links to other providers stay. It updates the **link memory** for the
+  ingredient's normalised name (§ 5.4). A link change counts as an edit (re-import protection,
+  § 4.3 step 4). The editor keeps links as they are.
 - **Pantry staples**: shown in their own collapsed section ("Básicos de despensa"). By default
   they are left out of the dish cost (setting "Incluir básicos en el coste") and out of the
   shopping list unless the pantry knows they are missing (§ 4.6).
@@ -259,16 +266,17 @@ The exact file format is in [RECIPE_FORMAT.md](RECIPE_FORMAT.md).
    existing recipe was **edited after import**, the default is "Omitir" (shown as "Mantener la
    mía"), and "Reemplazar" asks for confirmation: "Perderás los cambios que hiciste en la app".
 5. **Product matching** (§ 5.4) for every ingredient of the selected recipes, against the local
-   catalogue of active providers. The screen lists ingredients with the suggested product per
-   provider, package size and price. Each can be changed ("Ver más"), removed, or left unlinked.
+   catalogue of the primary supermarket (one provider until Día lands in phase 7). The screen
+   ("Productos") lists ingredients with the suggested product, its picture and price. Each can be changed ("Ver más"), removed, or left unlinked.
    **"Aceptar todo"** confirms every pre-selected suggestion in one tap. Links included in the
    file (`links:`) and remembered links are pre-selected first.
 6. **Save** in one Room transaction. Images are copied to app-private storage and downscaled to
    at most 1600 px on the long side. Link memory is updated with the confirmed links.
 7. **Summary**: "3 recetas importadas, 1 omitida" with a link to each.
 
-If no provider catalogue is synced yet, step 5 offers "Actualizar catálogo" or "Importar sin
-vincular".
+If no provider catalogue is synced yet, step 5 explains that there is nothing to suggest and
+offers "Importar sin vincular"; products can be linked later from each recipe. "Importar sin
+vincular" is also available when suggestions exist; links that came in the file are kept.
 
 #### Export
 
@@ -626,9 +634,10 @@ A lot whose unit cannot be converted is listed but needs a manual amount.
 
 Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient` without the three
 `recipe` columns marked *(v2)*. Schema v2 (phase 2) adds them with a tested migration. The other
-tables arrive with later schema versions and tested migrations; `ingredient_link` comes with
-`product` in phase 3, so until then ingredients are stored without links. Schema v3 (phase 3a)
-adds `product` and `price_snapshot`; `ingredient_link` and `link_memory` follow in v4 (phase 3b). All ids are `TEXT`
+tables arrive with later schema versions and tested migrations. Schema v3 (phase 3a) adds
+`product` and `price_snapshot`; schema v4 (phase 3b) adds `ingredient_link` (cascades with its
+ingredient, no foreign key to `product` so a link survives an uncached product) and
+`link_memory`. All ids are `TEXT`
 UUIDs except provider product keys.
 
 | Table | Key columns |
@@ -636,8 +645,8 @@ UUIDs except provider product keys.
 | `recipe` | `id`, `uid`, `title`, `description`, `servings`, `prep_minutes`, `cook_minutes`, `image_path`, `source`, `body_md`, `created_at`, `updated_at`, `origin` *(v2)*, `imported_at` *(v2)*, `edited_after_import` *(v2)* |
 | `recipe_tag` | `recipe_id`, `tag` |
 | `ingredient` | `id`, `recipe_id`, `position`, `group_label`, `name`, `name_key`, `quantity_milli`, `unit`, `note`, `optional`, `pantry_staple`, `unit_weight_g_milli`, `match_query`, `match_package`, `match_store_brand_ok` |
-| `ingredient_link` | `ingredient_id`, `provider_id`, `product_id`, `preferred`, `position` |
-| `link_memory` | `name_key`, `provider_id`, `product_id`, `last_used_at`, `use_count` |
+| `ingredient_link` *(v4)* | `ingredient_id`, `provider_id`, `product_id` (PK triple), `preferred`, `position` |
+| `link_memory` *(v4)* | `name_key`, `provider_id`, `product_id` (PK triple), `last_used_at`, `use_count` |
 | `product` *(v3)* | `provider_id`, `product_id` (PK pair), `name`, `search_key`, `brand`, `brand_kind`, `packaging`, `net_milli`, `base_unit`, `unit_count`, `unit_count_unit`, `drained_milli`, `approx`, `price_cents`, `reference_price_cents`, `reference_format`, `image_url`, `web_url`, `category_path`, `available`, `fetched_at` |
 | `price_snapshot` *(v3)* | `provider_id`, `product_id`, `fetched_at` (PK triple), `price_cents`; one row per new or changed price |
 | `pantry_lot` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `base_unit?`, `package_quantity_milli?`, `opened`, `opened_at`, `added_at`, `best_before`, `location`, `presence_only`, `use_soon_manual`, `use_soon_dismissed_at?`, `opened_shelf_life_days?` |
@@ -698,7 +707,7 @@ the phone.
 | **0 — Specification** (committed; push waits for the GitHub CLI) | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
 | **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
 | **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
-| **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b: Manual provider; ingredient linking in the editor; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
+| **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b (schema v4): Manual provider; ingredient linking from the recipe detail; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |
 | **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |
 | **6 — Shopping list** | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text | AC6.* |

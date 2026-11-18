@@ -109,4 +109,62 @@ class DatabaseSchemaTest {
                 database.close()
             }
         }
+
+    @Test
+    fun `v3 recipes and catalogue survive the migration to v4, and links can then be stored`() =
+        runTest {
+            helper.createDatabase(testDb, 3).use { db ->
+                db.execSQL(
+                    "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, image_path, source, " +
+                        "body_md, created_at, updated_at, origin, imported_at, edited_after_import) " +
+                        "VALUES ('r1', 'u1', 'Tacos', NULL, 2, NULL, NULL, NULL, NULL, '', 10, 20, 'created', NULL, 0)",
+                )
+                db.execSQL(
+                    "INSERT INTO ingredient (id, recipe_id, position, group_label, name, name_key, quantity_milli, unit, " +
+                        "note, optional, pantry_staple, unit_weight_g_milli, match_query, match_package, match_store_brand_ok) " +
+                        "VALUES ('i1', 'r1', 0, NULL, 'tortillas', 'tortillas', 4000, 'ud', NULL, 0, 0, NULL, 'tortillas trigo', NULL, 1)",
+                )
+                db.execSQL(
+                    "INSERT INTO product (provider_id, product_id, name, search_key, brand, brand_kind, packaging, net_milli, " +
+                        "base_unit, unit_count, unit_count_unit, drained_milli, approx, price_cents, reference_price_cents, " +
+                        "reference_format, image_url, web_url, category_path, available, fetched_at) VALUES ('mercadona', '80870', " +
+                        "'Maxi tortillas', 'maxi tortillas', NULL, 'STORE', NULL, 360000, 'g', 6, 'ud', NULL, 0, 150, NULL, NULL, " +
+                        "NULL, NULL, '', 1, 5)",
+                )
+            }
+            helper.runMigrationsAndValidate(testDb, 4, true, CocinaMigrations.MIGRATION_3_4).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), CocinaDatabase::class.java, testDb)
+                    .addMigrations(*CocinaMigrations.ALL)
+                    .allowMainThreadQueries()
+                    .build()
+            try {
+                val repository =
+                    com.lechugones.cocina.data.recipe
+                        .RoomRecipeRepository(database.recipeDao())
+                val recipe = checkNotNull(repository.get("r1"))
+                assertEquals("tortillas", recipe.ingredients.single().name)
+                assertEquals(1, database.productDao().observeCount("mercadona").first())
+
+                val link =
+                    com.lechugones.cocina.domain.recipe.IngredientLink(
+                        com.lechugones.cocina.domain.product
+                            .ProductKey("mercadona", "80870"),
+                        preferred = true,
+                    )
+                repository.save(recipe.copy(ingredients = recipe.ingredients.map { it.copy(links = listOf(link)) }))
+                assertEquals(
+                    listOf(link),
+                    repository
+                        .get("r1")
+                        ?.ingredients
+                        ?.single()
+                        ?.links,
+                )
+            } finally {
+                database.close()
+            }
+        }
 }

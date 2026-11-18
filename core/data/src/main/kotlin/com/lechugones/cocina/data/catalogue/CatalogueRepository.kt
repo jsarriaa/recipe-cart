@@ -5,6 +5,9 @@ import com.lechugones.cocina.data.db.ProductDao
 import com.lechugones.cocina.data.db.ProductEntity
 import com.lechugones.cocina.data.di.ApplicationScope
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.domain.product.ManualProductForm
+import com.lechugones.cocina.domain.product.ManualProductResult
+import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.product.ProductKey
 import com.lechugones.cocina.domain.recipe.NameKey
 import com.lechugones.cocina.provider.ProviderError
@@ -32,6 +35,7 @@ import kotlinx.coroutines.sync.withLock
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -131,10 +135,11 @@ class CatalogueRepository
                     .distinct()
             if (words.isEmpty()) return flowOf(emptyList())
             val first = words.maxBy { it.length }
-            val activeIds = providers.map { it.id }.toSet()
+            // Manual products are always searchable: they are the fallback for every shop.
+            val installed = providers.map { it.id }.toSet()
             val key = NameKey.of(query)
             return settings.settings
-                .map { it.activeProviders intersect activeIds }
+                .map { (it.activeProviders intersect installed) + ManualProducts.PROVIDER_ID }
                 .distinctUntilChanged()
                 .flatMapLatest { ids -> dao.search(ids, first, storeBrandOnly, CANDIDATES) }
                 .map { rows -> rank(rows, words, key, limit) }
@@ -291,6 +296,15 @@ class CatalogueRepository
                     }
                 }
             }
+        }
+
+        /** Saves a product typed by the user (built-in manual provider). Its shop is kept as its category. */
+        suspend fun saveManual(form: ManualProductForm): ManualProductResult {
+            val result = ManualProducts.build(UUID.randomUUID().toString(), form, Instant.now(clock))
+            if (result is ManualProductResult.Valid) {
+                store(listOf(ProviderProduct(result.product, categoryPath = listOfNotNull(result.shop))))
+            }
+            return result
         }
 
         /** Upserts products and records a price snapshot for each new or changed price. */

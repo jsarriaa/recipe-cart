@@ -8,6 +8,8 @@ import com.lechugones.cocina.data.settings.DataStoreSettingsRepository
 import com.lechugones.cocina.data.testing.InMemoryPreferencesDataStore
 import com.lechugones.cocina.domain.money.Money
 import com.lechugones.cocina.domain.product.BrandKind
+import com.lechugones.cocina.domain.product.ManualProductForm
+import com.lechugones.cocina.domain.product.ManualProductResult
 import com.lechugones.cocina.domain.product.Product
 import com.lechugones.cocina.domain.product.ProductKey
 import com.lechugones.cocina.domain.quantity.Amount
@@ -183,6 +185,22 @@ class CatalogueRepositoryTest {
             assertEquals(ProviderResult.Success(null), repository.refreshProduct(ProductKey(FakeProvider.ID, "orlando")))
             assertEquals(false, dao.get(FakeProvider.ID, "orlando")?.available)
             assertNull(dao.get(FakeProvider.ID, "gone"))
+        }
+
+    @Test
+    fun `manual products are saved, searchable and keep their shop`() =
+        runTest {
+            useFakeProvider()
+            val repository = repository()
+            val saved =
+                assertIs<ManualProductResult.Valid>(
+                    repository.saveManual(ManualProductForm("Queso de cabra artesano", size = "250 g", price = "4,90", shop = "Mercat")),
+                )
+            val found = repository.search("queso cabra", storeBrandOnly = false).first().single()
+            assertEquals(saved.product.key, found.product.key)
+            assertEquals(listOf("Mercat"), found.categoryPath)
+            assertEquals(Money(490), found.product.price)
+            assertIs<ManualProductResult.Invalid>(repository.saveManual(ManualProductForm("", size = "")))
         }
 
     private class MutableClock(
