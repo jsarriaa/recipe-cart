@@ -179,9 +179,16 @@ Use one dedicated folder, and remove only files you put there:
 ```
 
 To test the share sheet, open the pushed file in the phone's Files app and share it to
-"Cocina (debug)". An `am start -a android.intent.action.SEND` example with the exact import
-activity name is added here in phase 2. Multi-line text is awkward to pass through `am`, so file
-sharing is the main test path.
+"Importar receta" (the share target label of Cocina (debug)). `MainActivity` receives shares
+(`singleTask`, `onNewIntent`), so a text share can also be simulated, though multi-line recipes are
+awkward to pass through `am`:
+
+```bash
+"$ADB" shell am start -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT "hola" -n com.lechugones.cocina.debug/com.lechugones.cocina.MainActivity
+```
+
+(That text is not a recipe, so the import screen reports a missing front matter block, which is
+expected.)
 
 ## Debug vs release data
 

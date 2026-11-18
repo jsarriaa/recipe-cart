@@ -1,13 +1,16 @@
 package com.lechugones.cocina.data.db
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
-// Schema v1 (phase 1). Column names follow docs/SPEC.md § 6. Any change needs a new schema
-// version and a tested migration (CLAUDE.md, hard rule 2).
+// Schema v2 (phase 2). Column names follow docs/SPEC.md § 6. Any change needs a new schema
+// version and a tested migration (CLAUDE.md, hard rule 2). Columns added after v1 declare the
+// same DEFAULT as their migration, so Room's schema validation matches.
 
 @Entity(
     tableName = "recipe",
@@ -28,6 +31,12 @@ data class RecipeEntity(
     @ColumnInfo(name = "created_at") val createdAt: Long,
     /** Epoch milliseconds. */
     @ColumnInfo(name = "updated_at") val updatedAt: Long,
+    /** [com.lechugones.cocina.domain.recipe.RecipeOrigin.code]. Added in v2. */
+    @ColumnInfo(name = "origin", defaultValue = "'created'") val origin: String,
+    /** Epoch milliseconds. Added in v2. */
+    @ColumnInfo(name = "imported_at") val importedAt: Long?,
+    /** Added in v2. */
+    @ColumnInfo(name = "edited_after_import", defaultValue = "0") val editedAfterImport: Boolean,
 )
 
 @Entity(
@@ -46,6 +55,8 @@ data class RecipeEntity(
 data class RecipeTagEntity(
     @ColumnInfo(name = "recipe_id") val recipeId: String,
     val tag: String,
+    /** Order of the tag in the recipe. Added in v2. */
+    @ColumnInfo(name = "position", defaultValue = "0") val position: Int,
 )
 
 @Entity(
@@ -86,4 +97,24 @@ data class RecipeSummaryRow(
     val id: String,
     val title: String,
     val servings: Int,
+    val imagePath: String?,
+    val createdAt: Long,
+)
+
+/** A recipe list row with its tags and ingredient name keys, loaded in one transaction. */
+data class RecipeSummaryWithDetails(
+    @Embedded val row: RecipeSummaryRow,
+    @Relation(parentColumn = "id", entityColumn = "recipe_id", entity = RecipeTagEntity::class)
+    val tags: List<RecipeTagEntity>,
+    @Relation(parentColumn = "id", entityColumn = "recipe_id", entity = IngredientEntity::class, projection = ["name_key"])
+    val ingredientKeys: List<String>,
+)
+
+/** What the importer needs to detect duplicates. */
+data class ExistingRecipeRow(
+    val id: String,
+    val uid: String,
+    val title: String,
+    val createdAt: Long,
+    val editedAfterImport: Boolean,
 )

@@ -3,6 +3,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
 
     <string name="app_name">Cocina para Lechugones</string>
+    <string name="share_target_label">Importar receta</string>
 
     <!-- Navigation -->
     <string name="nav_recipes">Recetas</string>
@@ -10,33 +11,301 @@
     <string name="nav_shopping">Compra</string>
     <string name="nav_catalogue">Catálogo</string>
     <string name="settings_title">Ajustes</string>
+
+    <!-- Common actions -->
     <string name="action_open_settings">Abrir ajustes</string>
     <string name="action_back">Volver</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_duplicate">Duplicar</string>
+    <string name="action_export">Exportar</string>
+    <string name="action_more">Más opciones</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_close_search">Cerrar búsqueda</string>
+    <string name="action_sort">Ordenar</string>
+    <string name="action_discard">Descartar</string>
+    <string name="action_keep_editing">Seguir editando</string>
+    <string name="action_move_up">Subir</string>
+    <string name="action_move_down">Bajar</string>
 
-    <!-- Recipes -->
+    <!-- Recipe list -->
     <string name="recipes_loading">Cargando recetas</string>
     <string name="recipes_empty_title">Aún no tienes recetas</string>
-    <string name="recipes_empty_body">Muy pronto podrás crearlas aquí o importarlas desde un pack de recetas.</string>
+    <string name="recipes_empty_body">Crea una con el botón + o importa un pack de recetas desde el menú.</string>
+    <string name="recipes_new">Nueva receta</string>
+    <string name="recipes_import">Importar recetas</string>
+    <string name="recipes_export_all">Exportar todas</string>
+    <string name="recipes_search_hint">Buscar por nombre, ingrediente o etiqueta</string>
+    <string name="recipes_sort_name">Nombre</string>
+    <string name="recipes_sort_newest">Más recientes</string>
+    <string name="recipes_no_results">No hay recetas que coincidan</string>
     <plurals name="recipe_servings">
         <item quantity="one">%d ración</item>
         <item quantity="many">%d raciones</item>
         <item quantity="other">%d raciones</item>
     </plurals>
+    <plurals name="recipe_ingredient_count">
+        <item quantity="one">%d ingrediente</item>
+        <item quantity="many">%d ingredientes</item>
+        <item quantity="other">%d ingredientes</item>
+    </plurals>
 
-    <!-- Pantry -->
+    <!-- Recipe detail -->
+    <string name="recipe_not_found">Esta receta ya no existe.</string>
+    <string name="recipe_prep_minutes">Preparación: %1$d min</string>
+    <string name="recipe_cook_minutes">Cocción: %1$d min</string>
+    <string name="recipe_servings_label">Raciones</string>
+    <string name="recipe_servings_original">Receta original: %1$d</string>
+    <string name="recipe_servings_reset">Restablecer</string>
+    <string name="recipe_servings_decrease">Menos raciones</string>
+    <string name="recipe_servings_increase">Más raciones</string>
+    <string name="recipe_ingredients">Ingredientes</string>
+    <string name="recipe_staples">Básicos de despensa (%1$d)</string>
+    <string name="recipe_optional">opcional</string>
+    <string name="recipe_steps_empty">Esta receta todavía no tiene pasos.</string>
+    <string name="recipe_imported_on">Importada el %1$s</string>
+    <string name="recipe_imported_edited">Importada el %1$s · modificada en la app</string>
+    <string name="recipe_delete_title">¿Eliminar la receta?</string>
+    <string name="recipe_delete_body">Se eliminará «%1$s» y su foto. No se puede deshacer.</string>
+    <string name="recipe_copy_title">%1$s (copia)</string>
+    <string name="recipe_photo_description">Foto de la receta</string>
+
+    <!-- Recipe editor -->
+    <string name="editor_new_title">Nueva receta</string>
+    <string name="editor_edit_title">Editar receta</string>
+    <string name="editor_field_title">Título</string>
+    <string name="editor_field_description">Descripción</string>
+    <string name="editor_field_servings">Raciones</string>
+    <string name="editor_field_prep">Preparación (min)</string>
+    <string name="editor_field_cook">Cocción (min)</string>
+    <string name="editor_field_tags">Etiquetas</string>
+    <string name="editor_field_tags_help">Separadas por comas</string>
+    <string name="editor_field_source">Fuente</string>
+    <string name="editor_field_body">Pasos (Markdown)</string>
+    <string name="editor_body_template">## Preparación\n\n1. </string>
+    <string name="editor_preview">Vista previa</string>
+    <string name="editor_write">Escribir</string>
+    <string name="editor_photo_gallery">Galería</string>
+    <string name="editor_photo_camera">Cámara</string>
+    <string name="editor_photo_remove">Quitar foto</string>
+    <string name="editor_photo_error">No se pudo usar esa imagen.</string>
+    <string name="editor_ingredients">Ingredientes</string>
+    <string name="editor_add_ingredient">Añadir ingrediente</string>
+    <string name="editor_no_ingredients">Añade al menos un ingrediente.</string>
+    <string name="editor_discard_title">¿Descartar los cambios?</string>
+    <string name="editor_discard_body">Hay cambios sin guardar.</string>
+    <string name="editor_fix_errors">Revisa los campos marcados.</string>
+    <string name="editor_save_error">No se pudo guardar la receta.</string>
+
+    <!-- Ingredient sheet -->
+    <string name="ingredient_new">Nuevo ingrediente</string>
+    <string name="ingredient_edit">Editar ingrediente</string>
+    <string name="ingredient_name">Nombre genérico</string>
+    <string name="ingredient_name_help">Por ejemplo: contramuslo de pollo deshuesado</string>
+    <string name="ingredient_quantity">Cantidad</string>
+    <!-- Shows what to type, so plain digits rather than the ½ character. -->
+    <string name="ingredient_quantity_help" tools:ignore="TypographyFractions">Admite 1/2, 1 1/2 o 1,5</string>
+    <string name="ingredient_unit">Unidad</string>
+    <string name="ingredient_unit_weight">Gramos por unidad</string>
+    <string name="ingredient_unit_weight_help">Para unidades y cucharadas (opcional)</string>
+    <string name="ingredient_note">Nota</string>
+    <string name="ingredient_note_help">Por ejemplo: en tiras</string>
+    <string name="ingredient_group">Grupo</string>
+    <string name="ingredient_group_help">Por ejemplo: Para la salsa</string>
+    <string name="ingredient_optional">Opcional</string>
+    <string name="ingredient_pantry">Básico de despensa</string>
+    <string name="ingredient_match_title">Pistas para buscar el producto</string>
+    <string name="ingredient_match_query">Búsqueda en el súper</string>
+    <string name="ingredient_match_package">Envase típico</string>
+    <string name="ingredient_match_package_help">Por ejemplo: 500 g o 4 x 125 g</string>
+    <string name="ingredient_match_store_brand">Vale marca blanca</string>
+    <string name="ingredient_apply">Aceptar</string>
+
+    <!-- Units: symbols, and singular/plural words for display -->
+    <string name="unit_g">g</string>
+    <string name="unit_kg">kg</string>
+    <string name="unit_ml">ml</string>
+    <string name="unit_cl">cl</string>
+    <string name="unit_l">l</string>
+    <string name="unit_ud">ud</string>
+    <string name="unit_cdta_one">cucharadita</string>
+    <string name="unit_cdta_other">cucharaditas</string>
+    <string name="unit_cda_one">cucharada</string>
+    <string name="unit_cda_other">cucharadas</string>
+    <string name="unit_taza_one">taza</string>
+    <string name="unit_taza_other">tazas</string>
+    <string name="unit_diente_one">diente</string>
+    <string name="unit_diente_other">dientes</string>
+    <string name="unit_loncha_one">loncha</string>
+    <string name="unit_loncha_other">lonchas</string>
+    <string name="unit_rebanada_one">rebanada</string>
+    <string name="unit_rebanada_other">rebanadas</string>
+    <string name="unit_hoja_one">hoja</string>
+    <string name="unit_hoja_other">hojas</string>
+    <string name="unit_ramita_one">ramita</string>
+    <string name="unit_ramita_other">ramitas</string>
+    <string name="unit_pizca_one">pizca</string>
+    <string name="unit_pizca_other">pizcas</string>
+    <string name="unit_al_gusto">al gusto</string>
+    <!-- Unit picker names -->
+    <string name="unit_name_g">gramos</string>
+    <string name="unit_name_kg">kilos</string>
+    <string name="unit_name_ml">mililitros</string>
+    <string name="unit_name_cl">centilitros</string>
+    <string name="unit_name_l">litros</string>
+    <string name="unit_name_cdta">cucharadita (5 ml)</string>
+    <string name="unit_name_cda">cucharada (15 ml)</string>
+    <string name="unit_name_taza">taza (250 ml)</string>
+    <string name="unit_name_ud">unidades</string>
+    <string name="unit_name_diente">dientes</string>
+    <string name="unit_name_loncha">lonchas</string>
+    <string name="unit_name_rebanada">rebanadas</string>
+    <string name="unit_name_hoja">hojas</string>
+    <string name="unit_name_ramita">ramitas</string>
+    <string name="unit_name_pizca">pizca</string>
+    <string name="unit_name_al_gusto">al gusto</string>
+
+    <!-- Import -->
+    <string name="import_title">Importar recetas</string>
+    <string name="import_pick">Elegir archivos</string>
+    <string name="import_idle_body">Elige un archivo .md o un pack .zip, o comparte uno desde otra app con «Importar receta».</string>
+    <string name="import_loading">Leyendo el pack…</string>
+    <string name="import_read_error">No se pudo leer el archivo.</string>
+    <string name="import_rejected_title">No se puede importar</string>
+    <string name="import_backup_title">Esto es una copia de seguridad</string>
+    <string name="import_backup_body">Para recuperarla, ve a Ajustes › Copia de seguridad › Restaurar copia.</string>
+    <string name="import_go_settings">Ir a Ajustes</string>
+    <string name="import_pack_notes">Avisos del pack</string>
+    <string name="import_cannot">No se puede importar esta receta.</string>
+    <string name="import_duplicate">Ya tienes «%1$s»</string>
+    <string name="import_edited_hint">La modificaste en la app.</string>
+    <string name="import_choice_replace">Reemplazar</string>
+    <string name="import_choice_copy">Guardar copia</string>
+    <string name="import_choice_keep">Mantener la mía</string>
+    <string name="import_replace_confirm_title">¿Reemplazar tu versión?</string>
+    <string name="import_replace_confirm_body">Perderás los cambios que hiciste en la app en «%1$s».</string>
+    <plurals name="import_button">
+        <item quantity="one">Importar %d receta</item>
+        <item quantity="many">Importar %d recetas</item>
+        <item quantity="other">Importar %d recetas</item>
+    </plurals>
+    <string name="import_saving">Importando…</string>
+    <string name="import_done_title">Importación terminada</string>
+    <plurals name="import_done_imported">
+        <item quantity="one">%d receta importada</item>
+        <item quantity="many">%d recetas importadas</item>
+        <item quantity="other">%d recetas importadas</item>
+    </plurals>
+    <plurals name="import_done_skipped">
+        <item quantity="one">%d omitida</item>
+        <item quantity="many">%d omitidas</item>
+        <item quantity="other">%d omitidas</item>
+    </plurals>
+    <string name="import_done_view">Ver recetas</string>
+
+    <!-- Recipe pack issues (docs/RECIPE_FORMAT.md § 9) -->
+    <string name="issue_location_ingredient">Ingrediente %1$d</string>
+    <string name="issue_location_line">Línea %1$d</string>
+    <string name="issue_P01">El archivo no se puede leer: no es texto UTF-8 ni un .zip válido.</string>
+    <string name="issue_P02">El pack es demasiado grande.</string>
+    <string name="issue_P03">El pack contiene rutas no permitidas y se ha rechazado por seguridad.</string>
+    <string name="issue_P04">El pack no contiene ninguna receta (.md).</string>
+    <string name="issue_P05">Es una copia de seguridad, no un pack de recetas.</string>
+    <string name="issue_P06">Se ha ignorado el archivo «%1$s».</string>
+    <string name="issue_E01">Falta el bloque inicial entre líneas ---.</string>
+    <string name="issue_E02">Error de sintaxis YAML.</string>
+    <string name="issue_E03">Usa funciones de YAML no permitidas (anclas, alias o etiquetas).</string>
+    <string name="issue_E04">Formato no compatible: se espera cpl-recipe/1.</string>
+    <string name="issue_E05">Falta un campo obligatorio: %1$s.</string>
+    <string name="issue_E06">Tipo de dato incorrecto en %1$s.</string>
+    <string name="issue_E07">Valor fuera de rango en %1$s.</string>
+    <string name="issue_E08">Unidad desconocida: «%1$s».</string>
+    <string name="issue_E09">Falta la cantidad.</string>
+    <string name="issue_E10">Cantidad no válida: «%1$s».</string>
+    <string name="issue_E11">Envase no válido: «%1$s». Ejemplo: 500 g.</string>
+    <string name="issue_E12">La receta es demasiado larga.</string>
+    <string name="issue_W01">Se ignora el campo desconocido %1$s.</string>
+    <string name="issue_W02">Se ha normalizado %1$s.</string>
+    <string name="issue_W03">La foto no está en el pack: se importa sin foto.</string>
+    <string name="issue_W04">La ruta de la foto no es válida: se importa sin foto.</string>
+    <string name="issue_W05">Sin pistas para buscar el producto.</string>
+    <string name="issue_W06">Se ignora la cantidad de un ingrediente «al gusto».</string>
+    <string name="issue_W07">Vínculo a un producto que no está en tu catálogo: se omite.</string>
+    <string name="issue_W08">Hay más de un producto preferido en el mismo súper: se usa el primero.</string>
+    <string name="issue_W09">No hay sección «## Preparación».</string>
+    <string name="issue_W10">Ya tienes una receta igual.</string>
+    <string name="issue_W11">Ingrediente repetido.</string>
+    <string name="issue_W12">Cantidad redondeada a 3 decimales.</string>
+    <!-- Field names used inside issue messages -->
+    <string name="field_title">título</string>
+    <string name="field_servings">raciones</string>
+    <string name="field_ingredients">ingredientes</string>
+    <string name="field_name">nombre</string>
+    <string name="field_quantity">cantidad</string>
+    <string name="field_unit">unidad</string>
+    <string name="field_tags">etiquetas</string>
+    <string name="field_description">descripción</string>
+    <string name="field_prep_minutes">preparación</string>
+    <string name="field_cook_minutes">cocción</string>
+    <string name="field_image">foto</string>
+    <string name="field_source">fuente</string>
+    <string name="field_note">nota</string>
+    <string name="field_group">grupo</string>
+    <string name="field_query">búsqueda</string>
+    <string name="field_package_size">envase</string>
+    <string name="field_unit_weight_g">gramos por unidad</string>
+    <string name="field_body">pasos</string>
+
+    <!-- Export -->
+    <string name="export_dialog_body">Puedes compartir el archivo o guardarlo en el móvil.</string>
+    <string name="export_share">Compartir</string>
+    <string name="export_save">Guardar en el móvil</string>
+    <string name="export_saved">Archivo guardado.</string>
+    <string name="export_error">No se pudo exportar.</string>
+    <string name="export_all_file_name">recetas-%1$s.zip</string>
+
+    <!-- Placeholders for later phases -->
     <string name="pantry_empty_title">Tu despensa está vacía</string>
     <string name="pantry_empty_body">Aquí verás lo que tienes en casa, incluidos los paquetes abiertos.</string>
-
-    <!-- Shopping list -->
     <string name="shopping_empty_title">La lista de la compra está vacía</string>
     <string name="shopping_empty_body">Añade recetas y verás lo que te falta, agrupado por supermercado.</string>
-
-    <!-- Catalogue -->
     <string name="catalogue_empty_title">Catálogo sin descargar</string>
     <string name="catalogue_empty_body">Aquí podrás buscar productos de tus supermercados y ver sus precios.</string>
 
-    <!-- Settings -->
-    <string name="settings_coming_soon">Las opciones de supermercados, precios y copias de seguridad llegarán en las próximas versiones.</string>
+    <!-- Settings and backup -->
+    <string name="settings_backup_title">Copia de seguridad</string>
+    <string name="settings_backup_body">Guarda todas tus recetas, fotos y ajustes en un único archivo. No hay copias en la nube: guarda el archivo donde quieras.</string>
+    <string name="settings_backup_create">Crear copia</string>
+    <string name="settings_backup_restore">Restaurar copia</string>
+    <string name="settings_backup_undo">Deshacer la última restauración</string>
+    <string name="settings_backup_undo_body">Vuelve a los datos que tenías antes de restaurar (copia automática del %1$s).</string>
+    <plurals name="settings_backup_done">
+        <item quantity="one">Copia guardada: %d receta.</item>
+        <item quantity="many">Copia guardada: %d recetas.</item>
+        <item quantity="other">Copia guardada: %d recetas.</item>
+    </plurals>
+    <string name="settings_backup_error">No se pudo crear la copia.</string>
+    <string name="settings_restore_confirm_title">¿Restaurar esta copia?</string>
+    <string name="settings_restore_confirm_body">Copia del %1$s con %2$s y %3$s. Se reemplazarán todos los datos actuales. Antes se guardará una copia automática de lo que tienes ahora. La app se reiniciará.</string>
+    <plurals name="backup_recipes">
+        <item quantity="one">%d receta</item>
+        <item quantity="many">%d recetas</item>
+        <item quantity="other">%d recetas</item>
+    </plurals>
+    <plurals name="backup_photos">
+        <item quantity="one">%d foto</item>
+        <item quantity="many">%d fotos</item>
+        <item quantity="other">%d fotos</item>
+    </plurals>
+    <string name="settings_restore_action">Restaurar</string>
+    <string name="settings_restore_not_backup">Ese archivo no es una copia de seguridad de la app.</string>
+    <string name="settings_restore_newer">La copia es de una versión más nueva de la app. Actualiza la app primero.</string>
+    <string name="settings_restore_corrupt">La copia está dañada o incompleta. No se ha cambiado nada.</string>
+    <string name="settings_restore_failed">No se pudo restaurar.</string>
+    <string name="settings_working">Trabajando…</string>
+    <string name="settings_about_title">Acerca de</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>
 

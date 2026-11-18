@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.cpl.android.library)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -25,6 +26,10 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.coroutines.android)
+    // Backup manifest (SPEC § 4.7).
+    implementation(libs.kotlinx.serialization.json)
+    // EXIF orientation of recipe photos (SPEC § 4.9).
+    implementation(libs.androidx.exifinterface)
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlin.test)
