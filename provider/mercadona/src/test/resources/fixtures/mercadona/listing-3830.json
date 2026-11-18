@@ -1,0 +1,41 @@
+{
+ "id": "3830",
+ "packaging": "Pieza",
+ "published": true,
+ "share_url": "https://tienda.mercadona.es/product/3830/aguacate-pieza",
+ "thumbnail": "https://prod-mercadona.imgix.net/images/b1dee7e254871996d81c69a656fa4304.jpg?fit=crop&h=300&w=300",
+ "categories": [
+  {
+   "id": 1,
+   "name": "Fruta y verdura",
+   "level": 0,
+   "order": 306
+  }
+ ],
+ "display_name": "Aguacate",
+ "unavailable_from": null,
+ "price_instructions": {
+  "iva": null,
+  "is_new": false,
+  "is_pack": false,
+  "pack_size": null,
+  "unit_name": null,
+  "unit_size": 0.2,
+  "bulk_price": "5.60",
+  "unit_price": "1.12",
+  "approx_size": true,
+  "size_format": "kg",
+  "total_units": null,
+  "unit_selector": true,
+  "bunch_selector": false,
+  "drained_weight": null,
+  "selling_method": 0,
+  "tax_percentage": "4.000",
+  "price_decreased": false,
+  "reference_price": "5.600",
+  "min_bunch_amount": 1.0,
+  "reference_format": "kg",
+  "previous_unit_price": null,
+  "increment_bunch_amount": 1.0
+ }
+}

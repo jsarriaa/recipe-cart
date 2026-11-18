@@ -1,0 +1,41 @@
+{
+ "id": "51050",
+ "packaging": "Paquete",
+ "published": true,
+ "share_url": "https://tienda.mercadona.es/product/51050/mozzarella-fresca-vaca-hacendado-paquete",
+ "thumbnail": "https://prod-mercadona.imgix.net/images/82991bcf404ead6164e1b3b4ad79eeea.jpeg?fit=crop&h=300&w=300",
+ "categories": [
+  {
+   "id": 4,
+   "name": "Charcutería y quesos",
+   "level": 0,
+   "order": 159
+  }
+ ],
+ "display_name": "Mozzarella fresca de vaca Hacendado",
+ "unavailable_from": null,
+ "price_instructions": {
+  "iva": null,
+  "is_new": false,
+  "is_pack": false,
+  "pack_size": null,
+  "unit_name": null,
+  "unit_size": 0.25,
+  "bulk_price": "3.60",
+  "unit_price": "0.90",
+  "approx_size": false,
+  "size_format": "kg",
+  "total_units": null,
+  "unit_selector": true,
+  "bunch_selector": false,
+  "drained_weight": 0.125,
+  "selling_method": 0,
+  "tax_percentage": "4.000",
+  "price_decreased": false,
+  "reference_price": "7.200",
+  "min_bunch_amount": 1.0,
+  "reference_format": "kg",
+  "previous_unit_price": null,
+  "increment_bunch_amount": 1.0
+ }
+}
