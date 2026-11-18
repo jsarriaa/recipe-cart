@@ -84,6 +84,10 @@ tested fast. Android-specific code stays out of it.
   update `docs/SPEC.md`, `docs/RECIPE_FORMAT.md`, `docs/providers/*.md` and
   `prompts/recipe-pack-generator.md` together. A change to the recipe format must update the
   format doc, the generator prompt, the examples and the parser tests in one PR.
+- **Credits stay current.** Adding a dependency, a GitHub Action, or anything learned from or
+  taken from another project means updating "Credits and third-party code" at the end of
+  README.md in the same PR. Never copy code without checking that its licence allows it, keeping
+  its notice, and saying so in the credits.
 - **Check on the device** before calling UI work done: install, open the screen, take a
   screencap, read logcat for errors. Say what was and was not verified.
 
