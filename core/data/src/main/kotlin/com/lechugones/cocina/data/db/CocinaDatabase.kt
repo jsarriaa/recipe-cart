@@ -12,6 +12,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         IngredientEntity::class,
         ProductEntity::class,
         PriceSnapshotEntity::class,
+        IngredientLinkEntity::class,
+        LinkMemoryEntity::class,
     ],
     version = CocinaDatabase.VERSION,
     exportSchema = true,
@@ -21,9 +23,11 @@ abstract class CocinaDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
 
+    abstract fun linkMemoryDao(): LinkMemoryDao
+
     companion object {
         const val NAME = "cocina.db"
-        const val VERSION = 3
+        const val VERSION = 4
     }
 }
 
@@ -67,5 +71,27 @@ object CocinaMigrations {
             }
         }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+    /** v4 (phase 3b): ingredient product links and link memory. Existing data is untouched. */
+    val MIGRATION_3_4 =
+        object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `ingredient_link` (`ingredient_id` TEXT NOT NULL, `provider_id` TEXT NOT NULL, " +
+                        "`product_id` TEXT NOT NULL, `preferred` INTEGER NOT NULL, `position` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`ingredient_id`, `provider_id`, `product_id`), FOREIGN KEY(`ingredient_id`) " +
+                        "REFERENCES `ingredient`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_ingredient_link_provider_id_product_id` " +
+                        "ON `ingredient_link` (`provider_id`, `product_id`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `link_memory` (`name_key` TEXT NOT NULL, `provider_id` TEXT NOT NULL, " +
+                        "`product_id` TEXT NOT NULL, `last_used_at` INTEGER NOT NULL, `use_count` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`name_key`, `provider_id`, `product_id`))",
+                )
+            }
+        }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }

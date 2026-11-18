@@ -22,6 +22,12 @@ abstract class RecipeDao {
     @Query("SELECT * FROM ingredient WHERE recipe_id = :recipeId ORDER BY position")
     abstract suspend fun getIngredients(recipeId: String): List<IngredientEntity>
 
+    @Query(
+        "SELECT l.* FROM ingredient_link l JOIN ingredient i ON i.id = l.ingredient_id " +
+            "WHERE i.recipe_id = :recipeId ORDER BY l.ingredient_id, l.position",
+    )
+    abstract suspend fun getLinks(recipeId: String): List<IngredientLinkEntity>
+
     @Query("SELECT id FROM recipe ORDER BY title COLLATE NOCASE, id")
     abstract suspend fun allIds(): List<String>
 
@@ -48,16 +54,21 @@ abstract class RecipeDao {
     @Insert
     protected abstract suspend fun insertIngredients(ingredients: List<IngredientEntity>)
 
+    @Insert
+    protected abstract suspend fun insertLinks(links: List<IngredientLinkEntity>)
+
     /** Inserts or fully replaces a recipe with its tags and ingredients, atomically. */
     @Transaction
     open suspend fun upsertFull(
         recipe: RecipeEntity,
         tags: List<RecipeTagEntity>,
         ingredients: List<IngredientEntity>,
+        links: List<IngredientLinkEntity> = emptyList(),
     ) {
-        delete(recipe.id) // Cascades to tags and ingredients.
+        delete(recipe.id) // Cascades to tags, ingredients and their links.
         insertRecipe(recipe)
         if (tags.isNotEmpty()) insertTags(tags)
         if (ingredients.isNotEmpty()) insertIngredients(ingredients)
+        if (links.isNotEmpty()) insertLinks(links)
     }
 }
