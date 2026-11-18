@@ -109,7 +109,7 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 | Language | Kotlin 2.x (K2), JVM target 17 | |
 | UI | Jetpack Compose, Material 3, Navigation Compose with type-safe routes | Dynamic colour on Android 12+, with a green fallback palette |
 | DI | Hilt (KSP) | `hilt-core` in JVM provider modules |
-| DB | Room (KSP) with FTS4 for product search | Schemas exported to `app/schemas/` |
+| DB | Room (KSP) with FTS4 for product search | Schemas exported to `core/data/schemas/` |
 | Settings | DataStore Preferences | |
 | Network | Retrofit + OkHttp + kotlinx.serialization converter | One shared `OkHttpClient` with per-provider interceptors |
 | YAML | kaml (kotlinx.serialization YAML) | Only for recipe front matter |

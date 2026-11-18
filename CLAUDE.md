@@ -31,7 +31,7 @@ and what it costs, keeps a pantry, and builds a shopping list. The full specific
 1. **The phone holds the owner's real data.** Never uninstall the app, clear its data, or run a
    destructive adb command without asking first and getting an explicit yes. See
    [Device rules](#device-rules).
-2. **Never lose user data in a schema change.** Room schemas are exported to `app/schemas/` and
+2. **Never lose user data in a schema change.** Room schemas are exported to `core/data/schemas/` and
    committed. Every schema change bumps the version and ships a tested `Migration` (or
    `AutoMigration` with a spec). `fallbackToDestructiveMigration*` is forbidden in every build type.
 3. **Network etiquette with supermarkets** (details in [docs/providers/README.md](docs/providers/README.md)):

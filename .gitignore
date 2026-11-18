@@ -13,7 +13,7 @@ captures/
 *.ap_
 *.dex
 output-metadata.json
-# Room schemas (app/schemas/) and gradle/wrapper/gradle-wrapper.jar ARE committed.
+# Room schemas (core/data/schemas/) and gradle/wrapper/gradle-wrapper.jar ARE committed.
 
 # ---------------------------------------------------------------------------
 # IDEs and OS files
