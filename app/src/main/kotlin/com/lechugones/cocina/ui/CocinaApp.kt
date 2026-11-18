@@ -120,7 +120,11 @@ fun CocinaApp(
             composable<ImportRoute> {
                 ImportScreen(
                     onBack = { navController.popBackStack() },
-                    onDone = { navController.navigateToTopLevel(TopLevelDestination.RECIPES) },
+                    // Pop back to the list. navigateToTopLevel would restore the saved stack, which
+                    // contains this import screen, and appear to do nothing.
+                    onDone = {
+                        if (!navController.popBackStack<RecipesRoute>(inclusive = false)) navController.navigate(RecipesRoute)
+                    },
                     onOpenSettings = openSettings,
                 )
             }

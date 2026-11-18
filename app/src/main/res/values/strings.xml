@@ -64,7 +64,6 @@
     <string name="recipe_ingredients">Ingredientes</string>
     <string name="recipe_staples">Básicos de despensa (%1$d)</string>
     <string name="recipe_optional">opcional</string>
-    <string name="recipe_steps">Preparación</string>
     <string name="recipe_steps_empty">Esta receta todavía no tiene pasos.</string>
     <string name="recipe_imported_on">Importada el %1$s</string>
     <string name="recipe_imported_edited">Importada el %1$s · modificada en la app</string>
