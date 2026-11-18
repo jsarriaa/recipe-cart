@@ -78,7 +78,7 @@ class BackupManagerTest {
             val ready = assertIs<BackupInspection.Ready>(manager().inspect(ByteArrayInputStream(bytes)))
             assertEquals(1, ready.staged.manifest.recipes)
             assertEquals(1, ready.staged.manifest.images)
-            assertEquals(2, ready.staged.manifest.schemaVersion)
+            assertEquals(CocinaDatabase.VERSION, ready.staged.manifest.schemaVersion)
             manager().restore(ready.staged)
 
             database = openDatabase()
@@ -123,7 +123,7 @@ class BackupManagerTest {
                     if (path ==
                         BackupManager.MANIFEST
                     ) {
-                        String(bytes).replace("\"schemaVersion\": 2", "\"schemaVersion\": 99").toByteArray()
+                        String(bytes).replace("\"schemaVersion\": ${CocinaDatabase.VERSION}", "\"schemaVersion\": 99").toByteArray()
                     } else {
                         bytes
                     }

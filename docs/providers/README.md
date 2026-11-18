@@ -2,7 +2,9 @@
 
 A **provider** turns one supermarket's data into the app's normalised product model. Each
 provider is its own Gradle module (`:provider:<id>`), depends only on `:provider:api`, and is
-registered through a Hilt multibinding. Feature code never knows which supermarkets exist.
+registered through a Hilt multibinding (`Set<SupermarketProvider>`, contributed in `:app`'s
+`ProviderModule`, because provider modules are plain JVM modules without Hilt). Feature code
+never knows which supermarkets exist.
 
 | Provider | Module | Status | Doc |
 |---|---|---|---|
@@ -98,7 +100,7 @@ These rules apply to every provider and are enforced in shared code, not left to
 2. **Rate limit per provider** (token bucket in `:provider:api`), shared by every caller. Default:
    1 request per 1.2 s, burst 1, at most one request in flight per provider. A catalogue sync is
    sequential.
-3. **Retries**: only for timeouts and 5xx, at most 2, exponential backoff with jitter (2 s, 6 s).
+3. **Retries**: only for timeouts and 5xx, at most 2, exponential backoff with jitter (2 s, 6 s, plus up to 0,5 s).
    `429` honours `Retry-After` up to 60 s, otherwise it fails. `403` (or a bot-protection page)
    **is never retried**. The provider's circuit opens for 30 minutes and the UI says the shop
    refused the connection.
@@ -119,7 +121,8 @@ These rules apply to every provider and are enforced in shared code, not left to
 2. Create `:provider:<id>` (JVM module, `cpl.jvm.library` convention plugin) with:
    - `<Id>Api` Retrofit interface, `@Serializable` DTOs (ignore unknown keys), and a mapper to
      `ProviderProduct`.
-   - `<Id>Provider : SupermarketProvider`, plus a Hilt `@Module` with `@Binds @IntoSet`.
+   - `<Id>Provider : SupermarketProvider` with a `create(client, …)` factory, contributed by a
+     `@Provides @IntoSet` method in `:app`'s `ProviderModule` on the shared `OkHttpClient`.
    - Trimmed JSON fixtures in `src/test/resources/fixtures/<id>/` and mapper tests, including
      tricky items (variable weight, packs, drained weight, missing fields).
 3. Add the store brands, the rate limit and the base URL to the provider object.

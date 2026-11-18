@@ -3,7 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        No INTERNET permission yet: providers arrive in phase 3.
+        INTERNET is only for the supermarket endpoints and image CDNs in docs/providers/,
+        and only when the user asks (CLAUDE.md, hard rules 3 and 4).
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
         allowBackup=false and the data-extraction rules keep data out of Google backups and
         device-to-device transfer. The in-app backup file is the only backup path (SPEC § 4.7).
     -->

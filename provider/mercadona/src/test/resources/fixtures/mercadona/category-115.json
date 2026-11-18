@@ -1,0 +1,284 @@
+{
+ "id": 115,
+ "name": "Especias",
+ "order": 7,
+ "layout": 1,
+ "published": true,
+ "is_extended": false,
+ "categories": [
+  {
+   "id": 425,
+   "name": "Hierbas",
+   "order": 7,
+   "layout": 2,
+   "published": true,
+   "is_extended": false,
+   "image": null,
+   "subtitle": null,
+   "products": [
+    {
+     "id": "5598",
+     "packaging": "Bote",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/5598/oregano-hacendado-bote",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/20a564cf97b2b9662bb7727d6008ed69.jpg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Orégano Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": 10,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": null,
+      "unit_size": 0.025,
+      "bulk_price": "40.00",
+      "unit_price": "1.00",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": null,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "4.000",
+      "min_bunch_amount": 1.0,
+      "reference_format": "100 g",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    },
+    {
+     "id": "5599",
+     "packaging": "Bote",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/5599/perejil-hacendado-bote",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/b2bc740ba01dd6f5b0c62f44a5557dee.jpg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Perejil Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": null,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": null,
+      "unit_size": 0.018,
+      "bulk_price": "55.56",
+      "unit_price": "1.00",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": null,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "5.556",
+      "min_bunch_amount": 1.0,
+      "reference_format": "100 g",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    },
+    {
+     "id": "47994",
+     "packaging": "Paquete",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/47994/hoja-laurel-hacendado-paquete",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/4bce6bcc4f7a9880f0ee238f3e27003d.jpeg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Hoja de laurel Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": 10,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": null,
+      "unit_size": 0.012,
+      "bulk_price": "70.83",
+      "unit_price": "0.85",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": null,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "7.084",
+      "min_bunch_amount": 1.0,
+      "reference_format": "100 g",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    }
+   ]
+  },
+  {
+   "id": 840,
+   "name": "Colorante y pimentón",
+   "order": 7,
+   "layout": 2,
+   "published": true,
+   "is_extended": false,
+   "image": null,
+   "subtitle": null,
+   "products": [
+    {
+     "id": "34182",
+     "packaging": "Bote",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/34182/colorante-alimentario-hacendado-bote",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/279afe277bed6a3c1af998dbda9b66e7.jpg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Colorante alimentario Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": 10,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": null,
+      "unit_size": 0.085,
+      "bulk_price": "11.18",
+      "unit_price": "0.95",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": null,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "11.177",
+      "min_bunch_amount": 1.0,
+      "reference_format": "kg",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    },
+    {
+     "id": "34102",
+     "packaging": "Bote",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/34102/pimenton-dulce-vera-hacendado-bote",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/95891266ea34b4f24317e20b64344639.jpg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Pimentón dulce de la Vera Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": 10,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": null,
+      "unit_size": 0.075,
+      "bulk_price": "24.67",
+      "unit_price": "1.85",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": null,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "24.667",
+      "min_bunch_amount": 1.0,
+      "reference_format": "kg",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    },
+    {
+     "id": "34116",
+     "packaging": "Paquete",
+     "published": true,
+     "share_url": "https://tienda.mercadona.es/product/34116/azafran-molido-hacendado-paquete",
+     "thumbnail": "https://prod-mercadona.imgix.net/images/9b1e3bf3f850bb972810225a35e2d27e.jpg?fit=crop&h=300&w=300",
+     "categories": [
+      {
+       "id": 12,
+       "name": "Aceite, especias y salsas",
+       "level": 0,
+       "order": 7
+      }
+     ],
+     "display_name": "Azafrán molido Hacendado",
+     "unavailable_from": null,
+     "price_instructions": {
+      "iva": null,
+      "is_new": false,
+      "is_pack": false,
+      "pack_size": null,
+      "unit_name": "sobres",
+      "unit_size": 0.0004,
+      "bulk_price": "4750.00",
+      "unit_price": "1.90",
+      "approx_size": false,
+      "size_format": "kg",
+      "total_units": 4,
+      "unit_selector": true,
+      "bunch_selector": false,
+      "drained_weight": null,
+      "selling_method": 0,
+      "tax_percentage": "10.000",
+      "price_decreased": false,
+      "reference_price": "475.000",
+      "min_bunch_amount": 1.0,
+      "reference_format": "100 g",
+      "previous_unit_price": null,
+      "increment_bunch_amount": 1.0
+     }
+    }
+   ]
+  }
+ ],
+ "next_category": {
+  "id": 116,
+  "name": "Mayonesa, ketchup y mostaza"
+ }
+}

@@ -215,3 +215,4 @@ Price refresh for specific products uses `GET /api/products/{id}/` per product. 
 | 2026-11-18 | `GET /api/products/23353/` and `/api/products/80870/` (`vlc1`, `mad1`, no `wh`) | 200, detail fields as above, same price everywhere |
 | 2026-11-18 | `PUT /api/postal-codes/actions/change-pc/` with 28001 | 200, `x-customer-wh: mad3` |
 | 2026-11-18 | Descriptive User-Agent `CocinaParaLechugones/0.0 (personal use; Android)` | 200 |
+| 2026-11-18 | `PUT /api/postal-codes/actions/change-pc/` with 08001 (the app's suggested default) | 200, `x-customer-wh: bcn1` |

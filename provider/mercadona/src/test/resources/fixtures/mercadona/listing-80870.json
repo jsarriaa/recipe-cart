@@ -1,0 +1,41 @@
+{
+ "id": "80870",
+ "packaging": "Paquete",
+ "published": true,
+ "share_url": "https://tienda.mercadona.es/product/80870/maxi-tortillas-trigo-hacendado-paquete",
+ "thumbnail": "https://prod-mercadona.imgix.net/images/9bbd7b9434f81a70eb1514d235587d1f.jpg?fit=crop&h=300&w=300",
+ "categories": [
+  {
+   "id": 5,
+   "name": "Panadería y pastelería",
+   "level": 0,
+   "order": 515
+  }
+ ],
+ "display_name": "Maxi tortillas de trigo Hacendado",
+ "unavailable_from": null,
+ "price_instructions": {
+  "iva": null,
+  "is_new": false,
+  "is_pack": false,
+  "pack_size": null,
+  "unit_name": "ud.",
+  "unit_size": 0.36,
+  "bulk_price": "4.17",
+  "unit_price": "1.50",
+  "approx_size": false,
+  "size_format": "kg",
+  "total_units": 6,
+  "unit_selector": true,
+  "bunch_selector": false,
+  "drained_weight": null,
+  "selling_method": 0,
+  "tax_percentage": "4.000",
+  "price_decreased": false,
+  "reference_price": "4.167",
+  "min_bunch_amount": 1.0,
+  "reference_format": "kg",
+  "previous_unit_price": null,
+  "increment_bunch_amount": 1.0
+ }
+}

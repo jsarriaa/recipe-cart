@@ -1,0 +1,41 @@
+{
+ "id": "2789",
+ "packaging": "Bandeja",
+ "published": true,
+ "share_url": "https://tienda.mercadona.es/product/2789/contramuslos-pollo-deshuesados-sin-piel-bandeja",
+ "thumbnail": "https://prod-mercadona.imgix.net/images/6f014202bb9ed41e5125106c87ef1c74.jpg?fit=crop&h=300&w=300",
+ "categories": [
+  {
+   "id": 3,
+   "name": "Carne",
+   "level": 0,
+   "order": 17
+  }
+ ],
+ "display_name": "Contramuslos de pollo deshuesados y sin piel",
+ "unavailable_from": null,
+ "price_instructions": {
+  "iva": null,
+  "is_new": false,
+  "is_pack": false,
+  "pack_size": null,
+  "unit_name": null,
+  "unit_size": 0.55,
+  "bulk_price": "6.80",
+  "unit_price": "3.74",
+  "approx_size": true,
+  "size_format": "kg",
+  "total_units": null,
+  "unit_selector": true,
+  "bunch_selector": false,
+  "drained_weight": null,
+  "selling_method": 0,
+  "tax_percentage": "10.000",
+  "price_decreased": false,
+  "reference_price": "6.800",
+  "min_bunch_amount": 1.0,
+  "reference_format": "kg",
+  "previous_unit_price": null,
+  "increment_bunch_amount": 1.0
+ }
+}

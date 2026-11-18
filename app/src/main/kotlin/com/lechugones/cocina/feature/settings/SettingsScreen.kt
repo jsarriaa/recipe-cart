@@ -17,12 +17,14 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -33,6 +35,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
+import com.lechugones.cocina.ui.components.PostalCodeDialog
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.util.ProcessRestarter
@@ -110,6 +113,32 @@ fun SettingsScreen(
                 LinearProgressIndicator(Modifier.fillMaxWidth())
                 Text(stringResource(R.string.settings_working), style = MaterialTheme.typography.bodySmall)
             }
+            Text(stringResource(R.string.settings_supermarkets_title), style = MaterialTheme.typography.titleMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_postal_code), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        state.postalCode ?: stringResource(R.string.settings_postal_code_none),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                TextButton(onClick = { viewModel.editPostalCode(true) }) { Text(stringResource(R.string.settings_postal_code_change)) }
+            }
+            Text(stringResource(R.string.postal_code_body), style = MaterialTheme.typography.bodySmall)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.catalogue_store_brand_only), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(R.string.settings_store_brand_only_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = state.storeBrandOnly, onCheckedChange = viewModel::setStoreBrandOnly)
+            }
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
             Text(stringResource(R.string.settings_backup_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.settings_backup_body), style = MaterialTheme.typography.bodyMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -137,6 +166,10 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+
+    if (state.editingPostalCode) {
+        PostalCodeDialog(current = state.postalCode, onSave = viewModel::savePostalCode, onDismiss = { viewModel.editPostalCode(false) })
     }
 
     state.pendingRestore?.let { staged ->

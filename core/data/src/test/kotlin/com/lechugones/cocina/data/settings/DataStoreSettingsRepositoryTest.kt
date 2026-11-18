@@ -1,37 +1,18 @@
 package com.lechugones.cocina.data.settings
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.lechugones.cocina.data.testing.InMemoryPreferencesDataStore
 import com.lechugones.cocina.domain.settings.AppSettings
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-/**
- * Tests the mapping and sanitising done by [DataStoreSettingsRepository]. DataStore's own file
- * storage is replaced by an in-memory fake: its rename-over-existing-file step does not work on
- * Windows JVMs, where these tests also run (it does on Android).
- */
+/** Tests the mapping and sanitising done by [DataStoreSettingsRepository]. */
 class DataStoreSettingsRepositoryTest {
-    private class InMemoryPreferencesDataStore : DataStore<Preferences> {
-        private val state = MutableStateFlow(emptyPreferences())
-        private val mutex = Mutex()
-        override val data: Flow<Preferences> = state
-
-        override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences =
-            mutex.withLock { transform(state.value).also { state.value = it } }
-    }
-
     @Test
     fun `defaults when nothing is stored`() =
         runTest {

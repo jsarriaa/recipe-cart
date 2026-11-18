@@ -26,3 +26,5 @@ rootProject.name = "CocinaParaLechugones"
 include(":app")
 include(":core:domain")
 include(":core:data")
+include(":provider:api")
+include(":provider:mercadona")

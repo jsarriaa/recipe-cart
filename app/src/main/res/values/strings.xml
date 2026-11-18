@@ -272,7 +272,56 @@
     <string name="shopping_empty_title">La lista de la compra está vacía</string>
     <string name="shopping_empty_body">Añade recetas y verás lo que te falta, agrupado por supermercado.</string>
     <string name="catalogue_empty_title">Catálogo sin descargar</string>
-    <string name="catalogue_empty_body">Aquí podrás buscar productos de tus supermercados y ver sus precios.</string>
+    <string name="catalogue_empty_body">Descarga los productos de alimentación de %1$s para buscarlos y ver sus precios, también sin conexión. Tarda unos minutos y solo se hace cuando tú lo pides.</string>
+    <string name="catalogue_download">Descargar catálogo</string>
+    <string name="catalogue_update">Actualizar</string>
+    <plurals name="catalogue_status">
+        <item quantity="one">%1$s · %2$s producto · actualizado el %3$s</item>
+        <item quantity="many">%1$s · %2$s productos · actualizado el %3$s</item>
+        <item quantity="other">%1$s · %2$s productos · actualizado el %3$s</item>
+    </plurals>
+    <string name="catalogue_sync_connecting">Conectando con %1$s…</string>
+    <string name="catalogue_sync_progress">Descargando categoría %1$d de %2$d</string>
+    <plurals name="catalogue_sync_saved">
+        <item quantity="one">%1$s producto guardado</item>
+        <item quantity="many">%1$s productos guardados</item>
+        <item quantity="other">%1$s productos guardados</item>
+    </plurals>
+    <plurals name="catalogue_sync_done">
+        <item quantity="one">Catálogo actualizado: %1$s producto</item>
+        <item quantity="many">Catálogo actualizado: %1$s productos</item>
+        <item quantity="other">Catálogo actualizado: %1$s productos</item>
+    </plurals>
+    <string name="catalogue_sync_partial">Algunas categorías no se pudieron descargar. El resto está guardado.</string>
+    <plurals name="catalogue_sync_cancelled">
+        <item quantity="one">Descarga cancelada. Se ha guardado %1$s producto.</item>
+        <item quantity="many">Descarga cancelada. Se han guardado %1$s productos.</item>
+        <item quantity="other">Descarga cancelada. Se han guardado %1$s productos.</item>
+    </plurals>
+    <string name="catalogue_search_hint">Buscar productos</string>
+    <string name="catalogue_search_clear">Borrar búsqueda</string>
+    <string name="catalogue_search_prompt">Escribe lo que buscas: tomate, leche, arroz…</string>
+    <string name="catalogue_no_results">No hay productos que coincidan con «%1$s».</string>
+    <string name="catalogue_store_brand_only">Solo marca blanca</string>
+    <string name="catalogue_store_brand">Marca blanca</string>
+    <string name="catalogue_reference_price">%1$s/%2$s</string>
+    <string name="catalogue_no_price">Sin precio</string>
+    <string name="catalogue_approx">Peso aproximado</string>
+    <string name="catalogue_drained">Peso escurrido: %1$s</string>
+    <string name="catalogue_price_date">Precio del %1$s</string>
+    <string name="catalogue_refresh_price">Actualizar precio</string>
+    <string name="catalogue_price_updated">Precio actualizado</string>
+    <string name="catalogue_product_gone">%1$s ya no vende este producto.</string>
+    <string name="catalogue_open_web">Ver en la web</string>
+    <string name="provider_error_offline">No se ha podido conectar con %1$s. Se usan los datos guardados.</string>
+    <string name="provider_error_blocked">%1$s ha rechazado la conexión. Se usan los datos guardados. Vuelve a intentarlo más tarde.</string>
+    <string name="provider_error_rate_limited">%1$s pide esperar un poco. Vuelve a intentarlo en unos minutos.</string>
+    <string name="provider_error_http">%1$s ha respondido con un error (%2$d). Se usan los datos guardados.</string>
+    <string name="provider_error_parse">La respuesta de %1$s ha cambiado y no se ha podido leer.</string>
+    <string name="provider_error_not_served">%1$s no tiene tienda online para el código postal %2$s. Prueba con otro.</string>
+    <string name="postal_code_title">Código postal</string>
+    <string name="postal_code_body">Mercadona usa el código postal para elegir el almacén del que salen los precios. Solo se envía a Mercadona y solo para eso.</string>
+    <string name="postal_code_invalid">Escribe un código postal español de 5 cifras.</string>
 
     <!-- Settings and backup -->
     <string name="settings_backup_title">Copia de seguridad</string>
@@ -305,6 +354,11 @@
     <string name="settings_restore_corrupt">La copia está dañada o incompleta. No se ha cambiado nada.</string>
     <string name="settings_restore_failed">No se pudo restaurar.</string>
     <string name="settings_working">Trabajando…</string>
+    <string name="settings_supermarkets_title">Supermercados</string>
+    <string name="settings_postal_code">Código postal</string>
+    <string name="settings_postal_code_none">Sin elegir</string>
+    <string name="settings_postal_code_change">Cambiar</string>
+    <string name="settings_store_brand_only_body">Oculta las marcas de fabricante en las búsquedas del catálogo.</string>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>

@@ -8,6 +8,8 @@ import com.lechugones.cocina.data.backup.AppInfo
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.data.backup.BackupManager
 import com.lechugones.cocina.data.backup.StagedBackup
+import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.domain.settings.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -30,6 +32,9 @@ data class SettingsUiState(
     val pendingRestore: StagedBackup? = null,
     /** When the newest automatic pre-restore backup was taken, if any. */
     val lastAutomaticBackup: Instant? = null,
+    val postalCode: String? = null,
+    val storeBrandOnly: Boolean = false,
+    val editingPostalCode: Boolean = false,
 )
 
 sealed interface SettingsEvent {
@@ -55,6 +60,7 @@ class SettingsViewModel
     constructor(
         @ApplicationContext private val context: Context,
         private val backups: BackupManager,
+        private val settings: SettingsRepository,
         appInfo: AppInfo,
     ) : ViewModel() {
         private val state = MutableStateFlow(SettingsUiState(versionName = appInfo.versionName))
@@ -64,6 +70,23 @@ class SettingsViewModel
 
         init {
             refreshAutomatic()
+            viewModelScope.launch {
+                settings.settings.collect { s -> state.update { it.copy(postalCode = s.postalCode, storeBrandOnly = s.storeBrandOnly) } }
+            }
+        }
+
+        fun editPostalCode(open: Boolean) {
+            state.update { it.copy(editingPostalCode = open) }
+        }
+
+        fun savePostalCode(code: String) {
+            if (!AppSettings.isValidPostalCode(code)) return
+            state.update { it.copy(editingPostalCode = false) }
+            viewModelScope.launch { settings.update { it.copy(postalCode = code) } }
+        }
+
+        fun setStoreBrandOnly(enabled: Boolean) {
+            viewModelScope.launch { settings.update { it.copy(storeBrandOnly = enabled) } }
         }
 
         fun createBackup(target: Uri) =

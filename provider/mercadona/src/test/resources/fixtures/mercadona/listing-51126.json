@@ -1,0 +1,41 @@
+{
+ "id": "51126",
+ "packaging": "Paquete",
+ "published": true,
+ "share_url": "https://tienda.mercadona.es/product/51126/queso-lonchas-mozzarella-vaca-hacendado-paquete",
+ "thumbnail": "https://prod-mercadona.imgix.net/images/d96788c89dc992674ef5ea2ebdd8401f.jpg?fit=crop&h=300&w=300",
+ "categories": [
+  {
+   "id": 4,
+   "name": "Charcutería y quesos",
+   "level": 0,
+   "order": 159
+  }
+ ],
+ "display_name": "Queso lonchas mozzarella de vaca Hacendado",
+ "unavailable_from": null,
+ "price_instructions": {
+  "iva": null,
+  "is_new": false,
+  "is_pack": false,
+  "pack_size": null,
+  "unit_name": "lonchas",
+  "unit_size": 0.2,
+  "bulk_price": "9.00",
+  "unit_price": "1.80",
+  "approx_size": false,
+  "size_format": "kg",
+  "total_units": 10,
+  "unit_selector": true,
+  "bunch_selector": false,
+  "drained_weight": null,
+  "selling_method": 0,
+  "tax_percentage": "4.000",
+  "price_decreased": false,
+  "reference_price": "9.000",
+  "min_bunch_amount": 1.0,
+  "reference_format": "kg",
+  "previous_unit_price": null,
+  "increment_bunch_amount": 1.0
+ }
+}
