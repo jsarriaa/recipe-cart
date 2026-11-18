@@ -9,7 +9,9 @@ import com.lechugones.cocina.domain.quantity.PackageSize
 import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.domain.recipe.MatchHints
 import com.lechugones.cocina.domain.recipe.Recipe
+import com.lechugones.cocina.domain.recipe.RecipeOrigin
 import com.lechugones.cocina.domain.recipe.RecipeSummary
+import com.lechugones.cocina.domain.recipepack.ExistingRecipe
 import com.lechugones.cocina.domain.units.MeasureUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,19 +19,30 @@ import java.time.Instant
 import javax.inject.Inject
 
 interface RecipeRepository {
+    /** Every recipe with what the list needs (photo, tags, ingredient keys), unsorted. */
     fun observeSummaries(): Flow<List<RecipeSummary>>
 
     suspend fun get(id: String): Recipe?
+
+    /** All recipes, alphabetically (for "Exportar todas"). */
+    suspend fun getAll(): List<Recipe>
 
     /** Inserts or fully replaces [recipe]. */
     suspend fun save(recipe: Recipe)
 
     suspend fun delete(id: String)
+
+    suspend fun existing(): List<ExistingRecipe>
+
+    /** Photo file names referenced by any recipe. */
+    suspend fun imagePaths(): Set<String>
+
+    suspend fun count(): Int
 }
 
 /**
  * Room-backed [RecipeRepository]. Ingredient product links are not stored yet: they arrive with
- * schema v2 in phase 3, so [get] returns ingredients without links.
+ * the product tables in phase 3, so [get] returns ingredients without links.
  */
 class RoomRecipeRepository
     @Inject
@@ -37,7 +50,19 @@ class RoomRecipeRepository
         private val dao: RecipeDao,
     ) : RecipeRepository {
         override fun observeSummaries(): Flow<List<RecipeSummary>> =
-            dao.observeSummaries().map { rows -> rows.map { RecipeSummary(it.id, it.title, it.servings) } }
+            dao.observeSummaries().map { rows ->
+                rows.map { (row, tags, keys) ->
+                    RecipeSummary(
+                        id = row.id,
+                        title = row.title,
+                        servings = row.servings,
+                        imagePath = row.imagePath,
+                        tags = tags.sortedBy { it.position }.map { it.tag },
+                        ingredientKeys = keys.toSet(),
+                        createdAt = Instant.ofEpochMilli(row.createdAt),
+                    )
+                }
+            }
 
         override suspend fun get(id: String): Recipe? {
             val recipe = dao.getRecipe(id) ?: return null
@@ -47,15 +72,26 @@ class RoomRecipeRepository
             )
         }
 
+        override suspend fun getAll(): List<Recipe> = dao.allIds().mapNotNull { get(it) }
+
         override suspend fun save(recipe: Recipe) {
             dao.upsertFull(
                 recipe = recipe.toEntity(),
-                tags = recipe.tags.distinct().map { RecipeTagEntity(recipe.id, it) },
+                tags = recipe.tags.distinct().mapIndexed { index, tag -> RecipeTagEntity(recipe.id, tag, index) },
                 ingredients = recipe.ingredients.mapIndexed { index, ingredient -> ingredient.toEntity(recipe.id, index) },
             )
         }
 
         override suspend fun delete(id: String) = dao.delete(id)
+
+        override suspend fun existing(): List<ExistingRecipe> =
+            dao.existingRecipes().map {
+                ExistingRecipe(it.id, it.uid, it.title, Instant.ofEpochMilli(it.createdAt), it.editedAfterImport)
+            }
+
+        override suspend fun imagePaths(): Set<String> = dao.imagePaths().toSet()
+
+        override suspend fun count(): Int = dao.count()
     }
 
 internal fun Recipe.toEntity() =
@@ -72,6 +108,9 @@ internal fun Recipe.toEntity() =
         bodyMarkdown = bodyMarkdown,
         createdAt = createdAt.toEpochMilli(),
         updatedAt = updatedAt.toEpochMilli(),
+        origin = origin.code,
+        importedAt = importedAt?.toEpochMilli(),
+        editedAfterImport = editedAfterImport,
     )
 
 internal fun RecipeEntity.toDomain(
@@ -92,6 +131,9 @@ internal fun RecipeEntity.toDomain(
     imagePath = imagePath,
     source = source,
     bodyMarkdown = bodyMarkdown,
+    origin = RecipeOrigin.fromCode(origin),
+    importedAt = importedAt?.let(Instant::ofEpochMilli),
+    editedAfterImport = editedAfterImport,
 )
 
 internal fun Ingredient.toEntity(
