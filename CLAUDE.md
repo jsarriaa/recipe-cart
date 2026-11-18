@@ -185,5 +185,8 @@ Ask first, every time (an earlier yes covers only that one action):
   the PR description.
 - No `!!` in production code (use `checkNotNull`/`requireNotNull` with a message for real
   invariants). No `GlobalScope`. No `runBlocking` outside tests.
+- Never write invisible or special Unicode characters in source as literals or as unicode
+  escapes (no-break space, BOM, line and paragraph separators): tooling has silently turned the
+  escapes into raw characters and then dropped them. Use code points: `Char(0x00A0)`, `Char(0xFEFF)`.
 - Domain tests use JUnit Jupiter (`@ParameterizedTest` + `@CsvSource` for rule tables) and
   kotlin.test assertions. Android module tests use JUnit 4 + Robolectric.
