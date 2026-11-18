@@ -80,7 +80,7 @@ class ProductLinkerTest {
     fun `suggests and preselects the closest cached product, with its display data`() =
         runTest {
             stock("1" to "Tortillas de trigo Hacendado", "2" to "Maxi tortillas de trigo Hacendado", "3" to "Pan de molde")
-            val match = linker.match(tortillas).single()
+            val match = linker.match(tortillas).first()
             assertEquals("mercadona", match.providerId)
             val chosen = assertNotNull(match.result.preselected)
             assertEquals("1", chosen.product.key.productId)
@@ -97,7 +97,7 @@ class ProductLinkerTest {
             val best =
                 linker
                     .match(other)
-                    .single()
+                    .first()
                     .result.preselected
             assertEquals("2", best?.product?.key?.productId)
             assertEquals(SuggestionSource.MEMORY, best?.source)
@@ -110,13 +110,13 @@ class ProductLinkerTest {
             val fromFile =
                 linker
                     .match(tortillas, listOf(ProductKey("mercadona", "2")))
-                    .single()
+                    .first()
                     .result.preselected
             assertEquals(SuggestionSource.FILE, fromFile?.source)
             val missing =
                 linker
                     .match(tortillas, listOf(ProductKey("mercadona", "999")))
-                    .single()
+                    .first()
                     .result.preselected
             assertEquals(SuggestionSource.SEARCH, missing?.source)
         }

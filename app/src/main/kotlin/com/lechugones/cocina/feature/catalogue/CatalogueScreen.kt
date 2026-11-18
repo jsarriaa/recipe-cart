@@ -65,10 +65,15 @@ import com.lechugones.cocina.data.catalogue.SyncFailure
 import com.lechugones.cocina.data.catalogue.SyncState
 import com.lechugones.cocina.domain.format.SpanishNumberFormat
 import com.lechugones.cocina.domain.product.BrandKind
+import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.units.MeasureUnit
 import com.lechugones.cocina.provider.ProviderProduct
 import com.lechugones.cocina.ui.components.PostalCodeDialog
+import com.lechugones.cocina.ui.components.ProductImage
+import com.lechugones.cocina.ui.components.ProductListItem
 import com.lechugones.cocina.ui.components.ScreenScaffold
+import com.lechugones.cocina.ui.components.productReferenceText
+import com.lechugones.cocina.ui.components.productSizeText
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.providerErrorMessage
 import com.lechugones.cocina.ui.format.quantityText
@@ -306,7 +311,7 @@ private fun Results(
         else -> {
             LazyColumn(Modifier.fillMaxSize()) {
                 items(state.results, key = { it.product.key.providerId + ":" + it.product.key.productId }) { product ->
-                    ProductRow(product, onClick = { onSelect(product) })
+                    ProductListItem(product, onClick = { onSelect(product) })
                     HorizontalDivider()
                 }
             }
@@ -322,71 +327,6 @@ private fun Hint(text: String) {
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-}
-
-@Composable
-private fun ProductImage(
-    url: String?,
-    size: Dp,
-) {
-    val modifier =
-        Modifier
-            .size(size)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-    if (url == null) {
-        Spacer(modifier)
-    } else {
-        AsyncImage(model = url, contentDescription = null, modifier = modifier, contentScale = ContentScale.Fit)
-    }
-}
-
-@Composable
-private fun ProductRow(
-    item: ProviderProduct,
-    onClick: () -> Unit,
-) {
-    val product = item.product
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        ProductImage(item.imageUrl, 56.dp)
-        Column(Modifier.weight(1f)) {
-            Text(product.name, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(sizeText(item), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                product.price?.let(SpanishNumberFormat::money) ?: stringResource(R.string.catalogue_no_price),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            referenceText(item)?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-    }
-}
-
-/** "360 g · 6 ud", "1 kg". */
-@Composable
-private fun sizeText(item: ProviderProduct): String {
-    val product = item.product
-    val net = quantityText(product.net.value, product.net.unit)
-    val count = product.unitCount?.takeIf { it > 1 && product.net.unit != MeasureUnit.UD }
-    return if (count == null) {
-        net
-    } else {
-        net + " · " + quantityText(BigDecimal(count), product.unitCountUnit ?: MeasureUnit.UD)
-    }
-}
-
-@Composable
-private fun referenceText(item: ProviderProduct): String? {
-    val price = item.referencePrice ?: return null
-    val format = item.referenceFormat ?: return null
-    return stringResource(R.string.catalogue_reference_price, SpanishNumberFormat.money(price), format)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -426,7 +366,7 @@ private fun ProductSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Text(listOfNotNull(p.packaging, sizeText(product)).joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
+            Text(listOfNotNull(p.packaging, productSizeText(product)).joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
             p.drained?.let {
                 Text(
                     stringResource(R.string.catalogue_drained, quantityText(it.value, it.unit)),
@@ -439,7 +379,7 @@ private fun ProductSheet(
                     p.price?.let(SpanishNumberFormat::money) ?: stringResource(R.string.catalogue_no_price),
                     style = MaterialTheme.typography.headlineSmall,
                 )
-                referenceText(product)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                productReferenceText(product)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
             }
             p.fetchedAt?.let {
                 Text(
@@ -451,7 +391,10 @@ private fun ProductSheet(
             if (refreshing) LinearProgressIndicator(Modifier.fillMaxWidth())
             outcome?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onRefresh, enabled = !refreshing) { Text(stringResource(R.string.catalogue_refresh_price)) }
+                // Manual products have no shop to ask.
+                if (p.key.providerId != ManualProducts.PROVIDER_ID) {
+                    Button(onClick = onRefresh, enabled = !refreshing) { Text(stringResource(R.string.catalogue_refresh_price)) }
+                }
                 product.webUrl?.let { url ->
                     OutlinedButton(onClick = {
                         try {

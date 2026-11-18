@@ -2,8 +2,13 @@ package com.lechugones.cocina.data.recipe
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.lechugones.cocina.data.catalogue.ProductLinker
 import com.lechugones.cocina.data.db.CocinaDatabase
 import com.lechugones.cocina.data.image.RecipeImageStore
+import com.lechugones.cocina.data.settings.DataStoreSettingsRepository
+import com.lechugones.cocina.data.testing.InMemoryPreferencesDataStore
+import com.lechugones.cocina.domain.product.ProductKey
+import com.lechugones.cocina.domain.recipe.IngredientLink
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
 import com.lechugones.cocina.domain.recipepack.DuplicateChoice
 import com.lechugones.cocina.domain.recipepack.RecipePackReader
@@ -29,6 +34,7 @@ class RecipeLibraryTest {
     private lateinit var repository: RoomRecipeRepository
     private lateinit var images: RecipeImageStore
     private lateinit var library: RecipeLibrary
+    private lateinit var linker: ProductLinker
 
     private val tacos = File("../../examples/recipe-packs/tacos-de-pollo.md").readText()
 
@@ -38,7 +44,15 @@ class RecipeLibraryTest {
         repository = RoomRecipeRepository(database.recipeDao())
         images = RecipeImageStore(ApplicationProvider.getApplicationContext())
         images.directory.listFiles()?.forEach { it.delete() }
-        library = RecipeLibrary(repository, images, Clock.fixed(now, ZoneOffset.UTC))
+        val clock = Clock.fixed(now, ZoneOffset.UTC)
+        linker =
+            ProductLinker(
+                database.productDao(),
+                database.linkMemoryDao(),
+                DataStoreSettingsRepository(InMemoryPreferencesDataStore()),
+                clock,
+            )
+        library = RecipeLibrary(repository, images, clock, linker)
     }
 
     @After
@@ -141,5 +155,58 @@ class RecipeLibraryTest {
             assertEquals(listOf("Arroz", "Tacos de pollo con aguacate y mozzarella"), items.map { it.draft.title })
             assertNull(items[0].image)
             assertEquals(3, items[1].image?.bytes?.size)
+        }
+
+    @Test
+    fun `linking an ingredient saves it, marks the import as edited and remembers the choice`() =
+        runTest {
+            val pack = RecipePackReader.readText(tacos, "tacos.md")
+            val id = library.import(library.planImport(pack).map { it to null }, emptyMap()).imported.single()
+            val recipe = checkNotNull(library.get(id))
+            val ingredient = recipe.ingredients.first()
+            val link = IngredientLink(ProductKey("mercadona", "80870"), preferred = true)
+
+            val saved = checkNotNull(library.setLinks(id, ingredient.id, listOf(link)))
+            assertTrue(saved.editedAfterImport)
+            assertEquals(
+                listOf(link),
+                library
+                    .get(id)
+                    ?.ingredients
+                    ?.first()
+                    ?.links,
+            )
+            assertEquals(
+                "80870",
+                database
+                    .linkMemoryDao()
+                    .forName(ingredient.nameKey)
+                    .single()
+                    .productId,
+            )
+
+            library.setLinks(id, ingredient.id, emptyList())
+            assertTrue(
+                library
+                    .get(id)
+                    ?.ingredients
+                    ?.first()
+                    ?.links
+                    .orEmpty()
+                    .isEmpty(),
+            )
+        }
+
+    @Test
+    fun `file links to products that are not cached are dropped with W07`() =
+        runTest {
+            val linked =
+                tacos.replaceFirst(
+                    "    match:",
+                    "    links:\n      - provider: mercadona\n        product_id: \"999\"\n    match:",
+                )
+            val candidate = library.planImport(RecipePackReader.readText(linked, "tacos.md")).single()
+            assertTrue(candidate.issues.any { it.code.name == "W07" })
+            assertTrue(checkNotNull(candidate.draft).ingredients.all { it.links.isEmpty() })
         }
 }

@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,9 +58,13 @@ import com.lechugones.cocina.domain.recipe.RecipeOrigin
 import com.lechugones.cocina.domain.recipe.ServingsScaler
 import com.lechugones.cocina.feature.export.ExportDialog
 import com.lechugones.cocina.feature.export.ExportFile
+import com.lechugones.cocina.provider.ProviderProduct
+import com.lechugones.cocina.ui.components.ManualProductDialog
 import com.lechugones.cocina.ui.components.MarkdownText
+import com.lechugones.cocina.ui.components.ProductImage
 import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
+import com.lechugones.cocina.ui.components.productPriceText
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.quantityText
 
@@ -71,6 +76,7 @@ fun RecipeDetailScreen(
     viewModel: RecipeDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val linking by viewModel.linking.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var menuOpen by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -133,7 +139,7 @@ fun RecipeDetailScreen(
             }
 
             is RecipeDetailUiState.Loaded -> {
-                RecipeDetailContent(current.recipe, current.servings, viewModel::setServings, padding)
+                RecipeDetailContent(current, viewModel::setServings, viewModel::openLinking, padding)
             }
         }
     }
@@ -153,16 +159,48 @@ fun RecipeDetailScreen(
         )
     }
     export?.let { ExportDialog(it, snackbar, onDismiss = { export = null }) }
+
+    val sheet = linking
+    if (sheet != null && loaded != null) {
+        LinkProductSheet(
+            state = sheet,
+            current = linkedProduct(sheet.ingredient, loaded),
+            onQuery = viewModel::onLinkQuery,
+            onPick = viewModel::link,
+            onUnlink = viewModel::unlink,
+            onAddManual = { viewModel.openManual(true) },
+            onDismiss = viewModel::closeLinking,
+        )
+        if (sheet.manualOpen) {
+            ManualProductDialog(
+                initialName = sheet.ingredient.name,
+                errors = sheet.manualErrors,
+                onSave = viewModel::saveManual,
+                onDismiss = { viewModel.openManual(false) },
+            )
+        }
+    }
+}
+
+/** The product shown for [ingredient]: the first cached link, preferred ones first (the newest pick is first). */
+private fun linkedProduct(
+    ingredient: Ingredient,
+    loaded: RecipeDetailUiState.Loaded,
+): ProviderProduct? {
+    val links = ingredient.links.sortedBy { !it.preferred }
+    return links.firstNotNullOfOrNull { loaded.products[it.product] }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RecipeDetailContent(
-    recipe: Recipe,
-    servings: Int,
+    loaded: RecipeDetailUiState.Loaded,
     onServings: (Int) -> Unit,
+    onLink: (Ingredient) -> Unit,
     padding: PaddingValues,
 ) {
+    val recipe = loaded.recipe
+    val servings = loaded.servings
     var staplesOpen by rememberSaveable { mutableStateOf(false) }
     val (staples, main) = recipe.ingredients.partition { it.pantryStaple }
     val groups = main.groupBy { it.group }
@@ -225,7 +263,7 @@ private fun RecipeDetailContent(
                     )
                 }
             }
-            items(ingredients, key = { it.id }) { IngredientRow(it, recipe.servings, servings) }
+            items(ingredients, key = { it.id }) { IngredientRow(it, recipe.servings, servings, linkedProduct(it, loaded)) { onLink(it) } }
         }
         if (staples.isNotEmpty()) {
             item {
@@ -241,7 +279,9 @@ private fun RecipeDetailContent(
                     Icon(if (staplesOpen) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
                 }
             }
-            if (staplesOpen) items(staples, key = { it.id }) { IngredientRow(it, recipe.servings, servings) }
+            if (staplesOpen) {
+                items(staples, key = { it.id }) { IngredientRow(it, recipe.servings, servings, linkedProduct(it, loaded)) { onLink(it) } }
+            }
         }
         item { Spacer(Modifier.height(12.dp)) }
         item {
@@ -300,14 +340,26 @@ private fun IngredientRow(
     ingredient: Ingredient,
     recipeServings: Int,
     servings: Int,
+    product: ProviderProduct?,
+    onClick: () -> Unit,
 ) {
     val scaled = ServingsScaler.scale(ingredient.quantity, ingredient.unit, recipeServings, servings)
-    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(
+                onClickLabel = stringResource(R.string.link_action),
+                onClick = onClick,
+            ).padding(horizontal = 16.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ProductImage(product?.imageUrl, 40.dp)
+        Spacer(Modifier.width(12.dp))
         Text(
             quantityText(scaled, ingredient.unit),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.width(120.dp),
+            modifier = Modifier.width(96.dp),
         )
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
@@ -315,6 +367,15 @@ private fun IngredientRow(
             Text(ingredient.name + optional, style = MaterialTheme.typography.bodyLarge)
             ingredient.note?.let {
                 Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (product != null) {
+                Text(
+                    stringResource(R.string.link_product_line, product.product.name, productPriceText(product)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }

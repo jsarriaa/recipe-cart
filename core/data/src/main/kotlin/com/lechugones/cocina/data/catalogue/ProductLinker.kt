@@ -4,6 +4,7 @@ import com.lechugones.cocina.data.db.LinkMemoryDao
 import com.lechugones.cocina.data.db.LinkMemoryEntity
 import com.lechugones.cocina.data.db.ProductDao
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.product.MatchResult
 import com.lechugones.cocina.domain.product.ProductKey
 import com.lechugones.cocina.domain.product.ProductMatcher
@@ -36,10 +37,10 @@ class ProductLinker
         private val settings: SettingsRepository,
         private val clock: Clock,
     ) {
-        /** Providers that are active and have a cached catalogue, in settings order (primary first). */
+        /** Active providers, primary first, then the built-in manual provider. */
         suspend fun activeProviders(): List<String> {
             val s = settings.settings.first()
-            return (listOf(s.primaryProvider) + s.activeProviders.sorted()).distinct()
+            return (listOf(s.primaryProvider) + s.activeProviders.sorted() + ManualProducts.PROVIDER_ID).distinct()
         }
 
         /** Suggestions for [ingredient] at every active provider. [fileLinks] come from an imported pack. */
