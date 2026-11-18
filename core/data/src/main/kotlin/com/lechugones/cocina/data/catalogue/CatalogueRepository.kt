@@ -81,6 +81,13 @@ sealed interface SyncFailure {
     ) : SyncFailure
 }
 
+/** Outcome of [CatalogueRepository.refreshProducts]. [error] is the last failure, if any. */
+data class RefreshSummary(
+    val updated: Int,
+    val gone: Int,
+    val error: ProviderError?,
+)
+
 data class CatalogueStatus(
     val products: Int,
     val lastFetch: Instant?,
@@ -296,6 +303,30 @@ class CatalogueRepository
                     }
                 }
             }
+        }
+
+        /**
+         * "Actualizar precios" for a recipe (SPEC § 4.1): refreshes only [keys], one by one at the
+         * provider's rate limit. Manual products are skipped. Stops at the first error that would
+         * make the rest fail too (offline, blocked, rate limited); cached prices always stay.
+         */
+        suspend fun refreshProducts(keys: Collection<ProductKey>): RefreshSummary {
+            var updated = 0
+            var gone = 0
+            var error: ProviderError? = null
+            for (key in keys.distinct().filter { it.providerId != ManualProducts.PROVIDER_ID }) {
+                when (val result = refreshProduct(key)) {
+                    is ProviderResult.Success -> {
+                        if (result.value == null) gone++ else updated++
+                    }
+
+                    is ProviderResult.Failure -> {
+                        error = result.error
+                        if (result.error !is ProviderError.Http && result.error !is ProviderError.Parse) break
+                    }
+                }
+            }
+            return RefreshSummary(updated, gone, error)
         }
 
         /** Saves a product typed by the user (built-in manual provider). Its shop is kept as its category. */
