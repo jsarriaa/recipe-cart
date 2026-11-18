@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every user-visible string lives here, in Spanish (es-ES). See CLAUDE.md, language rules. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
+
+    <string name="app_name">Cocina para Lechugones</string>
+
+    <!-- Navigation -->
+    <string name="nav_recipes">Recetas</string>
+    <string name="nav_pantry">Despensa</string>
+    <string name="nav_shopping">Compra</string>
+    <string name="nav_catalogue">Catálogo</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="action_open_settings">Abrir ajustes</string>
+    <string name="action_back">Volver</string>
+
+    <!-- Recipes -->
+    <string name="recipes_loading">Cargando recetas</string>
+    <string name="recipes_empty_title">Aún no tienes recetas</string>
+    <string name="recipes_empty_body">Muy pronto podrás crearlas aquí o importarlas desde un pack de recetas.</string>
+    <plurals name="recipe_servings">
+        <item quantity="one">%d ración</item>
+        <item quantity="many">%d raciones</item>
+        <item quantity="other">%d raciones</item>
+    </plurals>
+
+    <!-- Pantry -->
+    <string name="pantry_empty_title">Tu despensa está vacía</string>
+    <string name="pantry_empty_body">Aquí verás lo que tienes en casa, incluidos los paquetes abiertos.</string>
+
+    <!-- Shopping list -->
+    <string name="shopping_empty_title">La lista de la compra está vacía</string>
+    <string name="shopping_empty_body">Añade recetas y verás lo que te falta, agrupado por supermercado.</string>
+
+    <!-- Catalogue -->
+    <string name="catalogue_empty_title">Catálogo sin descargar</string>
+    <string name="catalogue_empty_body">Aquí podrás buscar productos de tus supermercados y ver sus precios.</string>
+
+    <!-- Settings -->
+    <string name="settings_coming_soon">Las opciones de supermercados, precios y copias de seguridad llegarán en las próximas versiones.</string>
+    <string name="settings_version">Versión %1$s</string>
+    <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>
+
+</resources>
