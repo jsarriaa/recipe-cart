@@ -30,6 +30,20 @@ data object CatalogueRoute
 @Serializable
 data object SettingsRoute
 
+@Serializable
+data class RecipeDetailRoute(
+    val id: String,
+)
+
+/** [id] null creates a new recipe. */
+@Serializable
+data class RecipeEditorRoute(
+    val id: String? = null,
+)
+
+@Serializable
+data object ImportRoute
+
 /** The four bottom-bar destinations (SPEC § 4). Settings is reached from the top bar. */
 enum class TopLevelDestination(
     val route: Any,

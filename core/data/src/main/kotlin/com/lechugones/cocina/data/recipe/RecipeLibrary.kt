@@ -63,6 +63,9 @@ class RecipeLibrary
             return toSave
         }
 
+        /** Deletes photo files no recipe references (left over by an editor that never saved). */
+        suspend fun cleanOrphanPhotos() = images.deleteOrphans(repository.imagePaths())
+
         suspend fun delete(id: String) {
             val recipe = repository.get(id) ?: return
             repository.delete(id)
