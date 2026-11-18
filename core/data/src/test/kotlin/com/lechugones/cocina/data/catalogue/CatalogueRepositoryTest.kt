@@ -246,7 +246,7 @@ class CatalogueRepositoryTest {
             calls++
             return ProviderResult.Success(
                 when (productId) {
-                    "banana" -> banana(emptyList())
+                    "banana" -> banana(listOf("Frutas"))
                     "orlando" -> orlando()
                     else -> null
                 },

@@ -46,6 +46,8 @@ data class CatalogueUiState(
     val askingPostalCode: Boolean = false,
     val selected: ProviderProduct? = null,
     val refreshing: Boolean = false,
+    /** Outcome of the last price refresh, shown inside the product sheet (a snackbar would be hidden). */
+    val refreshOutcome: CatalogueEvent? = null,
 )
 
 sealed interface CatalogueEvent {
@@ -79,6 +81,7 @@ class CatalogueViewModel
         private data class LocalState(
             val askingPostalCode: Boolean = false,
             val refreshing: Boolean = false,
+            val refreshOutcome: CatalogueEvent? = null,
         )
 
         private val providerId = settings.settings.map { it.primaryProvider }.distinctUntilChanged()
@@ -110,6 +113,7 @@ class CatalogueViewModel
                     selected = product,
                     askingPostalCode = l.askingPostalCode,
                     refreshing = l.refreshing,
+                    refreshOutcome = l.refreshOutcome,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), CatalogueUiState())
 
@@ -165,25 +169,34 @@ class CatalogueViewModel
 
         fun select(product: ProviderProduct?) {
             selectedKey.value = product?.product?.key
+            local.update { it.copy(refreshOutcome = null) }
         }
 
         fun refreshSelected() {
             val key = selectedKey.value ?: return
             if (local.value.refreshing) return
-            local.update { it.copy(refreshing = true) }
+            local.update { it.copy(refreshing = true, refreshOutcome = null) }
             viewModelScope.launch {
+                var outcome: CatalogueEvent? = null
                 try {
-                    when (val result = catalogue.refreshProduct(key)) {
-                        is ProviderResult.Success -> {
-                            eventChannel.send(if (result.value == null) CatalogueEvent.ProductGone else CatalogueEvent.PriceUpdated)
-                        }
+                    outcome =
+                        when (val result = catalogue.refreshProduct(key)) {
+                            is ProviderResult.Success -> {
+                                if (result.value ==
+                                    null
+                                ) {
+                                    CatalogueEvent.ProductGone
+                                } else {
+                                    CatalogueEvent.PriceUpdated
+                                }
+                            }
 
-                        is ProviderResult.Failure -> {
-                            eventChannel.send(CatalogueEvent.RefreshFailed(result.error))
+                            is ProviderResult.Failure -> {
+                                CatalogueEvent.RefreshFailed(result.error)
+                            }
                         }
-                    }
                 } finally {
-                    local.update { it.copy(refreshing = false) }
+                    local.update { it.copy(refreshing = false, refreshOutcome = outcome) }
                 }
             }
         }

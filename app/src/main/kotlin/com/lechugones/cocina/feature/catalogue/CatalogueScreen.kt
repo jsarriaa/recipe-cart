@@ -90,16 +90,9 @@ fun CatalogueScreen(
             val name = latest.providerName
             val message =
                 when (event) {
-                    CatalogueEvent.PriceUpdated -> {
-                        resources.getString(R.string.catalogue_price_updated)
-                    }
-
-                    CatalogueEvent.ProductGone -> {
-                        resources.getString(R.string.catalogue_product_gone, name)
-                    }
-
-                    is CatalogueEvent.RefreshFailed -> {
-                        providerErrorMessage(resources, event.error, name, latest.postalCode)
+                    // Refresh outcomes are shown inside the product sheet.
+                    CatalogueEvent.PriceUpdated, CatalogueEvent.ProductGone, is CatalogueEvent.RefreshFailed -> {
+                        null
                     }
 
                     is CatalogueEvent.SyncEnded -> {
@@ -157,6 +150,13 @@ fun CatalogueScreen(
         ProductSheet(
             product = product,
             refreshing = state.refreshing,
+            outcome =
+                when (val outcome = state.refreshOutcome) {
+                    CatalogueEvent.PriceUpdated -> stringResource(R.string.catalogue_price_updated)
+                    CatalogueEvent.ProductGone -> stringResource(R.string.catalogue_product_gone, state.providerName)
+                    is CatalogueEvent.RefreshFailed -> providerErrorMessage(resources, outcome.error, state.providerName, state.postalCode)
+                    else -> null
+                },
             onRefresh = viewModel::refreshSelected,
             onDismiss = { viewModel.select(null) },
         )
@@ -394,6 +394,7 @@ private fun referenceText(item: ProviderProduct): String? {
 private fun ProductSheet(
     product: ProviderProduct,
     refreshing: Boolean,
+    outcome: String?,
     onRefresh: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -448,6 +449,7 @@ private fun ProductSheet(
                 )
             }
             if (refreshing) LinearProgressIndicator(Modifier.fillMaxWidth())
+            outcome?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onRefresh, enabled = !refreshing) { Text(stringResource(R.string.catalogue_refresh_price)) }
                 product.webUrl?.let { url ->

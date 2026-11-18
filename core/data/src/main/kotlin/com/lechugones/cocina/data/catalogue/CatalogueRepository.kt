@@ -181,7 +181,8 @@ class CatalogueRepository
                 _syncState.value = SyncState.Failed(providerId, SyncFailure.UnknownProvider, 0)
                 return
             }
-            var saved = 0
+            // A product can be listed in several categories: count each once.
+            val seen = HashSet<String>()
             try {
                 _syncState.value = SyncState.Running(providerId, 0, 0, 0)
                 val location =
@@ -197,10 +198,11 @@ class CatalogueRepository
                 val started = Instant.now(clock)
                 var complete = true
                 categories.forEachIndexed { index, category ->
-                    _syncState.value = SyncState.Running(providerId, index, categories.size, saved)
+                    _syncState.value = SyncState.Running(providerId, index, categories.size, seen.size)
                     when (val result = guarded(provider) { provider.productsIn(category, location) }) {
                         is ProviderResult.Success -> {
-                            saved += store(result.value)
+                            store(result.value)
+                            result.value.mapTo(seen) { it.product.key.productId }
                         }
 
                         is ProviderResult.Failure -> {
@@ -211,16 +213,16 @@ class CatalogueRepository
                                 }
 
                                 else -> {
-                                    return fail(providerId, SyncFailure.Provider(result.error), saved)
+                                    return fail(providerId, SyncFailure.Provider(result.error), seen.size)
                                 }
                             }
                         }
                     }
                 }
                 if (complete) dao.markUnseenUnavailable(providerId, started.toEpochMilli())
-                _syncState.value = SyncState.Finished(providerId, saved, complete)
+                _syncState.value = SyncState.Finished(providerId, seen.size, complete)
             } catch (e: CancellationException) {
-                _syncState.value = SyncState.Cancelled(providerId, saved)
+                _syncState.value = SyncState.Cancelled(providerId, seen.size)
                 throw e
             }
         }
@@ -276,12 +278,10 @@ class CatalogueRepository
                         dao.markUnavailable(key.providerId, key.productId)
                         ProviderResult.Success(null)
                     } else {
-                        // The detail endpoint lacks our category path: keep the one from the sync.
+                        // The detail endpoint gives a shorter category path than the sync: keep the sync's.
                         val previousPath = dao.get(key.providerId, key.productId)?.toProviderProduct()?.categoryPath
                         val merged =
-                            if (fresh.categoryPath.isEmpty() &&
-                                previousPath != null
-                            ) {
+                            if (!previousPath.isNullOrEmpty()) {
                                 fresh.copy(categoryPath = previousPath)
                             } else {
                                 fresh
@@ -294,8 +294,8 @@ class CatalogueRepository
         }
 
         /** Upserts products and records a price snapshot for each new or changed price. */
-        private suspend fun store(products: List<ProviderProduct>): Int {
-            if (products.isEmpty()) return 0
+        private suspend fun store(products: List<ProviderProduct>) {
+            if (products.isEmpty()) return
             val now = Instant.now(clock)
             val providerId =
                 products
@@ -309,7 +309,6 @@ class CatalogueRepository
                     .map { PriceSnapshotEntity(it.providerId, it.productId, it.fetchedAt, checkNotNull(it.priceCents) { "filtered" }) }
             dao.upsert(rows)
             dao.insertSnapshots(snapshots)
-            return rows.size
         }
 
         /** Short-circuits calls while a provider is in its post-403 pause. */
