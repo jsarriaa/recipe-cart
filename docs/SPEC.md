@@ -57,6 +57,7 @@ files are the only ways to move data between phones.
 | Memoria de vínculos | `LinkMemory` | Remembered links per normalised ingredient name |
 | Básico de despensa | `pantry staple` | Ingredient flagged `pantry: true` (salt, oil, spices) |
 | Despensa | `Pantry` / `PantryLot` | What is at home. One lot is one package or one opened remainder |
+| Usar pronto | `useSoon` | A pantry lot to use up first: tagged by hand, close to its best-before date, or opened for too long (§ 4.5) |
 | Lista de la compra | `ShoppingList` | Items to buy, grouped by provider |
 | Pack de recetas | `RecipePack` | `.md` or `.zip` in the [recipe format](RECIPE_FORMAT.md) |
 | Copia de seguridad | `Backup` | Single file with all app data |
@@ -193,9 +194,13 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
 
 - **List**: search by title, ingredient or tag; filter by tag; sort by name, recently cooked,
   recently added, or cost per serving.
-- **Create / edit**: title, description, servings, prep and cook minutes, tags, image (from
-  gallery or camera through the system picker), source, steps (Markdown editor with preview),
-  and ingredients.
+- **Create / edit**: title, description, servings, prep and cook minutes, tags, photo (§ 4.9),
+  source, steps (Markdown editor with preview), and ingredients.
+- **Everything is editable**: no recipe is read-only. Imported recipes can be changed exactly
+  like the ones created in the app: every field, ingredient, quantity, photo and step. Each
+  recipe records its origin (`created` or `imported`, with the import date) and whether it was
+  edited after import, so a later re-import of the same pack never silently overwrites local
+  changes (§ 4.3, step 4).
 - **Ingredient**: quantity, unit ([units](RECIPE_FORMAT.md#5-units)), generic name, note,
   group (for example "Para el guacamole"), optional flag, **pantry staple** flag, optional
   `unitWeightG` (grams per unit, for count and spoon units), match hints, and **links to one or
@@ -220,6 +225,10 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   (§ 5.3) while computations keep full precision.
 - AC2.2 Duplicating and then editing the copy never changes the original.
 - AC2.3 Every recipe field survives export → import unchanged (§ 4.3).
+- AC2.4 An imported recipe can be edited and saved like any other, and is then marked as edited
+  after import.
+- AC2.5 A recipe photo can be added from the gallery or the camera, replaced and removed. Deleting
+  a recipe deletes its photo file.
 
 ### 4.3 Recipe packs: import and export
 
@@ -243,7 +252,9 @@ The exact file format is in [RECIPE_FORMAT.md](RECIPE_FORMAT.md).
 3. **Preview**: one card per recipe with title, servings, ingredient count and image, plus its
    errors and warnings in Spanish. The user can deselect recipes.
 4. **Duplicates**: same `uid` as an existing recipe, or the same normalised title → choose
-   "Reemplazar", "Guardar como copia" or "Omitir" (per recipe, with "aplicar a todas").
+   "Reemplazar", "Guardar como copia" or "Omitir" (per recipe, with "aplicar a todas"). If the
+   existing recipe was **edited after import**, the default is "Omitir" (shown as "Mantener la
+   mía"), and "Reemplazar" asks for confirmation: "Perderás los cambios que hiciste en la app".
 5. **Product matching** (§ 5.4) for every ingredient of the selected recipes, against the local
    catalogue of active providers. The screen lists ingredients with the suggested product per
    provider, package size and price. Each can be changed ("Ver más"), removed, or left unlinked.
@@ -273,11 +284,14 @@ vincular".
   produces a clear Spanish message and never a crash. Covered by parser tests with fixtures.
 - AC3.4 The sample pack in `examples/recipe-packs/` imports with zero errors and zero warnings.
 - AC3.5 "Aceptar todo" is a single tap and then shows the result. No extra confirmation dialog.
+- AC3.6 Re-importing a pack never replaces a recipe that was edited after import unless the user
+  explicitly confirms it.
 
 ### 4.4 Quantities and cost
 
 For a recipe at the chosen servings and supermarket mode, each ingredient line shows:
 
+- The selected product's photo (§ 4.9), or a neutral placeholder when the ingredient is not linked.
 - The quantity in the recipe unit: "300 g de contramuslo de pollo deshuesado".
 - When linked and convertible, the **package fraction**: "1/2 paquete de ñoquis, 250 g de 500 g"
   (§ 5.3).
@@ -330,11 +344,24 @@ Rules:
   date, optional location ("nevera", "congelador", "armario").
 - Staples can be tracked **presence-only** ("tengo sal" / "se ha acabado") with no quantity.
 - Adding: from the catalogue, from a shopping list ("Comprado"), or manually with a generic name.
-- The list is grouped: Abiertos, Sin abrir, Básicos, with search and a location filter.
+- Each lot shows its product's photo (§ 4.9) when it is linked to a product.
+- **"Usar pronto"** marks food to use up first. A lot is *usar pronto* when any of these holds:
+  - the user tagged it by hand (toggle on the lot, or a swipe action in the list);
+  - its best-before date is within the warning window (setting "Avisar con antelación de",
+    default 3 days), or has passed (shown as **Caducado**, still listed so the user decides);
+  - it is opened and has an "after opening, keeps for N days" value whose limit falls within
+    the warning window. N is optional per lot and remembered per product (or name key), so it
+    is asked only once ("Nata abierta: se conserva 4 días").
+
+  The tag can be cleared by hand; an automatic one comes back only if its trigger changes
+  (a new best-before date, or the lot is opened again). There are no notifications: the app does
+  no background work.
+- The list is grouped: **Usar pronto** (first, with a count badge on the Despensa tab),
+  Abiertos, Sin abrir, Básicos, with search and a location filter.
 - **"Lo he cocinado"** on a recipe (at the current servings):
   1. The domain plans deductions: for each ingredient, matching lots (§ 5.5) are consumed
-     **opened lots first, then the earliest best-before, then FIFO by `addedAt`**. A sealed lot
-     that is partly used becomes opened.
+     **"usar pronto" lots first, then opened lots, then the earliest best-before, then FIFO by
+     `addedAt`**. A sealed lot that is partly used becomes opened.
   2. A confirmation sheet lists every deduction, editable: amount, which lot, or skip. Missing
      amounts are shown ("No tenías suficiente: faltan 50 g").
   3. Confirm applies it in one transaction and records a `CookEvent`. A snackbar offers
@@ -343,7 +370,9 @@ Rules:
      "Se ha acabado" for each.
 - **"¿Qué puedo cocinar?"**: every recipe, at its default servings, gets a coverage status
   ignoring staples and optional ingredients: **Lo tienes todo**, **Te falta 1–2**, **Te faltan
-  más**. Sorted by status, then by the share of the dish cost already in the pantry. Each card
+  más**. Recipes that use at least one "usar pronto" lot come first within each status, with a
+  chip naming them ("Aprovecha: nata, espinacas"), and a filter "Aprovechar lo que caduca" shows
+  only those. Then they are sorted by the share of the dish cost already in the pantry. Each card
   lists the missing items and has "Añadir lo que falta a la lista".
 
 #### AC
@@ -352,6 +381,9 @@ Rules:
   order, partial lots, insufficient stock, unit conversion (cda of oil from a 1 l bottle),
   count units, and undo restoring the exact previous state.
 - AC5.2 Nothing is deducted without the confirmation sheet.
+- AC5.3 The "usar pronto" rule is pure domain code, tested for: manual tag, best-before inside
+  and outside the window, expired lots, opened shelf life, clearing an automatic tag, and the
+  ordering it imposes on deductions and on "¿Qué puedo cocinar?".
 
 ### 4.6 Shopping list ("Lista de la compra")
 
@@ -444,8 +476,34 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
 | Incluir opcionales en el coste | off |
 | Precio antiguo a partir de | 14 days |
 | Añadir básicos que me faltan a la lista | on |
+| Avisar de "usar pronto" con antelación de | 3 days |
 | Copia de seguridad | Create / Restore |
 | Acerca de | Version, open-source licences, legal note (not affiliated with any supermarket) |
+
+### 4.9 Pictures
+
+#### Recipe photos (phase 2)
+
+- One photo per recipe, added in the editor from the **gallery** (Android photo picker, no
+  storage permission) or the **camera** (the system camera app through `TakePicture`, no camera
+  permission). It can be replaced or removed.
+- Shown as a thumbnail in the recipe list and as the header of the recipe detail. Recipes
+  without a photo get a neutral placeholder.
+- Stored in app-private storage (`files/images/<uuid>.jpg`), rotated per EXIF, downscaled to at
+  most 1600 px on the long side, JPEG quality 85. Replaced and deleted photos are removed from
+  disk. Photos travel in recipe pack exports (`images/`) and in backups.
+
+#### Ingredient pictures (phase 3 onwards)
+
+- Ingredient pictures come **only from the supermarket**: the image of the product an
+  ingredient is linked to (the selected product for the current supermarket mode, § 4.4). There
+  are no user photos for ingredients.
+- Shown next to ingredients in the recipe detail and editor, in the import matching screen
+  (product suggestions), in the catalogue, and from their phases on in the pantry and the
+  shopping list. Unlinked ingredients show a neutral placeholder icon.
+- Loaded with Coil from the provider's image CDN (Mercadona: `prod-mercadona.imgix.net` with
+  small `w`/`h` parameters), only when a screen needs them, and cached on disk so they keep
+  working offline. Manual products have no picture unless phase 7 adds one.
 
 ---
 
@@ -559,14 +617,15 @@ A lot whose unit cannot be converted is listed but needs a manual amount.
 
 ## 6. Data model (Room, first draft)
 
-Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient`, exactly as below. The other
+Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient` without the three
+`recipe` columns marked *(v2)*. Schema v2 (phase 2) adds them with a tested migration. The other
 tables arrive with later schema versions and tested migrations; `ingredient_link` comes with
 `product` in phase 3, so until then ingredients are stored without links. All ids are `TEXT`
 UUIDs except provider product keys.
 
 | Table | Key columns |
 |---|---|
-| `recipe` | `id`, `uid`, `title`, `description`, `servings`, `prep_minutes`, `cook_minutes`, `image_path`, `source`, `body_md`, `created_at`, `updated_at` |
+| `recipe` | `id`, `uid`, `title`, `description`, `servings`, `prep_minutes`, `cook_minutes`, `image_path`, `source`, `body_md`, `created_at`, `updated_at`, `origin` *(v2)*, `imported_at` *(v2)*, `edited_after_import` *(v2)* |
 | `recipe_tag` | `recipe_id`, `tag` |
 | `ingredient` | `id`, `recipe_id`, `position`, `group_label`, `name`, `name_key`, `quantity_milli`, `unit`, `note`, `optional`, `pantry_staple`, `unit_weight_g_milli`, `match_query`, `match_package`, `match_store_brand_ok` |
 | `ingredient_link` | `ingredient_id`, `provider_id`, `product_id`, `preferred`, `position` |
@@ -574,7 +633,8 @@ UUIDs except provider product keys.
 | `product` | `provider_id`, `product_id` (PK pair), `name`, `brand`, `brand_kind`, `packaging`, `net_quantity_milli`, `base_unit`, `unit_count`, `drained_milli`, `approx`, `price_cents`, `reference_price_cents`, `reference_unit`, `image_url`, `web_url`, `category_path`, `available`, `fetched_at`, `last_error` |
 | `product_fts` | FTS4 over `name`, `brand`, `category_path` (content = `product`) |
 | `price_snapshot` | `provider_id`, `product_id`, `price_cents`, `fetched_at` |
-| `pantry_lot` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `base_unit?`, `package_quantity_milli?`, `opened`, `opened_at`, `added_at`, `best_before`, `location`, `presence_only` |
+| `pantry_lot` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `base_unit?`, `package_quantity_milli?`, `opened`, `opened_at`, `added_at`, `best_before`, `location`, `presence_only`, `use_soon_manual`, `use_soon_dismissed_at?`, `opened_shelf_life_days?` |
+| `shelf_life_memory` | `key` (provider product or name key), `opened_shelf_life_days` |
 | `shopping_item` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `needed_milli`, `base_unit`, `packages`, `checked`, `manual`, `provider_override` |
 | `shopping_contribution` | `item_id`, `recipe_id`, `servings`, `needed_milli` |
 | `cook_event` | `id`, `recipe_id?`, `recipe_title`, `servings`, `cooked_at`, `undone` |
@@ -630,10 +690,10 @@ the phone.
 |---|---|---|
 | **0 — Specification** (committed; push waits for the GitHub CLI) | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
 | **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
-| **2 — Recipes, packs and backup** | Recipe list, detail, editor, duplicate, delete, scaling, staples; recipe pack parser/validator/serializer; import via share sheet and picker, with validation and preview (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC7.* |
-| **3 — Providers and catalogue** | `:provider:api`, rate limiter, Mercadona module, postal code → warehouse, catalogue sync, FTS search, product detail, price refresh with fallback, Manual provider, store-brand filter, settings; ingredient linking in the editor; import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
+| **2 — Recipes, packs and backup** | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
+| **3 — Providers and catalogue** | `:provider:api`, rate limiter, Mercadona module, postal code → warehouse, catalogue sync, FTS search, product detail, price refresh with fallback, Manual provider, store-brand filter, settings; ingredient linking in the editor; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |
-| **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" | AC5.* |
+| **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |
 | **6 — Shopping list** | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text | AC6.* |
 | **7 — Día and release** | Día feasibility check and provider (or a documented manual-price fallback); release signing; R8; friends' APK; polish and performance pass | Signed APK installed on a second phone |
 
