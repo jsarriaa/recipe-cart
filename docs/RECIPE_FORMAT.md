@@ -78,9 +78,13 @@ Limits (exceeding a pack limit rejects the whole input, `P02`):
 | Recipe body | ≤ 20 000 characters |
 | Zip file | ≤ 50 MiB compressed, ≤ 100 MiB uncompressed in total |
 | Zip entries | ≤ 500 |
-| Compression ratio per entry | ≤ 100 : 1 |
 | Image | ≤ 5 MiB each |
 | Recipes per pack | ≤ 100 |
+
+The limits are enforced while inflating: the reader never inflates more than the per-file limit
+of an entry (256 KiB for a document, 5 MiB for an image) or 100 MiB in total, so a zip bomb stops
+early. An oversized image or an unrecognised file is skipped with `P06`; an oversized document
+is `E12`.
 
 Zip entries with an absolute path, a drive letter, a backslash or a `..` segment reject the whole
 pack (`P03`).
@@ -150,7 +154,7 @@ pack (`P03`).
 | Field | Type | Req. | Rules |
 |---|---|---|---|
 | `provider` | string | **yes** | Provider id, `[a-z][a-z0-9_]{1,31}`: `mercadona`, `dia`, `manual` |
-| `product_id` | string | **yes** | 1–64 chars, the provider's product id. Write it quoted (`"80870"`). A bare number is accepted and converted (`W02`) |
+| `product_id` | string | **yes** | 1–64 chars, the provider's product id. Write it quoted (`"80870"`). A bare number is also read as text |
 | `name` | string | no | ≤ 200 chars. Product name snapshot, for humans reading the file |
 | `preferred` | boolean | no | At most one `true` per provider (extra ones: `W08`, the first wins). If none is set, the first link for each provider is preferred |
 
@@ -251,7 +255,8 @@ the codes are stable and used in tests.
 | `P02` | A limit in § 2 was exceeded |
 | `P03` | Unsafe zip entry path |
 | `P04` | No recipe document found |
-| `P05` | The file is an app backup (`backup-manifest.json` present). The app offers Restore instead |
+| `P05` | The file is an app backup (`backup-manifest.json` present). The import screen points to Ajustes › Copia de seguridad › Restaurar |
+| `P06` | A file in the zip was ignored: not a root `.md` or an `images/` picture, or an image over 5 MiB. The rest imports (warning) |
 
 ### 9.2 Recipe errors
 
@@ -275,7 +280,7 @@ the codes are stable and used in tests.
 | Code | Meaning |
 |---|---|
 | `W01` | Unknown field, ignored (field path reported) |
-| `W02` | Value normalised: unit alias, decimal comma, tag case, numeric `product_id` |
+| `W02` | Value normalised: unit alias, decimal comma, tag case or duplicates |
 | `W03` | `image` not found in the pack |
 | `W04` | `image` value invalid, ignored |
 | `W05` | Non-staple ingredient without `match` |

@@ -19,6 +19,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import javax.inject.Singleton
 
 @Module
@@ -39,6 +40,11 @@ object DataModule {
 
     @Provides
     fun provideRecipeDao(database: CocinaDatabase): RecipeDao = database.recipeDao()
+
+    /** Injected so tests can control "now". */
+    @Provides
+    @Singleton
+    fun provideClock(): Clock = Clock.systemUTC()
 
     @Provides
     @Singleton

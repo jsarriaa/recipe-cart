@@ -113,7 +113,7 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 | DB | Room (KSP) with FTS4 for product search | Schemas exported to `core/data/schemas/` |
 | Settings | DataStore Preferences | |
 | Network | Retrofit + OkHttp + kotlinx.serialization converter | One shared `OkHttpClient` with per-provider interceptors |
-| YAML | kaml (kotlinx.serialization YAML) | Only for recipe front matter |
+| YAML | kaml (node API only, no serializers) | Only for recipe front matter. Pure Kotlin, so it runs on Android 8 |
 | Markdown rendering | A small Compose renderer for the subset in RECIPE_FORMAT.md, or a maintained M3 Markdown library (decided in phase 2) | |
 | Images | Coil 3 | Disk cache for product thumbnails |
 | Tests | JUnit Jupiter 6 + kotlin.test (JVM modules), JUnit 4 + Robolectric (Room/Android), Turbine (Flow), MockWebServer (providers) | |
@@ -439,17 +439,21 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
   `CreateDocument`. Contents:
   - `backup-manifest.json`: format version, app version, Room schema version, creation time,
     row counts, SHA-256 of every other entry.
-  - `database/cocina.db`: a consistent snapshot of the Room database, taken after
-    `PRAGMA wal_checkpoint(FULL)` with writes paused by the repository write lock.
+  - `database/cocina.db`: a transactionally consistent snapshot of the Room database, made
+    with `VACUUM INTO` (Android 11+), or `PRAGMA wal_checkpoint(TRUNCATE)` plus a file copy on
+    older versions.
   - `datastore/settings.preferences_pb`.
-  - `images/…`: recipe images.
+  - `images/…`: the recipe photos that some recipe references (orphans are left out).
   The product catalogue is included, so cached prices survive a restore.
 - **"Restaurar copia"** reads the file and validates it before touching anything: manifest,
-  checksums, schema version not newer than the app's, `PRAGMA integrity_check`. Then it shows a
-  preview ("42 recetas, 118 productos en despensa, copia del 18/11/2026"). On confirmation it
-  first writes an automatic backup of the current data to app-private storage (the last 3 are
-  kept), then swaps in the files and restarts the app process. Room migrations upgrade older
-  backups on open.
+  checksums, only the allowed entries (`database/`, `datastore/`, `images/<file>`), schema version
+  not newer than the app's, `PRAGMA integrity_check`, and a `user_version` that matches the
+  manifest. Then it shows a preview ("Copia del 18/11/2026 10:20 con 42 recetas y 30 fotos"). On
+  confirmation it first writes an automatic backup of the current data to app-private storage
+  (`files/auto-backups/`, the last 3 are kept), then swaps in the files and restarts the app
+  process. Room migrations upgrade older backups on open.
+- **"Deshacer la última restauración"** restores the newest automatic backup through the same
+  validation and confirmation.
 - Because restore works through migrations, the backup format does not change when the schema
   changes. That is why the backup is a database snapshot, not a JSON dump.
 - `android:allowBackup="false"` and empty data-extraction rules: there is no Google cloud
@@ -690,7 +694,7 @@ the phone.
 |---|---|---|
 | **0 — Specification** (committed; push waits for the GitHub CLI) | Repository, CLAUDE.md, this spec, recipe format, generator prompt, sample pack, provider research, device setup | Committed and pushed |
 | **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
-| **2 — Recipes, packs and backup** | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
+| **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
 | **3 — Providers and catalogue** | `:provider:api`, rate limiter, Mercadona module, postal code → warehouse, catalogue sync, FTS search, product detail, price refresh with fallback, Manual provider, store-brand filter, settings; ingredient linking in the editor; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |
 | **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |

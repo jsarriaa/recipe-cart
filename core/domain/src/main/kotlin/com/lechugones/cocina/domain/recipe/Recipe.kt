@@ -23,17 +23,40 @@ data class Recipe(
     val imagePath: String? = null,
     val source: String? = null,
     val bodyMarkdown: String = "",
+    val origin: RecipeOrigin = RecipeOrigin.CREATED,
+    /** When the recipe was last imported from a pack (null for recipes created in the app). */
+    val importedAt: Instant? = null,
+    /** An imported recipe was changed in the app afterwards: re-imports must not overwrite it silently. */
+    val editedAfterImport: Boolean = false,
 ) {
     init {
         require(servings > 0) { "servings must be positive: $servings" }
     }
 }
 
-/** The fields shown in recipe lists. */
+/** Where a recipe came from (SPEC § 4.2, "Everything is editable"). */
+enum class RecipeOrigin(
+    val code: String,
+) {
+    CREATED("created"),
+    IMPORTED("imported"),
+    ;
+
+    companion object {
+        fun fromCode(code: String): RecipeOrigin = entries.firstOrNull { it.code == code } ?: CREATED
+    }
+}
+
+/** The fields shown in recipe lists, plus what list search and filters need. */
 data class RecipeSummary(
     val id: String,
     val title: String,
     val servings: Int,
+    val imagePath: String? = null,
+    val tags: List<String> = emptyList(),
+    /** [NameKey]s of the ingredient names, for search. */
+    val ingredientKeys: Set<String> = emptySet(),
+    val createdAt: Instant = Instant.EPOCH,
 )
 
 data class Ingredient(

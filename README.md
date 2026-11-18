@@ -7,9 +7,10 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: phase 1 (foundations).** The app shell, database, settings store and the domain core
-> (units, quantities, package fractions, costs) exist and are tested. No user features yet. See
-> the [development phases](docs/SPEC.md#9-development-phases).
+> **Status: phase 2 (recipes, recipe packs, backup).** Recipes can be created, edited (imported
+> ones too), photographed, scaled, duplicated, imported from recipe packs, exported and backed up.
+> Supermarket products and prices come in phase 3. See the
+> [development phases](docs/SPEC.md#9-development-phases).
 
 ## Features (planned)
 
@@ -126,9 +127,12 @@ bundle (2026-11-18). No third-party code was involved.
 | [JUnit](https://junit.org) (Jupiter and JUnit 4) | Unit tests | EPL-2.0 / EPL-1.0 |
 | [Robolectric](https://github.com/robolectric/robolectric) | Android tests on the JVM | MIT |
 | [Turbine](https://github.com/cashapp/turbine) | Testing Flows | Apache-2.0 |
+| [kaml](https://github.com/charleskorn/kaml) (and its [snakeyaml-engine-kmp](https://github.com/krzema12/snakeyaml-engine-kmp)) | Reading the YAML front matter of recipe packs | Apache-2.0 |
+| [Coil](https://github.com/coil-kt/coil) | Showing recipe photos | Apache-2.0 |
+| [AndroidX ExifInterface](https://developer.android.com/jetpack/androidx/releases/exifinterface) | Rotating camera photos correctly | Apache-2.0 |
+| [Okio](https://github.com/square/okio) (pulled in by kaml and DataStore) | I/O used by those libraries | Apache-2.0 |
 | [actions/checkout](https://github.com/actions/checkout), [actions/setup-java](https://github.com/actions/setup-java), [actions/upload-artifact](https://github.com/actions/upload-artifact), [gradle/actions](https://github.com/gradle/actions) | GitHub Actions CI | MIT |
 
 Planned for later phases (added here when they are introduced):
 [Retrofit](https://github.com/square/retrofit) and [OkHttp](https://github.com/square/okhttp)
-(Apache-2.0), [Coil](https://github.com/coil-kt/coil) (Apache-2.0) and
-[kaml](https://github.com/charleskorn/kaml) (Apache-2.0).
+(Apache-2.0).

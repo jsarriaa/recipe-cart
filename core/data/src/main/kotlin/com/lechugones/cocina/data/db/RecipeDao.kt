@@ -8,17 +8,30 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class RecipeDao {
-    @Query("SELECT id, title, servings FROM recipe ORDER BY title COLLATE NOCASE, id")
-    abstract fun observeSummaries(): Flow<List<RecipeSummaryRow>>
+    /** One consistent snapshot of every recipe with its tags and ingredient keys. */
+    @Transaction
+    @Query("SELECT id, title, servings, image_path AS imagePath, created_at AS createdAt FROM recipe")
+    abstract fun observeSummaries(): Flow<List<RecipeSummaryWithDetails>>
 
     @Query("SELECT * FROM recipe WHERE id = :id")
     abstract suspend fun getRecipe(id: String): RecipeEntity?
 
-    @Query("SELECT tag FROM recipe_tag WHERE recipe_id = :recipeId ORDER BY tag")
+    @Query("SELECT tag FROM recipe_tag WHERE recipe_id = :recipeId ORDER BY position, tag")
     abstract suspend fun getTags(recipeId: String): List<String>
 
     @Query("SELECT * FROM ingredient WHERE recipe_id = :recipeId ORDER BY position")
     abstract suspend fun getIngredients(recipeId: String): List<IngredientEntity>
+
+    @Query("SELECT id FROM recipe ORDER BY title COLLATE NOCASE, id")
+    abstract suspend fun allIds(): List<String>
+
+    @Query(
+        "SELECT id, uid, title, created_at AS createdAt, edited_after_import AS editedAfterImport FROM recipe",
+    )
+    abstract suspend fun existingRecipes(): List<ExistingRecipeRow>
+
+    @Query("SELECT image_path FROM recipe WHERE image_path IS NOT NULL")
+    abstract suspend fun imagePaths(): List<String>
 
     @Query("SELECT COUNT(*) FROM recipe")
     abstract suspend fun count(): Int

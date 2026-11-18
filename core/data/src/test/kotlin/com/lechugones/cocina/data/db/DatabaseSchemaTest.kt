@@ -10,6 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 /**
  * Migration harness. Every new schema version adds a test here that creates the previous
@@ -20,13 +21,6 @@ import kotlin.test.assertEquals
 class DatabaseSchemaTest {
     @get:Rule
     val helper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), CocinaDatabase::class.java)
-
-    @Test
-    fun `migrations cover every version step`() {
-        val steps = CocinaMigrations.ALL.map { it.startVersion to it.endVersion }
-        val expected = (1 until CocinaDatabase.VERSION).map { it to it + 1 }
-        assertEquals(expected, steps)
-    }
 
     /**
      * Absolute path: with a bare name, Room's test driver compares paths with "/" and fails
@@ -39,16 +33,29 @@ class DatabaseSchemaTest {
             .absolutePath
 
     @Test
-    fun `exported v1 schema opens with the current database and migrations`() =
+    fun `migrations cover every version step`() {
+        val steps = CocinaMigrations.ALL.map { it.startVersion to it.endVersion }
+        val expected = (1 until CocinaDatabase.VERSION).map { it to it + 1 }
+        assertEquals(expected, steps)
+    }
+
+    @Test
+    fun `v1 data survives the migration to v2 with safe defaults`() =
         runTest {
             helper.createDatabase(testDb, 1).use { db ->
                 db.execSQL(
                     "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, " +
                         "image_path, source, body_md, created_at, updated_at) " +
-                        "VALUES ('r1', 'u1', 'Gazpacho', NULL, 4, NULL, NULL, NULL, NULL, '', 0, 0)",
+                        "VALUES ('r1', 'u1', 'Gazpacho', NULL, 4, NULL, NULL, 'foto.jpg', NULL, '## Preparación', 10, 20)",
+                )
+                db.execSQL("INSERT INTO recipe_tag (recipe_id, tag) VALUES ('r1', 'verano')")
+                db.execSQL(
+                    "INSERT INTO ingredient (id, recipe_id, position, group_label, name, name_key, quantity_milli, unit, " +
+                        "note, optional, pantry_staple, unit_weight_g_milli, match_query, match_package, match_store_brand_ok) " +
+                        "VALUES ('i1', 'r1', 0, NULL, 'tomate', 'tomate', 1000000, 'g', NULL, 0, 0, NULL, 'tomate', '1 kg', 1)",
                 )
             }
-            helper.runMigrationsAndValidate(testDb, CocinaDatabase.VERSION, true, *CocinaMigrations.ALL).close()
+            helper.runMigrationsAndValidate(testDb, 2, true, CocinaMigrations.MIGRATION_1_2).close()
 
             val database =
                 Room
@@ -57,7 +64,15 @@ class DatabaseSchemaTest {
                     .allowMainThreadQueries()
                     .build()
             try {
-                assertEquals("Gazpacho", database.recipeDao().getRecipe("r1")?.title)
+                val dao = database.recipeDao()
+                val recipe = dao.getRecipe("r1")
+                assertEquals("Gazpacho", recipe?.title)
+                assertEquals("foto.jpg", recipe?.imagePath)
+                assertEquals("created", recipe?.origin)
+                assertNull(recipe?.importedAt)
+                assertEquals(false, recipe?.editedAfterImport)
+                assertEquals(listOf("verano"), dao.getTags("r1"))
+                assertEquals("tomate", dao.getIngredients("r1").single().name)
             } finally {
                 database.close()
             }

@@ -15,7 +15,8 @@ import java.math.RoundingMode
  * - Money: `3,45 €`, with a no-break space before the euro sign.
  */
 object SpanishNumberFormat {
-    const val NO_BREAK_SPACE = ' '
+    /** U+00A0, written as a code point so editors cannot turn it into a plain space. */
+    val NO_BREAK_SPACE: Char = Char(0x00A0)
 
     fun decimal(
         value: BigDecimal,

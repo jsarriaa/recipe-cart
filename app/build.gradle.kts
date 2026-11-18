@@ -22,8 +22,8 @@ android {
     defaultConfig {
         // Never change once real data exists (CLAUDE.md, hard rule 6).
         applicationId = "com.lechugones.cocina"
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
     }
 
     signingConfigs {
@@ -88,6 +88,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.kotlinx.serialization.json)
+    // Recipe photos (SPEC § 4.9); product images over the network come in phase 3.
+    implementation(libs.coil.compose)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

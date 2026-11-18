@@ -34,9 +34,9 @@ ADB="$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"
 "$ADB" push examples/recipe-packs/tacos-de-pollo.md /sdcard/Download/CocinaParaLechugones-test/
 ```
 
-Then open it from the Files app with "Compartir → Cocina (debug)", or use "Importar recetas"
-in the app. Once the import UI exists (phase 2), the expected result is one recipe with 8
-ingredients, 2 of them in "Básicos de despensa", and no warnings.
+Then open it from the Files app with "Compartir → Importar receta", or use "Importar recetas"
+in the app. The expected result is one recipe with 8 ingredients, 2 of them in "Básicos de
+despensa", and no warnings.
 
 Expected package fractions with the Mercadona products found on 2026-11-18 (phase 4):
 
