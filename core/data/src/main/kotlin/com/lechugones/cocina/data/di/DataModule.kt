@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.lechugones.cocina.data.db.CocinaDatabase
 import com.lechugones.cocina.data.db.CocinaMigrations
+import com.lechugones.cocina.data.db.ProductDao
 import com.lechugones.cocina.data.db.RecipeDao
 import com.lechugones.cocina.data.recipe.RecipeRepository
 import com.lechugones.cocina.data.recipe.RoomRecipeRepository
@@ -19,8 +20,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.time.Clock
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScope
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -40,6 +49,15 @@ object DataModule {
 
     @Provides
     fun provideRecipeDao(database: CocinaDatabase): RecipeDao = database.recipeDao()
+
+    @Provides
+    fun provideProductDao(database: CocinaDatabase): ProductDao = database.productDao()
+
+    /** Outlives screens: a catalogue sync keeps running when the user leaves the tab. */
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /** Injected so tests can control "now". */
     @Provides

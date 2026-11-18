@@ -19,6 +19,7 @@ room {
 
 dependencies {
     api(project(":core:domain"))
+    api(project(":provider:api"))
 
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)

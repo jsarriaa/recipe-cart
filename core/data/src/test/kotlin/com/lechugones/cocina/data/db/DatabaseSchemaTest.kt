@@ -5,6 +5,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -73,6 +74,37 @@ class DatabaseSchemaTest {
                 assertEquals(false, recipe?.editedAfterImport)
                 assertEquals(listOf("verano"), dao.getTags("r1"))
                 assertEquals("tomate", dao.getIngredients("r1").single().name)
+            } finally {
+                database.close()
+            }
+        }
+
+    @Test
+    fun `v2 recipes survive the migration to v3, which adds an empty catalogue`() =
+        runTest {
+            helper.createDatabase(testDb, 2).use { db ->
+                db.execSQL(
+                    "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, image_path, source, " +
+                        "body_md, created_at, updated_at, origin, imported_at, edited_after_import) " +
+                        "VALUES ('r1', 'u1', 'Tortilla', NULL, 2, 10, 20, NULL, NULL, '## Preparación', 10, 20, 'imported', 30, 1)",
+                )
+                db.execSQL("INSERT INTO recipe_tag (recipe_id, tag, position) VALUES ('r1', 'cena', 0)")
+            }
+            helper.runMigrationsAndValidate(testDb, 3, true, CocinaMigrations.MIGRATION_2_3).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), CocinaDatabase::class.java, testDb)
+                    .addMigrations(*CocinaMigrations.ALL)
+                    .allowMainThreadQueries()
+                    .build()
+            try {
+                val recipe = database.recipeDao().getRecipe("r1")
+                assertEquals("Tortilla", recipe?.title)
+                assertEquals("imported", recipe?.origin)
+                assertEquals(true, recipe?.editedAfterImport)
+                assertEquals(listOf("cena"), database.recipeDao().getTags("r1"))
+                assertEquals(0, database.productDao().observeCount("mercadona").first())
             } finally {
                 database.close()
             }
