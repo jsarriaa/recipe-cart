@@ -56,7 +56,10 @@ Kotlin, Jetpack Compose + Material 3, MVVM (ViewModel + `StateFlow` UI state), c
 Flow, Room (with FTS for product search), DataStore (Preferences), Retrofit + OkHttp with
 kotlinx.serialization, Hilt, KSP (not kapt), Coil for images, kaml for YAML front matter,
 Gradle Kotlin DSL + version catalog (`gradle/libs.versions.toml`) + convention plugins in
-`build-logic/`. minSdk 26, target/compile SDK 36.
+`build-logic/` (`cpl.android.application`, `cpl.android.library`, `cpl.jvm.library`).
+AGP 9 with its built-in Kotlin support (no `kotlin-android` plugin). minSdk 26, targetSdk 36
+(the test phone), compileSdk 37 (required by current AndroidX). Versions are pinned only in the
+catalog; bump them at the start of a phase, not in the middle of one.
 
 Module layout and responsibilities are defined in [docs/SPEC.md § Architecture](docs/SPEC.md#3-architecture).
 In short: `:core:domain` is pure Kotlin (JVM) and holds all business logic so it can be unit
@@ -81,26 +84,47 @@ tested fast. Android-specific code stays out of it.
   update `docs/SPEC.md`, `docs/RECIPE_FORMAT.md`, `docs/providers/*.md` and
   `prompts/recipe-pack-generator.md` together. A change to the recipe format must update the
   format doc, the generator prompt, the examples and the parser tests in one PR.
+- **Credits stay current.** Adding a dependency, a GitHub Action, or anything learned from or
+  taken from another project means updating "Credits and third-party code" at the end of
+  README.md in the same PR. Never copy code without checking that its licence allows it, keeping
+  its notice, and saying so in the credits.
 - **Check on the device** before calling UI work done: install, open the screen, take a
   screencap, read logcat for errors. Say what was and was not verified.
 
 ## Commands
 
-The `java` on PATH is JDK 11, which the Android Gradle Plugin rejects. Run Gradle with the
-Android Studio JBR (JDK 21):
+Two quirks of the development PC (details in [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md#the-development-pc-windows-11)):
+
+- The `java` on PATH is JDK 11, which the Android Gradle Plugin rejects. Use the **Adoptium
+  JDK 21**. Android Studio's JBR is also JDK 21, but it lacks the `jdk.crypto.mscapi` module needed
+  for the next point.
+- **Avast Web Shield intercepts HTTPS** and re-signs certificates with its own root, which Java
+  does not trust (`PKIX path building failed`). Point every JVM at the Windows trust store with
+  `JAVA_TOOL_OPTIONS`. CI (Linux) needs neither setting.
 
 ```bash
-export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"   # Git Bash
-./gradlew test                      # all JVM unit tests
-./gradlew lint                      # Android lint
+# Git Bash, once per shell
+export JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.1.12-hotspot"
+export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStoreType=Windows-ROOT"
+
+./gradlew spotlessApply             # format Kotlin with ktlint (run before committing)
+./gradlew spotlessCheck test lint   # what CI runs
 ./gradlew :app:installDebug         # build + install the debug app, keeps its data (adb install -r)
 ./gradlew :core:domain:test --tests "*PackageFraction*"
 ```
 
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"   # PowerShell
+# PowerShell
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.1.12-hotspot"
+$env:JAVA_TOOL_OPTIONS = "-Djavax.net.ssl.trustStoreType=Windows-ROOT"
 .\gradlew.bat test
 ```
+
+`local.properties` (gitignored) holds `sdk.dir=C\:/Users/Joan/AppData/Local/Android/Sdk`.
+
+Known test-environment limits on Windows, both handled in the tests: Room's
+`MigrationTestHelper` needs an absolute database path under Robolectric, and DataStore's file
+storage cannot rename over an existing file (repository tests use an in-memory `DataStore`).
 
 ## Device rules
 
@@ -148,11 +172,18 @@ Ask first, every time (an earlier yes covers only that one action):
   events via `Channel`/`SharedFlow`; no business logic in composables.
 - Repositories expose `Flow` for observable data and `suspend` functions for actions. Dispatchers
   are injected, never hard-coded.
-- Money is `Long` euro cents. Quantities are fixed-point `Long` thousandths of their unit.
-  Intermediate arithmetic uses `BigDecimal`. Round only when presenting.
-- Units and conversions come only from the domain `Unit` model. No ad-hoc `* 1000` in UI code.
+- Money is `Money` (`Long` euro cents). Quantities are `Amount` (fixed-point `Long` thousandths
+  of their unit). Intermediate arithmetic uses `BigDecimal`. Round only when presenting.
+- Units and conversions come only from the domain `MeasureUnit` and `UnitConverter`. No ad-hoc
+  `* 1000` in UI code.
+- es-ES number and money formatting (digits, comma, `€`) lives in the domain's
+  `SpanishNumberFormat` so it is unit tested. Words (unit names, sentences) come from string
+  resources.
 - Errors cross layers as sealed results (`ProviderResult`, `ImportResult`). Do not let exceptions
   escape repositories.
 - Keep dependencies in the version catalog. Adding a library needs a one-line justification in
   the PR description.
-- No `!!` in production code. No `GlobalScope`. No `runBlocking` outside tests.
+- No `!!` in production code (use `checkNotNull`/`requireNotNull` with a message for real
+  invariants). No `GlobalScope`. No `runBlocking` outside tests.
+- Domain tests use JUnit Jupiter (`@ParameterizedTest` + `@CsvSource` for rule tables) and
+  kotlin.test assertions. Android module tests use JUnit 4 + Robolectric.

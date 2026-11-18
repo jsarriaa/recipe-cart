@@ -20,26 +20,32 @@ Checked with `adb shell getprop` on 2026-11-18.
 
 | Tool | Location | Notes |
 |---|---|---|
-| Android SDK | `%LOCALAPPDATA%\Android\Sdk` | Has platform 35 and build-tools 35/36. **Platform 36 must be installed** (Android Studio → SDK Manager) before phase 1 builds |
+| Android SDK | `%LOCALAPPDATA%\Android\Sdk` | Platforms 35, 36 and 37 (Gradle installed 36 and 37 automatically in phase 1). Referenced from the gitignored `local.properties`: `sdk.dir=C\:/Users/Joan/AppData/Local/Android/Sdk` |
 | adb (use this one) | `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` | The one Gradle and Android Studio use. Update it from SDK Manager → SDK Tools → Platform-Tools |
 | adb (also installed) | `C:\Program Files\platform-tools\adb.exe` | v36.0.0. Fine, but two different adb versions restart each other's server |
 | adb (**do not use**) | `C:\Android\adb.exe` | v1.0.32 (2015), **first on PATH**. No `adb pair`, and it kills newer servers. Remove `C:\Android` from PATH (or move it after the SDK) |
-| JDK for Gradle | `C:\Program Files\Android\Android Studio\jbr` | JDK 21. The `java` on PATH is JDK 11, which the Android Gradle Plugin rejects. Set `JAVA_HOME` |
+| JDK for Gradle | `C:\Program Files\Eclipse Adoptium\jdk-21.0.1.12-hotspot` | JDK 21. The `java` on PATH is JDK 11, which the Android Gradle Plugin rejects. Android Studio's JBR (`…\Android Studio\jbr`) is JDK 21 too, but it lacks `jdk.crypto.mscapi`, so it cannot use the Windows trust store (next row) |
+| Avast Web Shield | HTTPS scanning on | Re-signs every HTTPS certificate with "Avast Web/Mail Shield Root". Windows trusts it; Java does not (`PKIX path building failed` when Gradle downloads). Fix per process: `JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStoreType=Windows-ROOT`. Alternatives, if you prefer: exclude Gradle/Maven hosts from Avast HTTPS scanning, or add `systemProp.javax.net.ssl.trustStoreType=Windows-ROOT` to `%USERPROFILE%\.gradle\gradle.properties` |
+| Android Studio | 2024.3 (build 243) | Older than AGP 9.5 supports. Update it before opening the project in the IDE; command-line builds don't need it |
 | GitHub CLI | not installed yet | `winget install --id GitHub.cli -e`, then `gh auth login` |
 
 In Git Bash:
 
 ```bash
 export ADB="$LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe"
-export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
+export JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.1.12-hotspot"
+export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStoreType=Windows-ROOT"
 ```
 
 In PowerShell:
 
 ```powershell
 $env:ADB = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.1.12-hotspot"
+$env:JAVA_TOOL_OPTIONS = "-Djavax.net.ssl.trustStoreType=Windows-ROOT"
 ```
+
+Every JVM then prints `Picked up JAVA_TOOL_OPTIONS: …` on stderr. That is expected.
 
 ## One-time phone setup
 
@@ -96,9 +102,18 @@ command, or unplug one.
 
 ```bash
 ./gradlew :app:installDebug      # build + install com.lechugones.cocina.debug, keeps data
-"$ADB" shell am start -n com.lechugones.cocina.debug/com.lechugones.cocina.MainActivity
+"$ADB" shell am start -W -n com.lechugones.cocina.debug/com.lechugones.cocina.MainActivity   # -W waits for the first frame
 "$ADB" shell am force-stop com.lechugones.cocina.debug
 ```
+
+Reading the screen as text is cheaper than a screenshot:
+
+```bash
+"$ADB" exec-out uiautomator dump /dev/tty | grep -oE '(text|content-desc)="[^"]+"'
+```
+
+Bottom-bar tap targets on this phone (phase 1 layout): Recetas (146, 2581), Despensa (469, 2581),
+Compra (793, 2581), Catálogo (1116, 2581), Ajustes gear (1166, 252).
 
 `installDebug` reinstalls over the existing app (`adb install -r`), so data is kept.
 
@@ -118,6 +133,13 @@ PID=$("$ADB" shell pidof -s com.lechugones.cocina.debug)
 
 App log tags start with `Cocina` (e.g. `CocinaImport`, `CocinaProvider`). Do not clear the log
 buffer (`logcat -c`); use `-T '<time>'` to read from a point in time instead.
+
+Harmless noise seen in our process on this phone (phase 1): OxygenOS framework lines
+(`OplusPredictiveBackController`, `OplusBracketLog`, `SchedAssist`, `DynamicFramerate`),
+`Access denied finding property`, a `WindowOnBackDispatcher` opt-in warning that appears even
+though the manifest opts in, and `hiddenapi … AccessibilityNodeInfo;->getSelection` when
+`uiautomator dump` runs (Compose probing an API 37 method on Android 16). Anything else at
+`W`/`E` level from our PID deserves a look.
 
 ## Screenshots and UI inspection
 

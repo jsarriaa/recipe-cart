@@ -207,7 +207,8 @@ tomate triturado" becomes `quantity: 400`, `unit: g`, `package_size: 400 g`.
 Rules:
 
 - Must be > 0 and ≤ 100 000 (`E10` otherwise). Must be a finite number.
-- More than 3 decimals are rounded half-up to 3 (`W12`). `"1/3"` becomes `0.333`.
+- Decimals with more than 3 places are rounded half-up to 3 (`W12`). Fractions are converted to
+  3 decimals without a warning: `"1/3"` becomes `0.333`.
 - `pizca`: quantity optional, default 1. `al_gusto`: a quantity is ignored (`W06`).
 - Every other unit requires a quantity (`E09`).
 
