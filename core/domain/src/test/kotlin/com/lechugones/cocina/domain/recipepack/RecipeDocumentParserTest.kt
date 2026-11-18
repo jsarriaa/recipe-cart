@@ -62,7 +62,8 @@ class RecipeDocumentParserTest {
 
     @Test
     fun `CRLF line endings and a BOM are accepted`() {
-        val text = "" + doc(minimal()).replace("\n", "\r\n")
+        // BOM as a code point: a literal one would be invisible and easy to lose.
+        val text = Char(0xFEFF) + doc(minimal()).replace("\n", "\r\n")
         assertEquals(emptyList(), parse(text).issues)
     }
 

@@ -64,6 +64,9 @@ object RecipeDocumentWriter {
 object YamlScalars {
     private const val INDICATORS = "-?:,[]{}#&*!|>'\"%@`"
     private const val FLOW_INDICATORS = ",[]{}"
+
+    /** DEL, NEL, line/paragraph separators and BOM: never written raw (code points, not literals). */
+    private val UNSAFE_CHARS = setOf(Char(0x7F), Char(0x85), Char(0x2028), Char(0x2029), Char(0xFEFF))
     private val RESERVED = setOf("null", "~", "true", "false", "yes", "no", "on", "off", "y", "n")
     private val NUMBER_LIKE =
         listOf(
@@ -85,7 +88,7 @@ object YamlScalars {
     ): Boolean =
         value.isNotEmpty() &&
             value == value.trim() &&
-            value.none { it < ' ' || it == '\u007F' || it == '\u0085' || it == ' ' || it == ' ' || it == '' } &&
+            value.none { it < ' ' || it in UNSAFE_CHARS } &&
             value[0] !in INDICATORS &&
             ": " !in value &&
             " #" !in value &&
@@ -120,7 +123,7 @@ object YamlScalars {
                     }
 
                     else -> {
-                        if (c < ' ' || c == '\u007F' || c == '\u0085' || c == ' ' || c == ' ' || c == '﻿') {
+                        if (c < ' ' || c in UNSAFE_CHARS) {
                             append("\\u").append(c.code.toString(16).padStart(4, '0'))
                         } else {
                             append(c)

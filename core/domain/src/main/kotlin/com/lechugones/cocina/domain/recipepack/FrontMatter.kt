@@ -11,7 +11,7 @@ object FrontMatter {
     )
 
     /** Removes a BOM and normalises CRLF and CR line endings to LF. */
-    fun normalize(text: String): String = text.removePrefix("﻿").replace("\r\n", "\n").replace('\r', '\n')
+    fun normalize(text: String): String = text.removePrefix(BOM).replace("\r\n", "\n").replace('\r', '\n')
 
     /** Returns null when the first line is not `---` or the front matter is never closed (`E01`). */
     fun split(text: String): Parts? {
@@ -33,4 +33,7 @@ object FrontMatter {
     }
 
     private const val DELIMITER = "---"
+
+    /** U+FEFF byte-order mark, as a code point (invisible characters do not survive editing). */
+    private val BOM = Char(0xFEFF).toString()
 }
