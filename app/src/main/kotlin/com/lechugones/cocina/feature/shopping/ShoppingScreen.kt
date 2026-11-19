@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -160,7 +161,8 @@ fun ShoppingScreen(
             }
 
             else -> {
-                LazyColumn(Modifier.padding(padding).fillMaxSize()) {
+                // Room below the last row so the + button never covers a price.
+                LazyColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = PaddingValues(bottom = 88.dp)) {
                     list.groups.forEach { group ->
                         item(key = "g:" + group.providerId) { GroupHeader(group, name) }
                         items(group.items, key = { it.key }) { item ->

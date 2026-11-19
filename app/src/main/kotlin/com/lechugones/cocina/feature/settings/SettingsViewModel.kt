@@ -35,6 +35,7 @@ data class SettingsUiState(
     val postalCode: String? = null,
     val storeBrandOnly: Boolean = false,
     val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
+    val addMissingStaples: Boolean = true,
     val editingPostalCode: Boolean = false,
 )
 
@@ -78,6 +79,7 @@ class SettingsViewModel
                             postalCode = s.postalCode,
                             storeBrandOnly = s.storeBrandOnly,
                             useSoonDays = s.useSoonWarningDays,
+                            addMissingStaples = s.addMissingStaplesToList,
                         )
                     }
                 }
@@ -92,6 +94,10 @@ class SettingsViewModel
             if (!AppSettings.isValidPostalCode(code)) return
             state.update { it.copy(editingPostalCode = false) }
             viewModelScope.launch { settings.update { it.copy(postalCode = code) } }
+        }
+
+        fun setAddMissingStaples(enabled: Boolean) {
+            viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }
         }
 
         fun setUseSoonDays(days: Int) {

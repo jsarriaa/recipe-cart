@@ -550,6 +550,8 @@
     <string name="settings_store_brand_only_body">Oculta las marcas de fabricante en las búsquedas del catálogo.</string>
     <string name="settings_pantry_title">Despensa</string>
     <string name="settings_use_soon_days">Avisar de lo que caduca</string>
+    <string name="settings_add_staples">Añadir básicos que me faltan</string>
+    <string name="settings_add_staples_body">Sal, aceite, especias… se añaden a la lista de la compra solo si los usas en la despensa y no queda ninguno.</string>
     <string name="settings_use_soon_less">Menos días</string>
     <string name="settings_use_soon_more">Más días</string>
     <plurals name="settings_use_soon_days_value">

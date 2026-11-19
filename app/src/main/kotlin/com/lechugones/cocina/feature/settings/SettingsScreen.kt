@@ -167,6 +167,18 @@ fun SettingsScreen(
                 }
             }
 
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_add_staples), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        stringResource(R.string.settings_add_staples_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = state.addMissingStaples, onCheckedChange = viewModel::setAddMissingStaples)
+            }
+
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             Text(stringResource(R.string.settings_backup_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.settings_backup_body), style = MaterialTheme.typography.bodyMedium)
