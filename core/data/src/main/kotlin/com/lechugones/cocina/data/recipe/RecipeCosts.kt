@@ -12,6 +12,12 @@ import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
+/** Cost per serving of a recipe; [lowerBound] when some counted ingredient has no price. */
+data class ServingCost(
+    val perServing: Money,
+    val lowerBound: Boolean,
+)
+
 /** Cost per serving of every recipe, for "Ordenar por precio" in the list (SPEC § 4.2). Offline. */
 class RecipeCosts
     @Inject
@@ -22,7 +28,7 @@ class RecipeCosts
         private val clock: Clock,
     ) {
         /** Recipe id → cost per serving at its own servings and the primary supermarket; null without any price. */
-        suspend fun perServing(): Map<String, Money?> {
+        suspend fun perServing(): Map<String, ServingCost?> {
             val s = settings.settings.first()
             val recipes = repository.getAll()
             val products = linker.productsFor(recipes.flatMap { r -> r.ingredients.flatMap { it.links } }).mapValues { it.value.product }
@@ -36,7 +42,7 @@ class RecipeCosts
             val selection = ProductSelection.SingleProvider(s.primaryProvider)
             return recipes.associate { recipe ->
                 val cost = RecipeCostCalculator.compute(recipe, recipe.servings, products, selection, options)
-                recipe.id to cost.perServing.takeIf { cost.pricedCount > 0 }
+                recipe.id to ServingCost(cost.perServing, cost.missingPriceCount > 0).takeIf { cost.pricedCount > 0 }
             }
         }
     }

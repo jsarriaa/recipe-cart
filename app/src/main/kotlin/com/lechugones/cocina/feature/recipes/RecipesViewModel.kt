@@ -74,7 +74,12 @@ class RecipesViewModel
         private fun withCosts(): Flow<List<RecipeSummary>> =
             library.observeSummaries().mapLatest { all ->
                 val perServing = costs.perServing()
-                all.map { it.copy(costPerServing = perServing[it.id]) }
+                all.map {
+                    it.copy(
+                        costPerServing = perServing[it.id]?.perServing,
+                        costIsLowerBound = perServing[it.id]?.lowerBound == true,
+                    )
+                }
             }
 
         init {

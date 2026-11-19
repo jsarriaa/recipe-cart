@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
-import com.lechugones.cocina.domain.format.SpanishNumberFormat
 import com.lechugones.cocina.domain.recipe.RecipeSort
 import com.lechugones.cocina.domain.recipe.RecipeSummary
 import com.lechugones.cocina.feature.export.ExportDialog
@@ -61,6 +60,7 @@ import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.ui.components.EmptyState
 import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
+import com.lechugones.cocina.ui.format.costFigure
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -240,7 +240,13 @@ private fun RecipeRow(
         headlineContent = { Text(recipe.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
         supportingContent = {
             val servings = pluralStringResource(R.plurals.recipe_servings, recipe.servings, recipe.servings)
-            val cost = recipe.costPerServing?.let { stringResource(R.string.recipes_cost_per_serving, SpanishNumberFormat.money(it)) }
+            val cost =
+                recipe.costPerServing?.let {
+                    stringResource(
+                        R.string.recipes_cost_per_serving,
+                        costFigure(it, missing = recipe.costIsLowerBound, approximate = false),
+                    )
+                }
             Text(
                 (listOfNotNull(servings, cost) + recipe.tags).joinToString(" · "),
                 maxLines = 1,

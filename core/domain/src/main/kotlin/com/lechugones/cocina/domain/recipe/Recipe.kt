@@ -60,6 +60,8 @@ data class RecipeSummary(
     val createdAt: Instant = Instant.EPOCH,
     /** Cost per serving at the primary supermarket; null when no ingredient has a price. */
     val costPerServing: Money? = null,
+    /** Some counted ingredient has no price: [costPerServing] is a lower bound ("≥"). */
+    val costIsLowerBound: Boolean = false,
 )
 
 data class Ingredient(

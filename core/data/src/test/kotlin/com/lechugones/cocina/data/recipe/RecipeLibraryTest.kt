@@ -250,8 +250,9 @@ class RecipeLibraryTest {
             assertEquals(
                 com.lechugones.cocina.domain.money
                     .Money(150),
-                costs[id],
+                costs[id]?.perServing,
             )
+            assertTrue(checkNotNull(costs[id]).lowerBound, "the other ingredients have no price")
             assertNull(costs["r2"])
         }
 }
