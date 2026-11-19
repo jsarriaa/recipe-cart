@@ -9,6 +9,9 @@ enum class RecipeSort {
 
     /** Most recently added first. */
     NEWEST,
+
+    /** Cheapest per serving first; recipes without a price go last, by name. */
+    CHEAPEST,
 }
 
 /** Search, tag filter and sorting of the recipe list (SPEC § 4.2). */
@@ -29,10 +32,18 @@ object RecipeListFilter {
                 (tag == null || tag in recipe.tags) &&
                     (words.isEmpty() || haystack(recipe).let { text -> words.all { it in text } })
             }
+        val collator = Collator.getInstance(SPANISH).apply { strength = Collator.PRIMARY }
         return when (sort) {
             RecipeSort.NAME -> {
-                val collator = Collator.getInstance(SPANISH).apply { strength = Collator.PRIMARY }
                 filtered.sortedWith(compareBy(collator) { it.title })
+            }
+
+            RecipeSort.CHEAPEST -> {
+                filtered.sortedWith(
+                    compareBy<RecipeSummary> { it.costPerServing == null }
+                        .thenBy { it.costPerServing?.cents ?: 0 }
+                        .thenBy(collator) { it.title },
+                )
             }
 
             RecipeSort.NEWEST -> {

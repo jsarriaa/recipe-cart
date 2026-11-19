@@ -6,8 +6,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.lechugones.cocina.data.catalogue.CatalogueRepository
 import com.lechugones.cocina.data.catalogue.ProductLinker
+import com.lechugones.cocina.data.catalogue.RefreshSummary
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.domain.cost.CostComparison
+import com.lechugones.cocina.domain.cost.CostOptions
+import com.lechugones.cocina.domain.cost.ProductSelection
+import com.lechugones.cocina.domain.cost.RecipeCost
+import com.lechugones.cocina.domain.cost.RecipeCostCalculator
 import com.lechugones.cocina.domain.product.ManualProductField
 import com.lechugones.cocina.domain.product.ManualProductForm
 import com.lechugones.cocina.domain.product.ManualProductResult
@@ -16,6 +22,7 @@ import com.lechugones.cocina.domain.product.SuggestionSource
 import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.domain.recipe.IngredientLink
 import com.lechugones.cocina.domain.recipe.Recipe
+import com.lechugones.cocina.domain.settings.AppSettings
 import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.feature.export.RecipeExporter
 import com.lechugones.cocina.provider.ProviderProduct
@@ -32,6 +39,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 
 sealed interface RecipeDetailUiState {
@@ -46,7 +56,29 @@ sealed interface RecipeDetailUiState {
         /** Cached display data of the linked products (picture, name, price). */
         val products: Map<ProductKey, ProviderProduct> = emptyMap(),
         val primaryProvider: String = "",
+        /** Supermarket mode of the cost card (SPEC § 4.4); not saved. */
+        val mode: CostMode = CostMode.Primary,
+        /** Providers this recipe has links to, primary first: the modes and the comparison. */
+        val providers: List<String> = emptyList(),
+        val cost: RecipeCost? = null,
+        /** Only when the recipe has links to more than one provider. */
+        val comparison: CostComparison? = null,
+        val includeStaples: Boolean = false,
+        val includeOptionals: Boolean = false,
+        val refreshingPrices: Boolean = false,
+        val refreshResult: RefreshSummary? = null,
     ) : RecipeDetailUiState
+}
+
+/** "Principal", one specific provider, or "Más barato" (SPEC § 4.4). */
+sealed interface CostMode {
+    data object Primary : CostMode
+
+    data class Provider(
+        val id: String,
+    ) : CostMode
+
+    data object Cheapest : CostMode
 }
 
 /** A product offered in the "Vincular producto" sheet. [source] is null for typed searches. */
@@ -92,6 +124,7 @@ class RecipeDetailViewModel
         private val linker: ProductLinker,
         private val catalogue: CatalogueRepository,
         private val settings: SettingsRepository,
+        private val clock: Clock,
     ) : ViewModel() {
         private val id = savedStateHandle.toRoute<RecipeDetailRoute>().id
         private val state = MutableStateFlow<RecipeDetailUiState>(RecipeDetailUiState.Loading)
@@ -110,23 +143,103 @@ class RecipeDetailViewModel
         private suspend fun reload() {
             val recipe = library.get(id)
             val previous = state.value as? RecipeDetailUiState.Loaded
+            if (recipe == null) {
+                state.value = RecipeDetailUiState.NotFound
+                return
+            }
+            val s = settings.settings.first()
+            val keep = previous != null && previous.recipe.servings == recipe.servings
+            val linkedProviders =
+                recipe.ingredients
+                    .flatMap { it.links }
+                    .map { it.product.providerId }
+                    .toSet()
             state.value =
-                if (recipe == null) {
-                    RecipeDetailUiState.NotFound
-                } else {
-                    val keep = previous != null && previous.recipe.servings == recipe.servings
+                withCost(
                     RecipeDetailUiState.Loaded(
                         recipe = recipe,
                         servings = if (keep) previous.servings else recipe.servings,
                         products = linker.productsFor(recipe.ingredients.flatMap { it.links }),
-                        primaryProvider = settings.settings.first().primaryProvider,
-                    )
+                        primaryProvider = s.primaryProvider,
+                        mode = previous?.mode ?: CostMode.Primary,
+                        providers = (listOf(s.primaryProvider) + linkedProviders.sorted()).distinct(),
+                        includeStaples = s.includeStaplesInCost,
+                        includeOptionals = s.includeOptionalsInCost,
+                        refreshResult = previous?.refreshResult,
+                    ),
+                    Duration.ofDays(s.staleAfterDays.toLong()),
+                )
+        }
+
+        private var staleAfter: Duration = Duration.ofDays(AppSettings.DEFAULT_STALE_AFTER_DAYS.toLong())
+
+        /** Recomputes the cost card (pure domain code, so it runs on every change). */
+        private fun withCost(
+            loaded: RecipeDetailUiState.Loaded,
+            staleAfter: Duration = this.staleAfter,
+        ): RecipeDetailUiState.Loaded {
+            this.staleAfter = staleAfter
+            val products = loaded.products.mapValues { it.value.product }
+            val options = CostOptions(Instant.now(clock), loaded.includeStaples, loaded.includeOptionals, staleAfter)
+            val selection =
+                when (val mode = loaded.mode) {
+                    CostMode.Primary -> ProductSelection.SingleProvider(loaded.primaryProvider)
+                    is CostMode.Provider -> ProductSelection.SingleProvider(mode.id)
+                    CostMode.Cheapest -> ProductSelection.Cheapest(loaded.providers.toSet())
                 }
+            val cost = RecipeCostCalculator.compute(loaded.recipe, loaded.servings, products, selection, options)
+            val comparison =
+                if (loaded.providers.size > 1) {
+                    RecipeCostCalculator.compare(loaded.recipe, loaded.servings, products, loaded.providers, options)
+                } else {
+                    null
+                }
+            return loaded.copy(cost = cost, comparison = comparison)
         }
 
         fun setServings(servings: Int) {
             val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
-            state.value = loaded.copy(servings = servings.coerceIn(MIN_SERVINGS, MAX_SERVINGS))
+            state.value = withCost(loaded.copy(servings = servings.coerceIn(MIN_SERVINGS, MAX_SERVINGS)))
+        }
+
+        fun setMode(mode: CostMode) {
+            val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
+            state.value = withCost(loaded.copy(mode = mode))
+        }
+
+        /** "Incluir básicos" / "Incluir opcionales": global settings, shown on the cost card. */
+        fun setIncludes(
+            staples: Boolean,
+            optionals: Boolean,
+        ) {
+            val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
+            state.value = withCost(loaded.copy(includeStaples = staples, includeOptionals = optionals))
+            viewModelScope.launch { settings.update { it.copy(includeStaplesInCost = staples, includeOptionalsInCost = optionals) } }
+        }
+
+        /** "Actualizar precios": refreshes only this recipe's linked products, then reloads. */
+        fun refreshPrices() {
+            val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
+            if (loaded.refreshingPrices) return
+            state.value = loaded.copy(refreshingPrices = true, refreshResult = null)
+            viewModelScope.launch {
+                val summary =
+                    catalogue.refreshProducts(
+                        loaded.recipe.ingredients
+                            .flatMap { it.links }
+                            .map { it.product },
+                    )
+                (state.value as? RecipeDetailUiState.Loaded)?.let { state.value = it.copy(refreshResult = summary) }
+                reload()
+                (state.value as? RecipeDetailUiState.Loaded)?.let { state.value = it.copy(refreshingPrices = false) }
+            }
+        }
+
+        /** Display name of an installed provider ("Mercadona"); null for unknown ids. */
+        fun providerDisplayName(id: String): String? = catalogue.provider(id)?.displayName
+
+        fun dismissRefreshResult() {
+            (state.value as? RecipeDetailUiState.Loaded)?.let { state.value = it.copy(refreshResult = null) }
         }
 
         // --- "Vincular producto" ------------------------------------------------------------

@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
+import com.lechugones.cocina.domain.format.SpanishNumberFormat
 import com.lechugones.cocina.domain.recipe.RecipeSort
 import com.lechugones.cocina.domain.recipe.RecipeSummary
 import com.lechugones.cocina.feature.export.ExportDialog
@@ -114,6 +115,10 @@ fun RecipesScreen(
                         sortOpen = false
                     }
                     SortItem(R.string.recipes_sort_newest, RecipeSort.NEWEST, state.sort) {
+                        viewModel.setSort(it)
+                        sortOpen = false
+                    }
+                    SortItem(R.string.recipes_sort_cheapest, RecipeSort.CHEAPEST, state.sort) {
                         viewModel.setSort(it)
                         sortOpen = false
                     }
@@ -235,8 +240,12 @@ private fun RecipeRow(
         headlineContent = { Text(recipe.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
         supportingContent = {
             val servings = pluralStringResource(R.plurals.recipe_servings, recipe.servings, recipe.servings)
-            val tags = recipe.tags.joinToString(" · ")
-            Text(if (tags.isEmpty()) servings else "$servings · $tags", maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val cost = recipe.costPerServing?.let { stringResource(R.string.recipes_cost_per_serving, SpanishNumberFormat.money(it)) }
+            Text(
+                (listOfNotNull(servings, cost) + recipe.tags).joinToString(" · "),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         },
     )
 }
