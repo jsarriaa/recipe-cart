@@ -500,6 +500,15 @@
     <string name="settings_postal_code_none">Sin elegir</string>
     <string name="settings_postal_code_change">Cambiar</string>
     <string name="settings_store_brand_only_body">Oculta las marcas de fabricante en las búsquedas del catálogo.</string>
+    <string name="settings_pantry_title">Despensa</string>
+    <string name="settings_use_soon_days">Avisar de lo que caduca</string>
+    <string name="settings_use_soon_less">Menos días</string>
+    <string name="settings_use_soon_more">Más días</string>
+    <plurals name="settings_use_soon_days_value">
+        <item quantity="one">Con %d día de antelación</item>
+        <item quantity="many">Con %d días de antelación</item>
+        <item quantity="other">Con %d días de antelación</item>
+    </plurals>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>

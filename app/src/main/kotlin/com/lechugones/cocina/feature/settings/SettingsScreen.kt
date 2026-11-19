@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -35,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
+import com.lechugones.cocina.domain.settings.AppSettings
 import com.lechugones.cocina.ui.components.PostalCodeDialog
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.format.Dates
@@ -136,6 +142,29 @@ fun SettingsScreen(
                     )
                 }
                 Switch(checked = state.storeBrandOnly, onCheckedChange = viewModel::setStoreBrandOnly)
+            }
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            Text(stringResource(R.string.settings_pantry_title), style = MaterialTheme.typography.titleMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_use_soon_days), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        pluralStringResource(R.plurals.settings_use_soon_days_value, state.useSoonDays, state.useSoonDays),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = { viewModel.setUseSoonDays(state.useSoonDays - 1) }, enabled = state.useSoonDays > 0) {
+                    Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.settings_use_soon_less))
+                }
+                IconButton(
+                    onClick = { viewModel.setUseSoonDays(state.useSoonDays + 1) },
+                    enabled =
+                        state.useSoonDays < AppSettings.USE_SOON_RANGE.last,
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.settings_use_soon_more))
+                }
             }
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
