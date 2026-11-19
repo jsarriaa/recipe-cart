@@ -7,7 +7,7 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: 1.0.0 (phase 7).** Every feature below is in the app. Mercadona and Día prices are
+> **Status: 1.1.0.** Every feature below is in the app. Mercadona and Día prices are
 > live (Día was verified from the phone; see [docs/providers/dia.md](docs/providers/dia.md)), and
 > any other shop's products can be added by hand as manual products. See the
 > [development phases](docs/SPEC.md#9-development-phases).
@@ -26,14 +26,16 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
   tap. Export round-trips. Recipes can be generated in an external Claude chat with
   [the generator prompt](prompts/recipe-pack-generator.md).
 - **Quantities and cost**: "1/2 paquete de ñoquis, 250 g de 500 g", dish cost, cost of whole
-  packages, leftovers, and a comparison across supermarkets.
-- **Pantry**: what is at home, including opened packages. Food to use up soon is tagged
-  "Usar pronto" (by hand, or automatically near its best-before date) and goes first in
-  "¿Qué puedo cocinar?". "Lo he cocinado" deducts what a recipe used, after an editable
-  confirmation.
+  packages, and a comparison across supermarkets.
+- **Pantry**: what is at home. A package can be marked "Abierto", and opened packages are used
+  first. No dates to keep. "¿Qué puedo cocinar?" checks recipes against it, and "Lo he cocinado"
+  deducts what a recipe used, after an editable confirmation.
 - **Shopping list**: built from recipes minus the pantry, grouped by supermarket, with an
   estimated total. Bought items move into the pantry. Shared as text.
 - **Backup and restore** to a single file.
+- **Updates**: "Buscar actualizaciones" in Ajustes looks for a newer
+  [GitHub release](https://github.com/jsarriaa/recipe-cart/releases), downloads its APK and opens
+  Android's installer.
 
 No accounts, analytics, ads or AI features. All data stays on the phone.
 

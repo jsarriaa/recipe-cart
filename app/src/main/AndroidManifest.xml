@@ -3,10 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        INTERNET is only for the supermarket endpoints and image CDNs in docs/providers/,
-        and only when the user asks (CLAUDE.md, hard rules 3 and 4).
+        INTERNET is only for the supermarket endpoints and image CDNs in docs/providers/, and for
+        GitHub when the user taps "Buscar actualizaciones"; only when the user asks (CLAUDE.md,
+        hard rules 3 and 4).
     -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+        "Buscar actualizaciones" in Ajustes hands a downloaded release APK to Android's installer,
+        which always asks the user to confirm. Never used in the background.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!--
         allowBackup=false and the data-extraction rules keep data out of Google backups and

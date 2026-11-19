@@ -43,8 +43,9 @@ and what it costs, keeps a pantry, and builds a shopping list. The full specific
    degrades to cached or manual prices.
 4. **Privacy.** No accounts, analytics, crash reporting, ads, remote config or AI features. No SDK
    that phones home. The only network hosts are the supermarket endpoints listed in
-   `docs/providers/` plus their image CDNs. `android:allowBackup="false"`; the in-app backup file
-   is the only backup path.
+   `docs/providers/` plus their image CDNs, and GitHub (`api.github.com` and its release
+   download hosts) only when the user taps "Buscar actualizaciones" in Ajustes.
+   `android:allowBackup="false"`; the in-app backup file is the only backup path.
 5. **No secrets in git.** Keystores, `keystore.properties`, `local.properties` and `.env` files are
    gitignored. Do not copy third-party API keys found in websites' JavaScript into this repo.
 6. **Never change `applicationId`** (`com.lechugones.cocina`, debug: `com.lechugones.cocina.debug`)

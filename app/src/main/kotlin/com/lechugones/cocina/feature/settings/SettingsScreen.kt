@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,11 +39,13 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.domain.settings.AppSettings
+import com.lechugones.cocina.feature.settings.update.AppLinks
 import com.lechugones.cocina.ui.components.PostalCodeDialog
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.format.Dates
@@ -200,6 +204,18 @@ fun SettingsScreen(
             }
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            Text(stringResource(R.string.settings_updates_title), style = MaterialTheme.typography.titleMedium)
+            UpdateSection(
+                state.update,
+                viewModel.canInstallUpdates,
+                onCheck = viewModel::checkUpdates,
+                onInstall = viewModel::downloadAndInstall,
+            )
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            GitHubCard()
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
             Text(stringResource(R.string.settings_about_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.settings_privacy), style = MaterialTheme.typography.bodyMedium)
             Text(
@@ -238,3 +254,85 @@ fun SettingsScreen(
 
 /** `cocina-backup-YYYYMMDD-HHmm.zip` (SPEC § 4.7). */
 private fun backupFileName(): String = "cocina-backup-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm")) + ".zip"
+
+@Composable
+private fun UpdateSection(
+    update: UpdateUi,
+    canInstall: Boolean,
+    onCheck: () -> Unit,
+    onInstall: () -> Unit,
+) {
+    val context = LocalContext.current
+    val message =
+        when (update) {
+            UpdateUi.Idle -> null
+            UpdateUi.Checking -> stringResource(R.string.settings_updates_checking)
+            UpdateUi.UpToDate -> stringResource(R.string.settings_updates_up_to_date)
+            is UpdateUi.Available -> stringResource(R.string.settings_updates_available, update.version)
+            is UpdateUi.NoApk -> stringResource(R.string.settings_updates_no_apk, update.version)
+            UpdateUi.Downloading -> stringResource(R.string.settings_updates_downloading)
+            UpdateUi.Failed -> stringResource(R.string.settings_updates_failed)
+        }
+    if (update == UpdateUi.Checking || update == UpdateUi.Downloading) LinearProgressIndicator(Modifier.fillMaxWidth())
+    message?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (update is UpdateUi.Available && canInstall) {
+            Button(onClick = onInstall) { Text(stringResource(R.string.settings_updates_install, update.version)) }
+        } else {
+            OutlinedButton(onClick = onCheck, enabled = update != UpdateUi.Checking && update != UpdateUi.Downloading) {
+                Text(stringResource(R.string.settings_updates_check))
+            }
+        }
+        if ((update is UpdateUi.Available && !canInstall) || update is UpdateUi.NoApk) {
+            TextButton(
+                onClick = { openUrl(context, AppLinks.RELEASES_URL) },
+            ) { Text(stringResource(R.string.settings_updates_open_github)) }
+        }
+    }
+    if (update is UpdateUi.Available && !canInstall) {
+        Text(
+            stringResource(R.string.settings_updates_debug),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** The owner's corner: who made the app and where the code lives. */
+@Composable
+private fun GitHubCard() {
+    val context = LocalContext.current
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                stringResource(R.string.settings_github_title, AppLinks.OWNER),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+            Text(
+                stringResource(R.string.settings_github_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { openUrl(context, AppLinks.PROFILE_URL) }) { Text(stringResource(R.string.settings_github_profile)) }
+                OutlinedButton(onClick = { openUrl(context, AppLinks.REPO_URL) }) { Text(stringResource(R.string.settings_github_repo)) }
+            }
+        }
+    }
+}
+
+/** Opens a web page in the browser; the app itself makes no request. */
+private fun openUrl(
+    context: android.content.Context,
+    url: String,
+) {
+    try {
+        context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, url.toUri()))
+    } catch (e: android.content.ActivityNotFoundException) {
+        // No browser installed: nothing to open.
+    }
+}
