@@ -2,6 +2,7 @@ package com.lechugones.cocina.feature.recipes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lechugones.cocina.data.recipe.RecipeCosts
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.domain.recipe.RecipeListFilter
 import com.lechugones.cocina.domain.recipe.RecipeSort
@@ -9,12 +10,14 @@ import com.lechugones.cocina.domain.recipe.RecipeSummary
 import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.feature.export.RecipeExporter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,6 +48,7 @@ class RecipesViewModel
     constructor(
         private val library: RecipeLibrary,
         private val exporter: RecipeExporter,
+        private val costs: RecipeCosts,
     ) : ViewModel() {
         private val query = MutableStateFlow("")
         private val tag = MutableStateFlow<String?>(null)
@@ -53,7 +57,7 @@ class RecipesViewModel
         val events: Flow<RecipesEvent> = eventChannel.receiveAsFlow()
 
         val uiState: StateFlow<RecipesUiState> =
-            combine(library.observeSummaries(), query, tag, sort) { all, query, tag, sort ->
+            combine(withCosts(), query, tag, sort) { all, query, tag, sort ->
                 RecipesUiState(
                     loading = false,
                     totalCount = all.size,
@@ -64,6 +68,19 @@ class RecipesViewModel
                     sort = sort,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), RecipesUiState())
+
+        /** Summaries with their cost per serving, recomputed (offline) whenever recipes change. */
+        @OptIn(ExperimentalCoroutinesApi::class)
+        private fun withCosts(): Flow<List<RecipeSummary>> =
+            library.observeSummaries().mapLatest { all ->
+                val perServing = costs.perServing()
+                all.map {
+                    it.copy(
+                        costPerServing = perServing[it.id]?.perServing,
+                        costIsLowerBound = perServing[it.id]?.lowerBound == true,
+                    )
+                }
+            }
 
         init {
             // Photos left behind by an editor session that never saved (for example, the app was killed).

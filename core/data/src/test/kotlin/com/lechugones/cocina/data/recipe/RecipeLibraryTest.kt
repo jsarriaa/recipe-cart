@@ -3,6 +3,7 @@ package com.lechugones.cocina.data.recipe
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lechugones.cocina.data.catalogue.ProductLinker
+import com.lechugones.cocina.data.catalogue.toEntity
 import com.lechugones.cocina.data.db.CocinaDatabase
 import com.lechugones.cocina.data.image.RecipeImageStore
 import com.lechugones.cocina.data.settings.DataStoreSettingsRepository
@@ -208,5 +209,50 @@ class RecipeLibraryTest {
             val candidate = library.planImport(RecipePackReader.readText(linked, "tacos.md")).single()
             assertTrue(candidate.issues.any { it.code.name == "W07" })
             assertTrue(checkNotNull(candidate.draft).ingredients.all { it.links.isEmpty() })
+        }
+
+    @Test
+    fun `cost per serving uses linked cached products, null when nothing is priced`() =
+        runTest {
+            val pack = RecipePackReader.readText(tacos, "tacos.md")
+            val id = library.import(library.planImport(pack).map { it to null }, emptyMap()).imported.single()
+            repository.save(testRecipe("r2", "Arroz"))
+            val chicken = checkNotNull(library.get(id)).ingredients.first()
+            database.productDao().upsert(
+                listOf(
+                    com.lechugones.cocina.provider
+                        .ProviderProduct(
+                            com.lechugones.cocina.domain.product.Product(
+                                ProductKey("mercadona", "p1"),
+                                "Contramuslos",
+                                com.lechugones.cocina.domain.quantity.Quantity(
+                                    com.lechugones.cocina.domain.quantity.Amount
+                                        .of(1000),
+                                    com.lechugones.cocina.domain.units.MeasureUnit.G,
+                                ),
+                                com.lechugones.cocina.domain.money
+                                    .Money(1000),
+                                fetchedAt = now,
+                            ),
+                        ).toEntity(now),
+                ),
+            )
+            library.setLinks(id, chicken.id, listOf(IngredientLink(ProductKey("mercadona", "p1"), preferred = true)))
+
+            val costs =
+                RecipeCosts(
+                    repository,
+                    linker,
+                    DataStoreSettingsRepository(InMemoryPreferencesDataStore()),
+                    Clock.fixed(now, ZoneOffset.UTC),
+                ).perServing()
+            // 300 g of a 1 kg pack at 10,00 €, for 2 servings.
+            assertEquals(
+                com.lechugones.cocina.domain.money
+                    .Money(150),
+                costs[id]?.perServing,
+            )
+            assertTrue(checkNotNull(costs[id]).lowerBound, "the other ingredients have no price")
+            assertNull(costs["r2"])
         }
 }

@@ -348,4 +348,44 @@ class RecipeCostCalculatorTest {
         assertEquals(2, RecipeCostCalculator.packagesFor(java.math.BigDecimal("1.001")))
         assertEquals(1, RecipeCostCalculator.packagesFor(java.math.BigDecimal("0.2")))
     }
+
+    @Test
+    fun `coverage, staleness and the oldest price are reported for the cost card`() {
+        val old = now.minus(Duration.ofDays(30))
+        val products = catalogue + (cherry.key to cherry.copy(fetchedAt = old))
+        val cost = RecipeCostCalculator.compute(tacos, 2, products, mercadona, options)
+        assertEquals(cost.includedCount, cost.pricedCount + cost.missingPriceCount)
+        assertTrue(cost.stale)
+        assertEquals(old, cost.oldestPriceAt)
+        assertTrue(cost.lines.single { it.product?.key == cherry.key }.stale)
+        assertFalse(cost.lines.single { it.product?.key == tortillas.key }.stale)
+    }
+
+    @Test
+    fun `comparison prices each provider and the best combination`() {
+        val manualTortillas = product(ProductKey("manual", "t"), "Tortillas del mercado", 360, 90, unitCount = 6)
+        val linked =
+            tacos.copy(
+                ingredients =
+                    tacos.ingredients.map {
+                        if (it.links.any { link -> link.product == tortillas.key }) {
+                            it.copy(
+                                links =
+                                    it.links + IngredientLink(manualTortillas.key),
+                            )
+                        } else {
+                            it
+                        }
+                    },
+            )
+        val products = catalogue + (manualTortillas.key to manualTortillas)
+        val comparison = RecipeCostCalculator.compare(linked, 2, products, listOf("mercadona", "manual"), options)
+
+        val atMercadona = checkNotNull(comparison.byProvider["mercadona"])
+        val atManual = checkNotNull(comparison.byProvider["manual"])
+        assertEquals(RecipeCostCalculator.compute(linked, 2, products, mercadona, options), atMercadona)
+        assertEquals(1, atManual.pricedCount)
+        assertTrue(atManual.missingPriceCount > 0)
+        assertEquals(atMercadona.wholePackagesCost.cents - 60, comparison.bestCombination.wholePackagesCost.cents)
+    }
 }

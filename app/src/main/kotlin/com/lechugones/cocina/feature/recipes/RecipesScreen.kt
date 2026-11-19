@@ -60,6 +60,7 @@ import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.ui.components.EmptyState
 import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
+import com.lechugones.cocina.ui.format.costFigure
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -114,6 +115,10 @@ fun RecipesScreen(
                         sortOpen = false
                     }
                     SortItem(R.string.recipes_sort_newest, RecipeSort.NEWEST, state.sort) {
+                        viewModel.setSort(it)
+                        sortOpen = false
+                    }
+                    SortItem(R.string.recipes_sort_cheapest, RecipeSort.CHEAPEST, state.sort) {
                         viewModel.setSort(it)
                         sortOpen = false
                     }
@@ -235,8 +240,18 @@ private fun RecipeRow(
         headlineContent = { Text(recipe.title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
         supportingContent = {
             val servings = pluralStringResource(R.plurals.recipe_servings, recipe.servings, recipe.servings)
-            val tags = recipe.tags.joinToString(" · ")
-            Text(if (tags.isEmpty()) servings else "$servings · $tags", maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val cost =
+                recipe.costPerServing?.let {
+                    stringResource(
+                        R.string.recipes_cost_per_serving,
+                        costFigure(it, missing = recipe.costIsLowerBound, approximate = false),
+                    )
+                }
+            Text(
+                (listOfNotNull(servings, cost) + recipe.tags).joinToString(" · "),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         },
     )
 }

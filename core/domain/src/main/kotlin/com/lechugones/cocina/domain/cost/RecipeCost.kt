@@ -52,6 +52,8 @@ data class IngredientCostLine(
     /** Exact proportional cost in cents, before rounding. */
     val costCents: BigDecimal? = null,
     val approximate: Boolean = false,
+    /** The product's price is older than [CostOptions.staleAfter]. */
+    val stale: Boolean = false,
 ) {
     val cost: Money? get() = costCents?.let(Money::ofCents)
     val isMissingPrice: Boolean
@@ -86,4 +88,18 @@ data class RecipeCost(
     /** Included ingredients without a usable price: the total is a lower bound ("≥"). */
     val missingPriceCount: Int,
     val approximate: Boolean,
+    /** Ingredients counted in the totals, and how many of them have a price ("5 de 6 con precio"). */
+    val includedCount: Int = 0,
+    val pricedCount: Int = 0,
+    /** Some included price is older than the staleness threshold. */
+    val stale: Boolean = false,
+    /** Fetch date of the oldest price used, for "Precios del …". */
+    val oldestPriceAt: Instant? = null,
+)
+
+/** "Comparativa" (SPEC § 4.4): the same recipe priced at each provider, plus the best combination. */
+data class CostComparison(
+    val byProvider: Map<String, RecipeCost>,
+    /** "Mejor combinación": each ingredient at the provider with the lowest whole-package cost. */
+    val bestCombination: RecipeCost,
 )

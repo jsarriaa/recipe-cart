@@ -1,5 +1,6 @@
 package com.lechugones.cocina.domain.recipe
 
+import com.lechugones.cocina.domain.money.Money
 import com.lechugones.cocina.domain.product.ProductKey
 import com.lechugones.cocina.domain.quantity.Amount
 import com.lechugones.cocina.domain.quantity.PackageSize
@@ -57,6 +58,10 @@ data class RecipeSummary(
     /** [NameKey]s of the ingredient names, for search. */
     val ingredientKeys: Set<String> = emptySet(),
     val createdAt: Instant = Instant.EPOCH,
+    /** Cost per serving at the primary supermarket; null when no ingredient has a price. */
+    val costPerServing: Money? = null,
+    /** Some counted ingredient has no price: [costPerServing] is a lower bound ("≥"). */
+    val costIsLowerBound: Boolean = false,
 )
 
 data class Ingredient(

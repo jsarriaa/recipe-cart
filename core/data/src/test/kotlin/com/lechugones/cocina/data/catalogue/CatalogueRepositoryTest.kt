@@ -203,6 +203,30 @@ class CatalogueRepositoryTest {
             assertIs<ManualProductResult.Invalid>(repository.saveManual(ManualProductForm("", size = "")))
         }
 
+    @Test
+    fun `refreshing a recipe's prices asks only for its products and skips manual ones`() =
+        runTest {
+            useFakeProvider()
+            val repository = repository()
+            repository.syncAndWait()
+            provider.bananaPrice = 250
+            val before = provider.calls
+            val summary =
+                repository.refreshProducts(
+                    listOf(ProductKey(FakeProvider.ID, "banana"), ProductKey(FakeProvider.ID, "gone"), ProductKey("manual", "x")),
+                )
+            assertEquals(RefreshSummary(updated = 1, gone = 1, error = null), summary)
+            assertEquals(before + 2, provider.calls)
+            assertEquals(
+                Money(250),
+                repository
+                    .observeProduct(ProductKey(FakeProvider.ID, "banana"))
+                    .first()
+                    ?.product
+                    ?.price,
+            )
+        }
+
     private class MutableClock(
         var now: Instant,
     ) : Clock() {

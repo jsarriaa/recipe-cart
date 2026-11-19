@@ -45,8 +45,26 @@ object RecipeCostCalculator {
             wholePackagesCost = purchases.fold(Money.ZERO) { sum, purchase -> sum + purchase.totalCost },
             missingPriceCount = lines.count { it.isMissingPrice },
             approximate = lines.any { it.includedInTotals && it.approximate },
+            includedCount = lines.count { it.includedInTotals },
+            pricedCount = included.size,
+            stale = included.any { it.stale },
+            oldestPriceAt = included.mapNotNull { it.product?.fetchedAt }.minOrNull(),
         )
     }
+
+    /** Prices [recipe] at each of [providerIds] and with the cheapest combination of them. */
+    fun compare(
+        recipe: Recipe,
+        servings: Int,
+        products: Map<ProductKey, Product>,
+        providerIds: List<String>,
+        options: CostOptions,
+    ): CostComparison =
+        CostComparison(
+            byProvider =
+                providerIds.associateWith { compute(recipe, servings, products, ProductSelection.SingleProvider(it), options) },
+            bestCombination = compute(recipe, servings, products, ProductSelection.Cheapest(providerIds.toSet()), options),
+        )
 
     private fun costLine(
         ingredient: Ingredient,
@@ -81,10 +99,19 @@ object RecipeCostCalculator {
         val product = chosen.product
         val usage = chosen.usage
         val price = product.price
-        val approximate = product.approx || isStale(product, options)
+        val stale = isStale(product, options)
+        val approximate = product.approx || stale
         return when {
             usage == null -> {
-                IngredientCostLine(ingredient, scaled, LineStatus.INCOMPATIBLE_UNITS, included, product, approximate = approximate)
+                IngredientCostLine(
+                    ingredient,
+                    scaled,
+                    LineStatus.INCOMPATIBLE_UNITS,
+                    included,
+                    product,
+                    approximate = approximate,
+                    stale = stale,
+                )
             }
 
             price == null -> {
@@ -97,6 +124,7 @@ object RecipeCostCalculator {
                     usage,
                     PackageFraction.ofRatio(usage.ratio),
                     approximate = approximate,
+                    stale = stale,
                 )
             }
 
@@ -111,6 +139,7 @@ object RecipeCostCalculator {
                     fraction = PackageFraction.ofRatio(usage.ratio),
                     costCents = usage.ratio.multiply(BigDecimal(price.cents)),
                     approximate = approximate,
+                    stale = stale,
                 )
             }
         }

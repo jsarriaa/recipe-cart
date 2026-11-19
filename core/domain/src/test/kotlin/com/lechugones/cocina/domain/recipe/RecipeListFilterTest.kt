@@ -63,4 +63,36 @@ class RecipeListFilterTest {
     fun `distinct sorted tags`() {
         assertEquals(listOf("cena", "italiana", "mexicana", "rápida"), RecipeListFilter.tags(recipes))
     }
+
+    @Test
+    fun `cheapest per serving first, recipes without a price last by name`() {
+        val priced =
+            recipes.mapIndexed { i, recipe ->
+                when (i) {
+                    0 -> {
+                        recipe.copy(
+                            costPerServing =
+                                com.lechugones.cocina.domain.money
+                                    .Money(240),
+                        )
+                    }
+
+                    2 -> {
+                        recipe.copy(
+                            costPerServing =
+                                com.lechugones.cocina.domain.money
+                                    .Money(180),
+                        )
+                    }
+
+                    else -> {
+                        recipe
+                    }
+                }
+            }
+        assertEquals(
+            listOf("Tacos de pollo", "Ñoquis con tomate", "arroz al horno", "Nachos"),
+            RecipeListFilter.apply(priced, "", null, RecipeSort.CHEAPEST).map { it.title },
+        )
+    }
 }

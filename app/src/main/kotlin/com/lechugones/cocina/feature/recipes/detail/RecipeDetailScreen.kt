@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +55,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
+import com.lechugones.cocina.domain.cost.IngredientCostLine
+import com.lechugones.cocina.domain.cost.LineStatus
+import com.lechugones.cocina.domain.format.SpanishNumberFormat
 import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
@@ -66,7 +72,9 @@ import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.components.productPriceText
 import com.lechugones.cocina.ui.format.Dates
+import com.lechugones.cocina.ui.format.providerErrorMessage
 import com.lechugones.cocina.ui.format.quantityText
+import com.lechugones.cocina.ui.format.usageText
 
 @Composable
 fun RecipeDetailScreen(
@@ -98,6 +106,21 @@ fun RecipeDetailScreen(
     }
 
     val loaded = state as? RecipeDetailUiState.Loaded
+    val resources = LocalResources.current
+    val refreshResult = loaded?.refreshResult
+    LaunchedEffect(refreshResult) {
+        val result = refreshResult ?: return@LaunchedEffect
+        val name = loaded.primaryProvider.let { viewModel.providerDisplayName(it) ?: it }
+        val error = result.error
+        snackbar.showSnackbar(
+            if (error != null) {
+                providerErrorMessage(resources, error, name, null)
+            } else {
+                resources.getQuantityString(R.plurals.cost_refreshed, result.updated, result.updated)
+            },
+        )
+        viewModel.dismissRefreshResult()
+    }
     ScreenScaffold(
         title = loaded?.recipe?.title.orEmpty(),
         onBack = onBack,
@@ -139,7 +162,7 @@ fun RecipeDetailScreen(
             }
 
             is RecipeDetailUiState.Loaded -> {
-                RecipeDetailContent(current, viewModel::setServings, viewModel::openLinking, padding)
+                RecipeDetailContent(current, viewModel, padding)
             }
         }
     }
@@ -182,6 +205,52 @@ fun RecipeDetailScreen(
     }
 }
 
+/** The cost card's choice for [ingredient] in the current mode, else its first cached link. */
+private fun shownProduct(
+    ingredient: Ingredient,
+    loaded: RecipeDetailUiState.Loaded,
+    line: IngredientCostLine?,
+): ProviderProduct? = line?.product?.key?.let { loaded.products[it] } ?: linkedProduct(ingredient, loaded)
+
+/** "1/2 paquete, 250 g de 500 g · 1,87 €", or why there is no cost. Staples left out of the cost say so. */
+@Composable
+private fun CostLineText(line: IngredientCostLine) {
+    val text =
+        when (line.status) {
+            LineStatus.PRICED -> {
+                listOfNotNull(usageText(line), line.cost?.let { SpanishNumberFormat.money(it) }).joinToString(" · ")
+            }
+
+            LineStatus.NO_PRICE -> {
+                listOfNotNull(usageText(line), stringResource(R.string.catalogue_no_price)).joinToString(" · ")
+            }
+
+            LineStatus.INCOMPATIBLE_UNITS -> {
+                stringResource(R.string.cost_incompatible)
+            }
+
+            LineStatus.NO_LINK, LineStatus.NO_QUANTITY -> {
+                null
+            }
+        } ?: return
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (line.stale) {
+            Icon(
+                Icons.Outlined.WarningAmber,
+                contentDescription = stringResource(R.string.cost_stale),
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(14.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+        }
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall,
+            color = if (line.includedInTotals) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.outline,
+        )
+    }
+}
+
 /** The product shown for [ingredient]: the first cached link, preferred ones first (the newest pick is first). */
 private fun linkedProduct(
     ingredient: Ingredient,
@@ -195,12 +264,18 @@ private fun linkedProduct(
 @Composable
 private fun RecipeDetailContent(
     loaded: RecipeDetailUiState.Loaded,
-    onServings: (Int) -> Unit,
-    onLink: (Ingredient) -> Unit,
+    viewModel: RecipeDetailViewModel,
     padding: PaddingValues,
 ) {
+    val onServings: (Int) -> Unit = viewModel::setServings
+    val onLink: (Ingredient) -> Unit = viewModel::openLinking
     val recipe = loaded.recipe
     val servings = loaded.servings
+    val lines =
+        loaded.cost
+            ?.lines
+            .orEmpty()
+            .associateBy { it.ingredient.id }
     var staplesOpen by rememberSaveable { mutableStateOf(false) }
     val (staples, main) = recipe.ingredients.partition { it.pantryStaple }
     val groups = main.groupBy { it.group }
@@ -251,6 +326,16 @@ private fun RecipeDetailContent(
             }
         }
         item { ServingsStepper(servings, recipe.servings, onServings) }
+        item {
+            CostCard(
+                loaded = loaded,
+                providerNames = viewModel::providerDisplayName,
+                onMode = viewModel::setMode,
+                onIncludes = viewModel::setIncludes,
+                onRefresh = viewModel::refreshPrices,
+                onFixMissing = onLink,
+            )
+        }
         item { SectionTitle(stringResource(R.string.recipe_ingredients)) }
         groups.forEach { (group, ingredients) ->
             if (group != null) {
@@ -263,7 +348,9 @@ private fun RecipeDetailContent(
                     )
                 }
             }
-            items(ingredients, key = { it.id }) { IngredientRow(it, recipe.servings, servings, linkedProduct(it, loaded)) { onLink(it) } }
+            items(ingredients, key = { it.id }) {
+                IngredientRow(it, recipe.servings, servings, shownProduct(it, loaded, lines[it.id]), lines[it.id]) { onLink(it) }
+            }
         }
         if (staples.isNotEmpty()) {
             item {
@@ -280,7 +367,9 @@ private fun RecipeDetailContent(
                 }
             }
             if (staplesOpen) {
-                items(staples, key = { it.id }) { IngredientRow(it, recipe.servings, servings, linkedProduct(it, loaded)) { onLink(it) } }
+                items(staples, key = { it.id }) {
+                    IngredientRow(it, recipe.servings, servings, shownProduct(it, loaded, lines[it.id]), lines[it.id]) { onLink(it) }
+                }
             }
         }
         item { Spacer(Modifier.height(12.dp)) }
@@ -341,6 +430,7 @@ private fun IngredientRow(
     recipeServings: Int,
     servings: Int,
     product: ProviderProduct?,
+    line: IngredientCostLine?,
     onClick: () -> Unit,
 ) {
     val scaled = ServingsScaler.scale(ingredient.quantity, ingredient.unit, recipeServings, servings)
@@ -377,6 +467,7 @@ private fun IngredientRow(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            line?.let { CostLineText(it) }
         }
     }
 }
