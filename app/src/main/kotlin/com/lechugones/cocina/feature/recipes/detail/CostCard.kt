@@ -62,6 +62,12 @@ fun CostCard(
 
             if (cost.includedCount == 0) {
                 Text(stringResource(R.string.cost_nothing), style = MaterialTheme.typography.bodyMedium)
+            } else if (cost.pricedCount == 0) {
+                // Nothing linked in this supermarket yet: "≥ 0,00 €" would only confuse.
+                Text(stringResource(R.string.cost_nothing_here), style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { onFixMissing(cost.lines.first { it.isMissingPrice }.ingredient) }) {
+                    Text(stringResource(R.string.cost_link_first))
+                }
             } else {
                 val missing = cost.missingPriceCount > 0
                 Figure(stringResource(R.string.cost_dish), costFigure(cost.dishCost, missing, cost.approximate), strong = true)

@@ -454,6 +454,8 @@
     <string name="cost_to_buy">Te falta comprar</string>
     <string name="cost_title">Coste</string>
     <string name="cost_dish">Coste del plato</string>
+    <string name="cost_nothing_here">Ningún ingrediente tiene producto en este supermercado todavía.</string>
+    <string name="cost_link_first">Vincular el primero</string>
     <string name="cost_per_serving">Por ración</string>
     <string name="cost_whole_packages">Comprando envases enteros</string>
     <string name="cost_nothing">Vincula productos a los ingredientes para ver lo que cuesta el plato.</string>

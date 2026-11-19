@@ -11,16 +11,38 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.io.File
 
 /*
  * "Cocina mediterránea": tomato red, olive green and saffron on a cream page, with a warm
- * espresso dark mode. Headings use the system serif (Noto Serif on Android) for a recipe-book
- * feel; body text stays in the readable sans-serif. No bundled fonts, nothing downloaded.
+ * espresso dark mode. Headings use Noto Serif for a recipe-book feel; body text stays in the
+ * readable sans-serif. No bundled fonts, nothing downloaded.
  */
+
+/**
+ * Noto Serif, read from the system font files: some phones (OnePlus) swap the "serif" family for
+ * their own sans-serif, so asking for [FontFamily.Serif] is not enough. Falls back to it when the
+ * files are missing.
+ */
+private val HeadingFamily: FontFamily =
+    run {
+        val regular = File("/system/fonts/NotoSerif-Regular.ttf")
+        val bold = File("/system/fonts/NotoSerif-Bold.ttf")
+        if (regular.canRead() && bold.canRead()) {
+            FontFamily(
+                Font(regular, FontWeight.Normal),
+                Font(bold, FontWeight.SemiBold),
+                Font(bold, FontWeight.Bold),
+            )
+        } else {
+            FontFamily.Serif
+        }
+    }
 
 private val Tomato = Color(0xFFB3412A)
 private val TomatoLight = Color(0xFFFFB4A2)
@@ -101,7 +123,7 @@ private val DarkColors: ColorScheme =
 
 private val Base = Typography()
 
-private fun TextStyle.serif(weight: FontWeight = FontWeight.SemiBold) = copy(fontFamily = FontFamily.Serif, fontWeight = weight)
+private fun TextStyle.serif(weight: FontWeight = FontWeight.SemiBold) = copy(fontFamily = HeadingFamily, fontWeight = weight)
 
 /** Serif headings and titles, sans-serif body and labels. */
 private val CocinaTypography =
