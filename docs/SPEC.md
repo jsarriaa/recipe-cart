@@ -504,6 +504,7 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
 | Añadir básicos que me faltan a la lista | on |
 | Copia de seguridad | Create / Restore |
 | Actualizaciones | "Buscar actualizaciones": asks `api.github.com` for the latest release of `jsarriaa/recipe-cart`. If its version is newer and it has an `.apk` asset, "Descargar e instalar" downloads it to the cache and opens Android's installer (the user confirms there; the first time Android asks to allow installs from this app). From 1.2.0 the app also checks once each time it opens; if a newer release has an APK, a pop-up "¡Hay una versión nueva!" offers "Actualizar" or "Ahora no" (it asks again on the next open). A failed check shows nothing. The APK is downloaded only on "Actualizar". The debug build only checks and links to the release page, because the release APK is a different app |
+| Tu nombre en el recetario | Not set. The name shown as "por …" on published recipes; asked the first time you publish |
 | GitHub | A card "Hecha con cariño por @jsarriaa" with buttons to the owner's GitHub profile and the app's repository (opened in the browser; the app fetches nothing) |
 | Acerca de | Version, open-source licences, legal note (not affiliated with any supermarket) |
 
@@ -550,13 +551,25 @@ Full design: [COMMUNITY.md](COMMUNITY.md).
   **Descargar** downloads the file and opens the normal import (§ 4.3): preview, duplicates and
   product matching.
 - Only paths `recipes/….md` from the index are downloaded, at most 200 000 characters.
-- Publishing from the app is phase B (§ 9): a first-time name prompt, then a small Cloudflare
-  Worker that commits the recipe to the book; the owner removes anything unwanted on GitHub.
+- **Publicar en la comunidad** (1.4.0), in a recipe's ⋮ menu:
+  1. The first time, the app asks for the name shown as "por …" (1–60 characters, kept in
+     settings, changeable in Ajustes → "Tu nombre en el recetario").
+  2. A confirmation says the recipe becomes public (CC BY 4.0) and is published without its
+     photo and without product links; "Cambiar nombre" is offered there too.
+  3. The app POSTs the `cpl-recipe/1` text, with `author` set, to the owner's Cloudflare Worker
+     (`community/worker/`), which commits it to `recipes/`. The recipe then keeps that author.
+  4. A recipe signed by someone else (downloaded from the book) cannot be published: "Esta
+     receta es de Marta".
+  5. Results: published ("aparecerá en unos minutos"), rate limited (3 per minute per IP),
+     rejected, failed, or not available (no Worker address in this build).
+  The owner removes anything unwanted on GitHub.
 
 #### AC
 
 - AC10.1 Search and filters are pure domain code (`CommunitySearch`), tested.
 - AC10.2 A failed index download shows "Reintentar"; a failed recipe download shows a snackbar.
+- AC10.3 The published text is built by domain code (`CommunityPublication`), tested: author
+  set, no links, no photo, parses back; someone else's recipe is refused; names are cleaned.
 
 ## 5. Domain rules
 
@@ -678,12 +691,12 @@ ingredient, no foreign key to `product` so a link survives an uncached product) 
 `link_memory`; schema v5 (phase 5) adds `pantry_lot`, `shelf_life_memory`, `cook_event`
 (no foreign key to the recipe: history keeps a title snapshot) and `cook_deduction` (a JSON
 snapshot of each touched lot, so "Deshacer" restores it exactly); schema v6 (phase 6) adds the
-shopping list inputs. All ids are `TEXT`
+shopping list inputs; schema v7 (1.4.0) adds `recipe.author`. All ids are `TEXT`
 UUIDs except provider product keys.
 
 | Table | Key columns |
 |---|---|
-| `recipe` | `id`, `uid`, `title`, `description`, `servings`, `prep_minutes`, `cook_minutes`, `image_path`, `source`, `body_md`, `created_at`, `updated_at`, `origin` *(v2)*, `imported_at` *(v2)*, `edited_after_import` *(v2)* |
+| `recipe` | `id`, `uid`, `title`, `description`, `servings`, `prep_minutes`, `cook_minutes`, `image_path`, `source`, `body_md`, `created_at`, `updated_at`, `origin` *(v2)*, `imported_at` *(v2)*, `edited_after_import` *(v2)*, `author` *(v7)* |
 | `recipe_tag` | `recipe_id`, `tag` |
 | `ingredient` | `id`, `recipe_id`, `position`, `group_label`, `name`, `name_key`, `quantity_milli`, `unit`, `note`, `optional`, `pantry_staple`, `unit_weight_g_milli`, `match_query`, `match_package`, `match_store_brand_ok` |
 | `ingredient_link` *(v4)* | `ingredient_id`, `provider_id`, `product_id` (PK triple), `preferred`, `position` |
@@ -761,7 +774,7 @@ supermarket switch and added the "cocina mediterránea" theme; 1.1.0 removed eve
 (only "Abierto" is left), and added "Buscar actualizaciones" and the GitHub card in Ajustes. The
 repository is public from 1.1.0 and releases carry the signed APK. 1.2.0 checks for updates when
 the app opens and offers them in a pop-up. 1.3.0 adds the community recipe book (§ 4.10);
-publishing from the app comes next.
+1.4.0 adds publishing to it (schema v7).
 
 Phases 4–6 depend on 3 for real prices, but their domain logic is already exercised from
 phase 1 with in-memory products.

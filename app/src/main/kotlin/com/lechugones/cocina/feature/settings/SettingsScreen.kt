@@ -31,7 +31,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.domain.settings.AppSettings
+import com.lechugones.cocina.feature.community.NameDialog
 import com.lechugones.cocina.feature.settings.update.AppLinks
 import com.lechugones.cocina.ui.components.PostalCodeDialog
 import com.lechugones.cocina.ui.components.ScreenScaffold
@@ -204,6 +207,10 @@ fun SettingsScreen(
             }
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            Text(stringResource(R.string.community_title), style = MaterialTheme.typography.titleMedium)
+            PublisherNameRow(state.publisherName, onSave = viewModel::setPublisherName)
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
             Text(stringResource(R.string.settings_updates_title), style = MaterialTheme.typography.titleMedium)
             UpdateSection(
                 state.update,
@@ -334,5 +341,36 @@ private fun openUrl(
         context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, url.toUri()))
     } catch (e: android.content.ActivityNotFoundException) {
         // No browser installed: nothing to open.
+    }
+}
+
+@Composable
+private fun PublisherNameRow(
+    name: String?,
+    onSave: (String) -> Boolean,
+) {
+    var editing by remember { mutableStateOf(false) }
+    var invalid by remember { mutableStateOf(false) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.settings_publisher_name), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                name ?: stringResource(R.string.settings_publisher_name_none),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        TextButton(onClick = {
+            invalid = false
+            editing = true
+        }) { Text(stringResource(R.string.action_change)) }
+    }
+    if (editing) {
+        NameDialog(
+            initial = name.orEmpty(),
+            invalid = invalid,
+            onSave = { if (onSave(it)) editing = false else invalid = true },
+            onDismiss = { editing = false },
+        )
     }
 }

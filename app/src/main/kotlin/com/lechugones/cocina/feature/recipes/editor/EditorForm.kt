@@ -184,6 +184,7 @@ object EditorForms {
             tags = draft.tags,
             imagePath = form.photo,
             source = draft.source,
+            author = original?.author,
             bodyMarkdown = draft.body,
             origin = original?.origin ?: RecipeOrigin.CREATED,
             importedAt = original?.importedAt,

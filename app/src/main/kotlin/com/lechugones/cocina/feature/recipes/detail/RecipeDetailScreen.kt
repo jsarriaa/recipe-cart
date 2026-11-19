@@ -65,6 +65,8 @@ import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
 import com.lechugones.cocina.domain.recipe.ServingsScaler
+import com.lechugones.cocina.feature.community.PublishDialogs
+import com.lechugones.cocina.feature.community.PublishViewModel
 import com.lechugones.cocina.feature.export.ExportDialog
 import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.provider.ProviderProduct
@@ -98,6 +100,8 @@ fun RecipeDetailScreen(
     var menuOpen by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
     var export by remember { mutableStateOf<ExportFile?>(null) }
+    val publisher: PublishViewModel = hiltViewModel()
+    val publishState by publisher.uiState.collectAsStateWithLifecycle()
     val exportError = stringResource(R.string.export_error)
     val copyTitle = stringResource(R.string.recipe_copy_title, "%s")
 
@@ -172,6 +176,10 @@ fun RecipeDetailScreen(
                             menuOpen = false
                             viewModel.duplicate { copyTitle.replace("%s", it) }
                         })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.publish_menu)) }, onClick = {
+                            menuOpen = false
+                            publisher.start()
+                        })
                         DropdownMenuItem(text = { Text(stringResource(R.string.action_export)) }, onClick = {
                             menuOpen = false
                             viewModel.export()
@@ -215,6 +223,13 @@ fun RecipeDetailScreen(
         )
     }
     export?.let { ExportDialog(it, snackbar, onDismiss = { export = null }) }
+    PublishDialogs(
+        publishState,
+        onSaveName = publisher::saveName,
+        onChangeName = publisher::changeName,
+        onPublish = publisher::publish,
+        onDismiss = publisher::dismiss,
+    )
 
     cookSheet?.let { cook ->
         CookSheet(
