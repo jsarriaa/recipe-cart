@@ -10,6 +10,7 @@ import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.data.backup.BackupManager
 import com.lechugones.cocina.data.backup.StagedBackup
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.domain.community.CommunityPublication
 import com.lechugones.cocina.domain.settings.AppSettings
 import com.lechugones.cocina.feature.settings.update.AppUpdates
 import com.lechugones.cocina.feature.settings.update.UpdateCheck
@@ -45,6 +46,7 @@ data class SettingsUiState(
     val activeProviders: Set<String> = emptySet(),
     val primaryProvider: String = AppSettings.DEFAULT_PROVIDER,
     val update: UpdateUi = UpdateUi.Idle,
+    val publisherName: String? = null,
     val editingPostalCode: Boolean = false,
 )
 
@@ -120,6 +122,7 @@ class SettingsViewModel
                             addMissingStaples = s.addMissingStaplesToList,
                             activeProviders = s.activeProviders,
                             primaryProvider = s.primaryProvider,
+                            publisherName = s.publisherName,
                         )
                     }
                 }
@@ -187,6 +190,13 @@ class SettingsViewModel
                     it.copy(update = if (ok) UpdateUi.Available(update.version, update.apk.size) else UpdateUi.Failed)
                 }
             }
+        }
+
+        /** False when [input] is not a usable name (empty or too long). */
+        fun setPublisherName(input: String): Boolean {
+            val name = CommunityPublication.cleanName(input) ?: return false
+            viewModelScope.launch { settings.update { it.copy(publisherName = name) } }
+            return true
         }
 
         fun setAddMissingStaples(enabled: Boolean) {

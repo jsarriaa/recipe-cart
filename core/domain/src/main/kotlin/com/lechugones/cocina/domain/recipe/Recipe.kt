@@ -23,6 +23,8 @@ data class Recipe(
     val tags: List<String> = emptyList(),
     val imagePath: String? = null,
     val source: String? = null,
+    /** Who wrote it, as shown in the community recipe book ("por Joan"). */
+    val author: String? = null,
     val bodyMarkdown: String = "",
     val origin: RecipeOrigin = RecipeOrigin.CREATED,
     /** When the recipe was last imported from a pack (null for recipes created in the app). */

@@ -55,7 +55,7 @@ up to 5 minutes.
 when the user taps "Descargar". The text goes to the normal import screen. `CommunitySearch`
 (domain) filters by text, tags and time.
 
-## Publishing (phase B, planned)
+## Publishing (app 1.4.0)
 
 1. The first "Publicar", on a recipe's menu, asks for the name to show ("por Joan") and keeps it
    in settings; it can be changed in Ajustes.
@@ -66,3 +66,12 @@ when the user taps "Descargar". The text goes to the normal import screen. `Comm
    repository (kept as a Worker secret, never in the app).
 4. The index workflow runs; the recipe appears in every app's search. The owner removes
    anything unwanted on GitHub.
+
+Code: `CommunityPublication` (domain: text, name rules, refusing someone else's recipe),
+`PublishViewModel` and `PublishDialogs` (app), `CommunityBook.publish`, and the Worker in
+[`community/worker/`](../community/worker/) with its [setup guide](../community/worker/README.md).
+The app only publishes once `CommunityLinks.PUBLISH_URL` holds the deployed Worker's address;
+until then "Publicar" says it is not available.
+
+Publishing keeps the recipe's `uid`, so publishing the same recipe twice creates two files;
+the owner deletes the extra one.

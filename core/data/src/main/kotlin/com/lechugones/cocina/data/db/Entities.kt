@@ -37,6 +37,8 @@ data class RecipeEntity(
     @ColumnInfo(name = "imported_at") val importedAt: Long?,
     /** Added in v2. */
     @ColumnInfo(name = "edited_after_import", defaultValue = "0") val editedAfterImport: Boolean,
+    /** Name shown in the community recipe book ("por Joan"), v7. */
+    val author: String? = null,
 )
 
 @Entity(

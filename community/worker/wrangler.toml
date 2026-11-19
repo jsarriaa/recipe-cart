@@ -1,0 +1,17 @@
+# Optional: deploy from the command line with `npx wrangler deploy` instead of the dashboard.
+# The GitHub token is never written here: `npx wrangler secret put GITHUB_TOKEN`.
+name = "recetario"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+REPO = "jsarriaa/recetario"
+
+# At most 3 publications per IP per minute.
+[[ratelimits]]
+name = "PUBLISH_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 3
+  period = 60

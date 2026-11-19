@@ -13,6 +13,8 @@ data class AppSettings(
     val addMissingStaplesToList: Boolean = true,
     /** Shopping list: "Más barato por producto" instead of the primary supermarket. */
     val shoppingCheapest: Boolean = false,
+    /** Name shown on recipes published to the community recipe book ("por Joan"). */
+    val publisherName: String? = null,
 ) {
     /** Replaces impossible values (from an old or edited file) with safe ones. */
     fun sanitized(): AppSettings {

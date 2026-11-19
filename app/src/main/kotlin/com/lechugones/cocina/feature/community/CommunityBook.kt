@@ -7,8 +7,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import javax.inject.Inject
 
@@ -18,6 +20,12 @@ object CommunityLinks {
     const val REPO_URL = "https://github.com/$REPO"
     const val RAW_BASE = "https://raw.githubusercontent.com/$REPO/main/"
     const val INDEX_URL = RAW_BASE + "index.json"
+
+    /**
+     * The owner's Cloudflare Worker that commits published recipes (community/worker/). Empty
+     * until it is deployed: "Publicar" then says publishing is not available yet.
+     */
+    const val PUBLISH_URL = ""
 
     /** Recipe file paths come from the index; anything that could leave the book is refused. */
     private val SAFE_PATH = Regex("^recipes/[A-Za-z0-9._/-]+\\.md$")
@@ -45,6 +53,13 @@ data class CommunityRecipeDto(
 ) {
     fun toDomain() = CommunityRecipe(path, title, servings, uid, author, description, totalMinutes, tags, ingredients)
 }
+
+@Serializable
+data class PublishRequest(
+    val recipe: String,
+)
+
+enum class PublishResult { Published, RateLimited, Rejected, Failed, NotAvailable }
 
 /** Downloads the book's index and recipe files, only when the user opens the screen or taps. */
 class CommunityBook
@@ -83,6 +98,34 @@ class CommunityBook
             }
         }
 
+        /** Sends [text] to the publishing Worker (docs/COMMUNITY.md, phase B). */
+        suspend fun publish(text: String): PublishResult {
+            if (CommunityLinks.PUBLISH_URL.isBlank()) return PublishResult.NotAvailable
+            return withContext(Dispatchers.IO) {
+                try {
+                    val body = json.encodeToString(PublishRequest.serializer(), PublishRequest(text))
+                    val request =
+                        Request
+                            .Builder()
+                            .url(CommunityLinks.PUBLISH_URL)
+                            .post(body.toRequestBody("application/json".toMediaType()))
+                            .build()
+                    client.newCall(request).execute().use { response ->
+                        when {
+                            response.isSuccessful -> PublishResult.Published
+                            response.code == HTTP_TOO_MANY -> PublishResult.RateLimited
+                            response.code == HTTP_UNPROCESSABLE -> PublishResult.Rejected
+                            else -> PublishResult.Failed
+                        }
+                    }
+                } catch (e: IOException) {
+                    PublishResult.Failed
+                } catch (e: IllegalArgumentException) {
+                    PublishResult.Failed
+                }
+            }
+        }
+
         private fun get(url: String): String? =
             client.newCall(Request.Builder().url(url).build()).execute().use { response ->
                 if (response.isSuccessful) response.body.string() else null
@@ -91,5 +134,7 @@ class CommunityBook
         private companion object {
             const val INDEX_FORMAT = "cpl-recetario/1"
             const val MAX_RECIPE_CHARS = 200_000
+            const val HTTP_TOO_MANY = 429
+            const val HTTP_UNPROCESSABLE = 422
         }
     }

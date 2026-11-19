@@ -279,4 +279,36 @@ class DatabaseSchemaTest {
                 database.close()
             }
         }
+
+    @Test
+    fun `v6 recipes survive the migration to v7 without an author, and an author can then be stored`() =
+        runTest {
+            helper.createDatabase(testDb, 6).use { db ->
+                db.execSQL(
+                    "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, image_path, source, " +
+                        "body_md, created_at, updated_at, origin, imported_at, edited_after_import) " +
+                        "VALUES ('r1', 'u1', 'Tacos', NULL, 2, NULL, NULL, NULL, 'casa', '', 10, 20, 'created', NULL, 0)",
+                )
+            }
+            helper.runMigrationsAndValidate(testDb, 7, true, CocinaMigrations.MIGRATION_6_7).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), CocinaDatabase::class.java, testDb)
+                    .addMigrations(*CocinaMigrations.ALL)
+                    .allowMainThreadQueries()
+                    .build()
+            try {
+                val recipes =
+                    com.lechugones.cocina.data.recipe
+                        .RoomRecipeRepository(database.recipeDao())
+                val recipe = checkNotNull(recipes.get("r1"))
+                assertEquals("casa", recipe.source)
+                assertEquals(null, recipe.author)
+                recipes.save(recipe.copy(author = "Joan"))
+                assertEquals("Joan", recipes.get("r1")?.author)
+            } finally {
+                database.close()
+            }
+        }
 }

@@ -131,6 +131,7 @@ internal fun Recipe.toEntity() =
         origin = origin.code,
         importedAt = importedAt?.toEpochMilli(),
         editedAfterImport = editedAfterImport,
+        author = author,
     )
 
 internal fun RecipeEntity.toDomain(
@@ -150,6 +151,7 @@ internal fun RecipeEntity.toDomain(
     tags = tags,
     imagePath = imagePath,
     source = source,
+    author = author,
     bodyMarkdown = bodyMarkdown,
     origin = RecipeOrigin.fromCode(origin),
     importedAt = importedAt?.let(Instant::ofEpochMilli),

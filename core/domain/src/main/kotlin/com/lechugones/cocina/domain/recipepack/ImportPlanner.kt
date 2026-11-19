@@ -158,6 +158,7 @@ object RecipeDrafts {
         tags = draft.tags,
         imagePath = imagePath,
         source = draft.source,
+        author = draft.author,
         bodyMarkdown = draft.body,
         origin = RecipeOrigin.IMPORTED,
         importedAt = now,
@@ -200,6 +201,7 @@ object RecipeDrafts {
         tags = recipe.tags,
         image = image,
         source = recipe.source,
+        author = recipe.author,
         body = recipe.bodyMarkdown,
     )
 }

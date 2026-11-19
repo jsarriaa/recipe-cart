@@ -47,7 +47,9 @@ and what it costs, keeps a pantry, and builds a shopping list. The full specific
    download hosts) for updates: one check each time the app opens (owner's request) and the
    "Buscar actualizaciones" button. The APK is downloaded only when the user taps "Actualizar".
    `raw.githubusercontent.com` serves the community recipe book (`jsarriaa/recetario`), read
-   only when the user opens "Recetas de la comunidad" or taps "Descargar".
+   only when the user opens "Recetas de la comunidad" or taps "Descargar". The owner's
+   Cloudflare Worker (`community/worker/`, address in `CommunityLinks.PUBLISH_URL`) receives a
+   recipe only when the user confirms "Publicar".
    `android:allowBackup="false"`; the in-app backup file is the only backup path.
 5. **No secrets in git.** Keystores, `keystore.properties`, `local.properties` and `.env` files are
    gitignored. Do not copy third-party API keys found in websites' JavaScript into this repo.
