@@ -95,4 +95,20 @@ class RecipeListFilterTest {
             RecipeListFilter.apply(priced, "", null, RecipeSort.CHEAPEST).map { it.title },
         )
     }
+
+    @Test
+    fun `recently cooked first, never cooked last by name`() {
+        val cooked =
+            recipes.mapIndexed { i, recipe ->
+                when (i) {
+                    1 -> recipe.copy(lastCookedAt = Instant.parse("2026-11-10T20:00:00Z"))
+                    3 -> recipe.copy(lastCookedAt = Instant.parse("2026-11-18T20:00:00Z"))
+                    else -> recipe
+                }
+            }
+        assertEquals(
+            listOf("arroz al horno", "Nachos", "Ñoquis con tomate", "Tacos de pollo"),
+            RecipeListFilter.apply(cooked, "", null, RecipeSort.RECENTLY_COOKED).map { it.title },
+        )
+    }
 }

@@ -62,6 +62,8 @@ data class RecipeSummary(
     val costPerServing: Money? = null,
     /** Some counted ingredient has no price: [costPerServing] is a lower bound ("≥"). */
     val costIsLowerBound: Boolean = false,
+    /** Last "Lo he cocinado" that was not undone. */
+    val lastCookedAt: Instant? = null,
 )
 
 data class Ingredient(

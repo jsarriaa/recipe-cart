@@ -34,6 +34,7 @@ data class SettingsUiState(
     val lastAutomaticBackup: Instant? = null,
     val postalCode: String? = null,
     val storeBrandOnly: Boolean = false,
+    val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
     val editingPostalCode: Boolean = false,
 )
 
@@ -71,7 +72,15 @@ class SettingsViewModel
         init {
             refreshAutomatic()
             viewModelScope.launch {
-                settings.settings.collect { s -> state.update { it.copy(postalCode = s.postalCode, storeBrandOnly = s.storeBrandOnly) } }
+                settings.settings.collect { s ->
+                    state.update {
+                        it.copy(
+                            postalCode = s.postalCode,
+                            storeBrandOnly = s.storeBrandOnly,
+                            useSoonDays = s.useSoonWarningDays,
+                        )
+                    }
+                }
             }
         }
 
@@ -83,6 +92,11 @@ class SettingsViewModel
             if (!AppSettings.isValidPostalCode(code)) return
             state.update { it.copy(editingPostalCode = false) }
             viewModelScope.launch { settings.update { it.copy(postalCode = code) } }
+        }
+
+        fun setUseSoonDays(days: Int) {
+            val value = days.coerceIn(AppSettings.USE_SOON_RANGE)
+            viewModelScope.launch { settings.update { it.copy(useSoonWarningDays = value) } }
         }
 
         fun setStoreBrandOnly(enabled: Boolean) {

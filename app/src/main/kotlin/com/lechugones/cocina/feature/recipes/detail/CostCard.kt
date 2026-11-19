@@ -68,6 +68,12 @@ fun CostCard(
                 Figure(stringResource(R.string.cost_dish), costFigure(cost.dishCost, missing, cost.approximate), strong = true)
                 Figure(stringResource(R.string.cost_per_serving), costFigure(cost.perServing, missing, cost.approximate))
                 Figure(stringResource(R.string.cost_whole_packages), costFigure(cost.wholePackagesCost, missing, cost.approximate))
+                loaded.toBuy?.let { toBuy ->
+                    Figure(
+                        stringResource(R.string.cost_to_buy),
+                        costFigure(toBuy.wholePackagesCost, toBuy.missingPriceCount > 0, toBuy.approximate),
+                    )
+                }
                 if (missing) {
                     val first = cost.lines.first { it.isMissingPrice }.ingredient
                     TextButton(onClick = { onFixMissing(first) }) {

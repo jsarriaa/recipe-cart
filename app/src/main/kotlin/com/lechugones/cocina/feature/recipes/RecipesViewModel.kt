@@ -2,6 +2,7 @@ package com.lechugones.cocina.feature.recipes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lechugones.cocina.data.pantry.PantryRepository
 import com.lechugones.cocina.data.recipe.RecipeCosts
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.domain.recipe.RecipeListFilter
@@ -49,6 +50,7 @@ class RecipesViewModel
         private val library: RecipeLibrary,
         private val exporter: RecipeExporter,
         private val costs: RecipeCosts,
+        private val pantry: PantryRepository,
     ) : ViewModel() {
         private val query = MutableStateFlow("")
         private val tag = MutableStateFlow<String?>(null)
@@ -72,15 +74,17 @@ class RecipesViewModel
         /** Summaries with their cost per serving, recomputed (offline) whenever recipes change. */
         @OptIn(ExperimentalCoroutinesApi::class)
         private fun withCosts(): Flow<List<RecipeSummary>> =
-            library.observeSummaries().mapLatest { all ->
-                val perServing = costs.perServing()
-                all.map {
-                    it.copy(
-                        costPerServing = perServing[it.id]?.perServing,
-                        costIsLowerBound = perServing[it.id]?.lowerBound == true,
-                    )
+            combine(library.observeSummaries(), pantry.observeLastCooked()) { all, cooked -> all to cooked }
+                .mapLatest { (all, cooked) ->
+                    val perServing = costs.perServing()
+                    all.map {
+                        it.copy(
+                            costPerServing = perServing[it.id]?.perServing,
+                            costIsLowerBound = perServing[it.id]?.lowerBound == true,
+                            lastCookedAt = cooked[it.id],
+                        )
+                    }
                 }
-            }
 
         init {
             // Photos left behind by an editor session that never saved (for example, the app was killed).

@@ -364,12 +364,16 @@ Rules:
   remaining quantity, package size, `opened` flag, `openedAt`, `addedAt`, optional best-before
   date, optional location ("nevera", "congelador", "armario").
 - Staples can be tracked **presence-only** ("tengo sal" / "se ha acabado") with no quantity.
-- Adding: from the catalogue, from a shopping list ("Comprado"), or manually with a generic name.
+- Adding: from the catalogue (a full sealed package, measured like the cost engine measures it:
+  pieces first, so "Maxi tortillas" is 6 ud), manually with a generic name, and from phase 6 from
+  the shopping list ("Comprado"). Lots are edited in a sheet: quantity left (g, ml or ud),
+  opened, best-before date, location, shelf life once opened, and the "Usar pronto" tag.
 - Each lot shows its product's photo (§ 4.9) when it is linked to a product.
 - **"Usar pronto"** marks food to use up first. A lot is *usar pronto* when any of these holds:
-  - the user tagged it by hand (toggle on the lot, or a swipe action in the list);
-  - its best-before date is within the warning window (setting "Avisar con antelación de",
-    default 3 days), or has passed (shown as **Caducado**, still listed so the user decides);
+  - the user tagged it by hand (the ⚡ button on each lot, or the switch in its editor);
+  - its best-before date is within the warning window (setting "Avisar de lo que caduca" in
+    Ajustes, 0–30 days, default 3), or has passed (shown as **Caducado**, still listed so the
+    user decides);
   - it is opened and has an "after opening, keeps for N days" value whose limit falls within
     the warning window. N is optional per lot and remembered per product (or name key), so it
     is asked only once ("Nata abierta: se conserva 4 días").
@@ -394,7 +398,10 @@ Rules:
   más**. Recipes that use at least one "usar pronto" lot come first within each status, with a
   chip naming them ("Aprovecha: nata, espinacas"), and a filter "Aprovechar lo que caduca" shows
   only those. Then they are sorted by the share of the dish cost already in the pantry. Each card
-  lists the missing items and has "Añadir lo que falta a la lista".
+  lists the missing items; "Añadir lo que falta a la lista" arrives with the shopping list in
+  phase 6. The screen opens from the Recetas top bar.
+- **"Te falta comprar"** (cost card, § 4.4) is shown once the pantry has anything: the whole
+  packages still to buy after "Lo he cocinado" planning subtracts the pantry.
 
 #### AC
 
@@ -649,7 +656,9 @@ Schema v1 (phase 1) contains `recipe`, `recipe_tag` and `ingredient` without the
 tables arrive with later schema versions and tested migrations. Schema v3 (phase 3a) adds
 `product` and `price_snapshot`; schema v4 (phase 3b) adds `ingredient_link` (cascades with its
 ingredient, no foreign key to `product` so a link survives an uncached product) and
-`link_memory`. All ids are `TEXT`
+`link_memory`; schema v5 (phase 5) adds `pantry_lot`, `shelf_life_memory`, `cook_event`
+(no foreign key to the recipe: history keeps a title snapshot) and `cook_deduction` (a JSON
+snapshot of each touched lot, so "Deshacer" restores it exactly). All ids are `TEXT`
 UUIDs except provider product keys.
 
 | Table | Key columns |
@@ -661,12 +670,12 @@ UUIDs except provider product keys.
 | `link_memory` *(v4)* | `name_key`, `provider_id`, `product_id` (PK triple), `last_used_at`, `use_count` |
 | `product` *(v3)* | `provider_id`, `product_id` (PK pair), `name`, `search_key`, `brand`, `brand_kind`, `packaging`, `net_milli`, `base_unit`, `unit_count`, `unit_count_unit`, `drained_milli`, `approx`, `price_cents`, `reference_price_cents`, `reference_format`, `image_url`, `web_url`, `category_path`, `available`, `fetched_at` |
 | `price_snapshot` *(v3)* | `provider_id`, `product_id`, `fetched_at` (PK triple), `price_cents`; one row per new or changed price |
-| `pantry_lot` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `base_unit?`, `package_quantity_milli?`, `opened`, `opened_at`, `added_at`, `best_before`, `location`, `presence_only`, `use_soon_manual`, `use_soon_dismissed_at?`, `opened_shelf_life_days?` |
-| `shelf_life_memory` | `key` (provider product or name key), `opened_shelf_life_days` |
+| `pantry_lot` *(v5)* | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `quantity_milli?`, `unit?`, `package_quantity_milli?`, `opened`, `opened_at?`, `added_at`, `best_before?` (epoch day), `location?`, `presence_only`, `use_soon_manual`, `use_soon_dismissed_at?`, `opened_shelf_life_days?` |
+| `shelf_life_memory` *(v5)* | `key` (provider product key or name key), `opened_shelf_life_days` |
 | `shopping_item` | `id`, `provider_id?`, `product_id?`, `name`, `name_key`, `needed_milli`, `base_unit`, `packages`, `checked`, `manual`, `provider_override` |
 | `shopping_contribution` | `item_id`, `recipe_id`, `servings`, `needed_milli` |
-| `cook_event` | `id`, `recipe_id?`, `recipe_title`, `servings`, `cooked_at`, `undone` |
-| `cook_deduction` | `event_id`, `lot_id`, `lot_snapshot_json`, `deducted_milli` |
+| `cook_event` *(v5)* | `id`, `recipe_id?`, `recipe_title`, `servings`, `cooked_at`, `undone` |
+| `cook_deduction` *(v5)* | `event_id`, `lot_id` (PK pair), `lot_snapshot_json`, `deducted_milli` |
 
 Manual products are `product` rows with `provider_id = 'manual'`.
 
@@ -721,7 +730,7 @@ the phone.
 | **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
 | **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b (schema v4): Manual provider; ingredient linking from the recipe detail; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, "Actualizar precios" for a recipe, sort by cost per serving (price snapshots are stored since 3a; showing them stays optional). No schema change | AC4.* |
-| **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |
+| **5 — Pantry and cooking** (schema v5) | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic) with the tab badge, "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up, "Te falta comprar", sort by "Cocinadas hace poco" | AC5.* |
 | **6 — Shopping list** | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text | AC6.* |
 | **7 — Día and release** | Día feasibility check and provider (or a documented manual-price fallback); release signing; R8; friends' APK; polish and performance pass | Signed APK installed on a second phone |
 

@@ -12,6 +12,7 @@ import com.lechugones.cocina.domain.recipepack.PackIssue
 import com.lechugones.cocina.domain.units.MeasureUnit
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -25,6 +26,9 @@ object Dates {
     fun date(instant: Instant): String = DATE.format(instant.atZone(ZoneId.systemDefault()))
 
     fun dateTime(instant: Instant): String = DATE_TIME.format(instant.atZone(ZoneId.systemDefault()))
+
+    /** A calendar date (best-before), with no time zone involved. */
+    fun date(date: LocalDate): String = DATE.format(date)
 }
 
 /** "300 g", "1 1/2 cucharadas", "4 ud", "1 pizca", "al gusto". */

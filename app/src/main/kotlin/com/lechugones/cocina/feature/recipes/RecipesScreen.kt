@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.RestaurantMenu
+import androidx.compose.material.icons.outlined.SoupKitchen
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -69,6 +70,7 @@ fun RecipesScreen(
     onOpenRecipe: (String) -> Unit,
     onNewRecipe: () -> Unit,
     onImport: () -> Unit,
+    onCookable: () -> Unit,
     onOpenSettings: () -> Unit,
     viewModel: RecipesViewModel = hiltViewModel(),
 ) {
@@ -105,6 +107,9 @@ fun RecipesScreen(
                     contentDescription = stringResource(if (searching) R.string.action_close_search else R.string.action_search),
                 )
             }
+            IconButton(onClick = onCookable) {
+                Icon(Icons.Outlined.SoupKitchen, contentDescription = stringResource(R.string.cookable_title))
+            }
             Box {
                 IconButton(onClick = { sortOpen = true }) {
                     Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.action_sort))
@@ -119,6 +124,10 @@ fun RecipesScreen(
                         sortOpen = false
                     }
                     SortItem(R.string.recipes_sort_cheapest, RecipeSort.CHEAPEST, state.sort) {
+                        viewModel.setSort(it)
+                        sortOpen = false
+                    }
+                    SortItem(R.string.recipes_sort_cooked, RecipeSort.RECENTLY_COOKED, state.sort) {
                         viewModel.setSort(it)
                         sortOpen = false
                     }

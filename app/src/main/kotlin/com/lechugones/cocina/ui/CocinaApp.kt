@@ -2,6 +2,8 @@ package com.lechugones.cocina.ui
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -22,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lechugones.cocina.feature.catalogue.CatalogueScreen
+import com.lechugones.cocina.feature.cookable.CookableScreen
 import com.lechugones.cocina.feature.importer.ImportScreen
 import com.lechugones.cocina.feature.pantry.PantryScreen
 import com.lechugones.cocina.feature.recipes.RecipesScreen
@@ -30,6 +35,7 @@ import com.lechugones.cocina.feature.recipes.editor.RecipeEditorScreen
 import com.lechugones.cocina.feature.settings.SettingsScreen
 import com.lechugones.cocina.feature.shopping.ShoppingScreen
 import com.lechugones.cocina.ui.navigation.CatalogueRoute
+import com.lechugones.cocina.ui.navigation.CookableRoute
 import com.lechugones.cocina.ui.navigation.ImportRoute
 import com.lechugones.cocina.ui.navigation.PantryRoute
 import com.lechugones.cocina.ui.navigation.RecipeDetailRoute
@@ -49,7 +55,9 @@ import kotlinx.coroutines.flow.filterNotNull
 fun CocinaApp(
     pendingImport: StateFlow<ImportSource?>,
     navController: NavHostController = rememberNavController(),
+    shell: ShellViewModel = hiltViewModel(),
 ) {
+    val useSoon by shell.useSoonCount.collectAsStateWithLifecycle()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val topLevel = TopLevelDestination.entries.firstOrNull { currentDestination.isOn(it) }
@@ -70,10 +78,16 @@ fun CocinaApp(
                             selected = selected,
                             onClick = { navController.navigateToTopLevel(destination) },
                             icon = {
-                                Icon(
-                                    if (selected) destination.selectedIcon else destination.unselectedIcon,
-                                    contentDescription = null,
-                                )
+                                BadgedBox(
+                                    badge = {
+                                        if (destination == TopLevelDestination.PANTRY && useSoon > 0) Badge { Text(useSoon.toString()) }
+                                    },
+                                ) {
+                                    Icon(
+                                        if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                        contentDescription = null,
+                                    )
+                                }
                             },
                             label = { Text(stringResource(destination.label)) },
                         )
@@ -93,7 +107,14 @@ fun CocinaApp(
                     onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
                     onNewRecipe = { navController.navigate(RecipeEditorRoute()) },
                     onImport = { navController.navigate(ImportRoute) },
+                    onCookable = { navController.navigate(CookableRoute) },
                     onOpenSettings = openSettings,
+                )
+            }
+            composable<CookableRoute> {
+                CookableScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
                 )
             }
             composable<RecipeDetailRoute> {

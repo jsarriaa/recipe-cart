@@ -167,4 +167,58 @@ class DatabaseSchemaTest {
                 database.close()
             }
         }
+
+    @Test
+    fun `v4 recipes, links and link memory survive the migration to v5, with an empty pantry`() =
+        runTest {
+            helper.createDatabase(testDb, 4).use { db ->
+                db.execSQL(
+                    "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, image_path, source, " +
+                        "body_md, created_at, updated_at, origin, imported_at, edited_after_import) " +
+                        "VALUES ('r1', 'u1', 'Tacos', NULL, 2, NULL, NULL, NULL, NULL, '', 10, 20, 'created', NULL, 0)",
+                )
+                db.execSQL(
+                    "INSERT INTO ingredient (id, recipe_id, position, group_label, name, name_key, quantity_milli, unit, " +
+                        "note, optional, pantry_staple, unit_weight_g_milli, match_query, match_package, match_store_brand_ok) " +
+                        "VALUES ('i1', 'r1', 0, NULL, 'tortillas', 'tortillas', 4000, 'ud', NULL, 0, 0, NULL, NULL, NULL, 1)",
+                )
+                db.execSQL("INSERT INTO ingredient_link VALUES ('i1', 'mercadona', '80870', 1, 0)")
+                db.execSQL("INSERT INTO link_memory VALUES ('tortillas', 'mercadona', '80870', 5, 2)")
+            }
+            helper.runMigrationsAndValidate(testDb, 5, true, CocinaMigrations.MIGRATION_4_5).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), CocinaDatabase::class.java, testDb)
+                    .addMigrations(*CocinaMigrations.ALL)
+                    .allowMainThreadQueries()
+                    .build()
+            try {
+                val recipe =
+                    checkNotNull(
+                        com.lechugones.cocina.data.recipe
+                            .RoomRecipeRepository(database.recipeDao())
+                            .get("r1"),
+                    )
+                assertEquals(
+                    "80870",
+                    recipe.ingredients
+                        .single()
+                        .links
+                        .single()
+                        .product.productId,
+                )
+                assertEquals(
+                    2,
+                    database
+                        .linkMemoryDao()
+                        .forName("tortillas")
+                        .single()
+                        .useCount,
+                )
+                assertEquals(emptyList(), database.pantryDao().lots())
+            } finally {
+                database.close()
+            }
+        }
 }

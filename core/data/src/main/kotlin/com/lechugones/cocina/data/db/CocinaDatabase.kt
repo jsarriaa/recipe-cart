@@ -14,6 +14,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         PriceSnapshotEntity::class,
         IngredientLinkEntity::class,
         LinkMemoryEntity::class,
+        PantryLotEntity::class,
+        ShelfLifeMemoryEntity::class,
+        CookEventEntity::class,
+        CookDeductionEntity::class,
     ],
     version = CocinaDatabase.VERSION,
     exportSchema = true,
@@ -25,9 +29,11 @@ abstract class CocinaDatabase : RoomDatabase() {
 
     abstract fun linkMemoryDao(): LinkMemoryDao
 
+    abstract fun pantryDao(): PantryDao
+
     companion object {
         const val NAME = "cocina.db"
-        const val VERSION = 4
+        const val VERSION = 5
     }
 }
 
@@ -93,5 +99,38 @@ object CocinaMigrations {
             }
         }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+    /** v5 (phase 5): pantry lots, opened shelf-life memory and cook history. Existing data is untouched. */
+    val MIGRATION_4_5 =
+        object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `pantry_lot` (`id` TEXT NOT NULL, `provider_id` TEXT, `product_id` TEXT, " +
+                        "`name` TEXT NOT NULL, `name_key` TEXT NOT NULL, `quantity_milli` INTEGER, `unit` TEXT, " +
+                        "`package_quantity_milli` INTEGER, `opened` INTEGER NOT NULL, `opened_at` INTEGER, " +
+                        "`added_at` INTEGER NOT NULL, `best_before` INTEGER, `location` TEXT, `presence_only` INTEGER NOT NULL, " +
+                        "`use_soon_manual` INTEGER NOT NULL, `use_soon_dismissed_at` INTEGER, `opened_shelf_life_days` INTEGER, " +
+                        "PRIMARY KEY(`id`))",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_pantry_lot_name_key` ON `pantry_lot` (`name_key`)")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_pantry_lot_provider_id_product_id` ON `pantry_lot` (`provider_id`, `product_id`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `shelf_life_memory` (`key` TEXT NOT NULL, " +
+                        "`opened_shelf_life_days` INTEGER NOT NULL, PRIMARY KEY(`key`))",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `cook_event` (`id` TEXT NOT NULL, `recipe_id` TEXT, `recipe_title` TEXT NOT NULL, " +
+                        "`servings` INTEGER NOT NULL, `cooked_at` INTEGER NOT NULL, `undone` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_cook_event_recipe_id` ON `cook_event` (`recipe_id`)")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `cook_deduction` (`event_id` TEXT NOT NULL, `lot_id` TEXT NOT NULL, " +
+                        "`lot_snapshot_json` TEXT NOT NULL, `deducted_milli` INTEGER NOT NULL, PRIMARY KEY(`event_id`, `lot_id`), " +
+                        "FOREIGN KEY(`event_id`) REFERENCES `cook_event`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+                )
+            }
+        }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
 }

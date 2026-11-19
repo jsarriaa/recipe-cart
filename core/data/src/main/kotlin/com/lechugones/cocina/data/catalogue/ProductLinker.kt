@@ -84,6 +84,10 @@ class ProductLinker
                 .flatMap { (providerId, keys) -> load(providerId, keys.map { it.productId }) }
                 .associateBy { it.product.key }
 
+        /** Products confirmed before for each of [nameKeys] (SPEC § 5.5: they also match pantry lots). */
+        suspend fun rememberedProducts(nameKeys: Collection<String>): Map<String, Set<ProductKey>> =
+            nameKeys.distinct().associateWith { key -> memory.forName(key).map { ProductKey(it.providerId, it.productId) }.toSet() }
+
         /** Records confirmed links so the same ingredient name suggests them first next time. */
         suspend fun remember(
             nameKey: String,
