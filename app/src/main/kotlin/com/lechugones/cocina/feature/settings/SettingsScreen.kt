@@ -170,27 +170,6 @@ fun SettingsScreen(
             Text(stringResource(R.string.settings_pantry_title), style = MaterialTheme.typography.titleMedium)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.settings_use_soon_days), style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        pluralStringResource(R.plurals.settings_use_soon_days_value, state.useSoonDays, state.useSoonDays),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                IconButton(onClick = { viewModel.setUseSoonDays(state.useSoonDays - 1) }, enabled = state.useSoonDays > 0) {
-                    Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.settings_use_soon_less))
-                }
-                IconButton(
-                    onClick = { viewModel.setUseSoonDays(state.useSoonDays + 1) },
-                    enabled =
-                        state.useSoonDays < AppSettings.USE_SOON_RANGE.last,
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.settings_use_soon_more))
-                }
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.settings_add_staples), style = MaterialTheme.typography.bodyLarge)
                     Text(
                         stringResource(R.string.settings_add_staples_body),

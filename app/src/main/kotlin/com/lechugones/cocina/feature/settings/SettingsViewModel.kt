@@ -35,7 +35,6 @@ data class SettingsUiState(
     val lastAutomaticBackup: Instant? = null,
     val postalCode: String? = null,
     val storeBrandOnly: Boolean = false,
-    val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
     val addMissingStaples: Boolean = true,
     /** Installed supermarkets: id to display name. */
     val providers: List<Pair<String, String>> = emptyList(),
@@ -90,7 +89,6 @@ class SettingsViewModel
                         it.copy(
                             postalCode = s.postalCode,
                             storeBrandOnly = s.storeBrandOnly,
-                            useSoonDays = s.useSoonWarningDays,
                             addMissingStaples = s.addMissingStaplesToList,
                             activeProviders = s.activeProviders,
                             primaryProvider = s.primaryProvider,
@@ -129,11 +127,6 @@ class SettingsViewModel
 
         fun setAddMissingStaples(enabled: Boolean) {
             viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }
-        }
-
-        fun setUseSoonDays(days: Int) {
-            val value = days.coerceIn(AppSettings.USE_SOON_RANGE)
-            viewModelScope.launch { settings.update { it.copy(useSoonWarningDays = value) } }
         }
 
         fun setStoreBrandOnly(enabled: Boolean) {

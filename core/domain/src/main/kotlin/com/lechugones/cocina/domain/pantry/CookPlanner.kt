@@ -10,8 +10,6 @@ import com.lechugones.cocina.domain.units.UnitConverter
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 
 /** Ingredient ↔ pantry matching (SPEC § 5.5). */
 object PantryMatcher {
@@ -65,8 +63,8 @@ data class PantryChange(
 /**
  * Plans and applies "Lo he cocinado" deductions (SPEC § 4.5, AC5.1). Pure.
  *
- * Lots are consumed "usar pronto" first, then opened, then earliest best-before, then oldest.
- * Several ingredients drawing on the same lot share what is left of it.
+ * Opened lots are consumed first, then the oldest. Several ingredients drawing on the same lot
+ * share what is left of it.
  */
 object CookPlanner {
     private val EPSILON = BigDecimal("0.0005")
@@ -75,13 +73,10 @@ object CookPlanner {
         recipe: Recipe,
         servings: Int,
         lots: List<PantryLot>,
-        today: LocalDate,
-        zone: ZoneId,
-        windowDays: Int = UseSoon.DEFAULT_WINDOW_DAYS,
         remembered: (String) -> Set<ProductKey> = { emptySet() },
     ): CookPlan {
         val left = lots.filter { it.hasStock }.associate { it.id to checkNotNull(it.quantity).toBigDecimal() }.toMutableMap()
-        val order = consumptionOrder(lots, today, zone, windowDays)
+        val order = consumptionOrder(lots)
         val ingredients =
             recipe.ingredients.map { ingredient ->
                 val matching = order.filter { PantryMatcher.matches(it, ingredient, remembered(ingredient.nameKey)) }
@@ -90,19 +85,9 @@ object CookPlanner {
         return CookPlan(servings, ingredients)
     }
 
-    /** "Usar pronto" first, then opened, then earliest best-before, then FIFO by added date. */
-    fun consumptionOrder(
-        lots: List<PantryLot>,
-        today: LocalDate,
-        zone: ZoneId,
-        windowDays: Int = UseSoon.DEFAULT_WINDOW_DAYS,
-    ): List<PantryLot> =
-        lots.sortedWith(
-            compareBy<PantryLot> { !UseSoon.evaluate(it, today, zone, windowDays).useSoon }
-                .thenBy { !it.opened }
-                .thenBy { it.bestBefore ?: LocalDate.MAX }
-                .thenBy { it.addedAt },
-        )
+    /** Opened lots first, then FIFO by added date. */
+    fun consumptionOrder(lots: List<PantryLot>): List<PantryLot> =
+        lots.sortedWith(compareBy<PantryLot> { !it.opened }.thenBy { it.addedAt })
 
     private fun deduct(
         ingredient: Ingredient,

@@ -5,11 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.lechugones.cocina.data.catalogue.CatalogueRepository
 import com.lechugones.cocina.data.catalogue.ProductLinker
 import com.lechugones.cocina.data.pantry.PantryRepository
-import com.lechugones.cocina.data.settings.SettingsRepository
 import com.lechugones.cocina.domain.pantry.PantryLocation
 import com.lechugones.cocina.domain.pantry.PantryLot
-import com.lechugones.cocina.domain.pantry.UseSoon
-import com.lechugones.cocina.domain.pantry.UseSoonStatus
 import com.lechugones.cocina.domain.recipe.IngredientLink
 import com.lechugones.cocina.domain.recipe.NameKey
 import com.lechugones.cocina.provider.ProviderProduct
@@ -29,19 +26,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import javax.inject.Inject
 
 /** One lot as the list shows it. */
 data class LotRow(
     val lot: PantryLot,
-    val status: UseSoonStatus,
     val imageUrl: String?,
 )
 
 /** The list groups of SPEC § 4.5, in display order. */
-enum class PantryGroup { USE_SOON, OPENED, SEALED, STAPLES }
+enum class PantryGroup { OPENED, SEALED, STAPLES }
 
 data class PantryUiState(
     val loading: Boolean = true,
@@ -64,21 +58,17 @@ class PantryViewModel
         private val pantry: PantryRepository,
         private val linker: ProductLinker,
         private val catalogue: CatalogueRepository,
-        private val settings: SettingsRepository,
         private val clock: Clock,
     ) : ViewModel() {
-        private val zone: ZoneId = ZoneId.systemDefault()
         private val query = MutableStateFlow("")
         private val location = MutableStateFlow<PantryLocation?>(null)
         private val local = MutableStateFlow(PantryUiState())
 
         private val rows: Flow<List<LotRow>> =
-            combine(pantry.observeLots(), settings.settings.map { it.useSoonWarningDays }) { lots, window -> lots to window }
-                .mapLatest { (lots, window) ->
-                    val today = LocalDate.now(clock.withZone(zone))
-                    val images = linker.productsFor(lots.mapNotNull { it.product }.map { IngredientLink(it) })
-                    lots.map { LotRow(it, UseSoon.evaluate(it, today, zone, window), it.product?.let { key -> images[key]?.imageUrl }) }
-                }
+            pantry.observeLots().mapLatest { lots ->
+                val images = linker.productsFor(lots.mapNotNull { it.product }.map { IngredientLink(it) })
+                lots.map { LotRow(it, it.product?.let { key -> images[key]?.imageUrl }) }
+            }
 
         private val productResults =
             local
@@ -104,7 +94,6 @@ class PantryViewModel
 
         private fun groupOf(row: LotRow): PantryGroup =
             when {
-                row.status.useSoon -> PantryGroup.USE_SOON
                 row.lot.presenceOnly -> PantryGroup.STAPLES
                 row.lot.opened -> PantryGroup.OPENED
                 else -> PantryGroup.SEALED
@@ -133,18 +122,10 @@ class PantryViewModel
             local.update { it.copy(productQuery = value) }
         }
 
-        /** A full sealed package of [product], with its remembered shelf life once opened. */
+        /** A full sealed package of [product]. */
         fun addProduct(product: ProviderProduct) {
-            viewModelScope.launch {
-                val lot = pantry.newLotFor(product.product)
-                val days = pantry.rememberedShelfLife(product.product.key, product.product.name)
-                local.update {
-                    it.copy(
-                        editing = LotForm.fromLot(lot.copy(openedShelfLifeDays = days), isNew = true),
-                        choosingProduct = false,
-                    )
-                }
-            }
+            val lot = pantry.newLotFor(product.product)
+            local.update { it.copy(editing = LotForm.fromLot(lot, isNew = true), choosingProduct = false) }
         }
 
         // --- Editing -----------------------------------------------------------------------
@@ -161,15 +142,11 @@ class PantryViewModel
             local.update { it.copy(editing = null) }
         }
 
-        /** Saves a valid form. A new generic lot gets the shelf life remembered for its name. */
         fun saveForm() {
             val form = local.value.editing ?: return
             val lot = form.toLot(Instant.now(clock)) ?: return
             closeEditor()
-            viewModelScope.launch {
-                val days = lot.openedShelfLifeDays ?: if (form.isNew) pantry.rememberedShelfLife(lot.product, lot.name) else null
-                pantry.save(lot.copy(openedShelfLifeDays = days))
-            }
+            viewModelScope.launch { pantry.save(lot) }
         }
 
         fun deleteEditing() {
@@ -183,28 +160,12 @@ class PantryViewModel
             viewModelScope.launch { pantry.delete(lot.id) }
         }
 
-        /** The "Usar pronto" toggle: tag by hand, or clear (an automatic tag stays dismissed). */
-        fun toggleUseSoon(row: LotRow) {
+        /** Marks a lot as opened, or back to sealed. Opened lots are used first when cooking. */
+        fun toggleOpened(lot: PantryLot) {
             viewModelScope.launch {
-                val lot = row.lot
                 pantry.save(
-                    if (row.status.useSoon) {
-                        UseSoon.clear(
-                            lot,
-                            Instant.now(clock),
-                        )
-                    } else {
-                        lot.copy(useSoonManual = true, useSoonDismissedAt = null)
-                    },
+                    if (lot.opened) lot.copy(opened = false, openedAt = null) else lot.copy(opened = true, openedAt = Instant.now(clock)),
                 )
-            }
-        }
-
-        /** "Abrir": the lot is opened now, with the remembered shelf life if it has none. */
-        fun markOpened(lot: PantryLot) {
-            viewModelScope.launch {
-                val days = lot.openedShelfLifeDays ?: pantry.rememberedShelfLife(lot.product, lot.name)
-                pantry.save(lot.copy(opened = true, openedAt = Instant.now(clock), openedShelfLifeDays = days))
             }
         }
 

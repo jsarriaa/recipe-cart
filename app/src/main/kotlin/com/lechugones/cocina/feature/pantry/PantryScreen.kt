@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Kitchen
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.DropdownMenu
@@ -48,7 +46,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lechugones.cocina.R
 import com.lechugones.cocina.domain.pantry.PantryLocation
-import com.lechugones.cocina.domain.pantry.UseSoonReason
 import com.lechugones.cocina.ui.components.EmptyState
 import com.lechugones.cocina.ui.components.ProductImage
 import com.lechugones.cocina.ui.components.ProductListItem
@@ -114,7 +111,7 @@ fun PantryScreen(
                             LotRowItem(
                                 row = row,
                                 onClick = { viewModel.edit(row.lot) },
-                                onToggleUseSoon = { viewModel.toggleUseSoon(row) },
+                                onToggleOpened = { viewModel.toggleOpened(row.lot) },
                                 onFinished = { viewModel.finished(row.lot) },
                             )
                             HorizontalDivider()
@@ -184,14 +181,13 @@ private fun GroupTitle(
     Text(
         stringResource(
             when (group) {
-                PantryGroup.USE_SOON -> R.string.pantry_group_use_soon
                 PantryGroup.OPENED -> R.string.pantry_group_opened
                 PantryGroup.SEALED -> R.string.pantry_group_sealed
                 PantryGroup.STAPLES -> R.string.pantry_group_staples
             },
         ) + " ($count)",
         style = MaterialTheme.typography.titleSmall,
-        color = if (group == PantryGroup.USE_SOON) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
     )
 }
@@ -200,7 +196,7 @@ private fun GroupTitle(
 private fun LotRowItem(
     row: LotRow,
     onClick: () -> Unit,
-    onToggleUseSoon: () -> Unit,
+    onToggleOpened: () -> Unit,
     onFinished: () -> Unit,
 ) {
     val lot = row.lot
@@ -230,7 +226,6 @@ private fun LotRowItem(
                             }
                         }
                     },
-                    lot.openedAt?.takeIf { lot.opened }?.let { stringResource(R.string.pantry_opened_on, Dates.date(it)) },
                     lot.location?.let { locationLabel(it) },
                 )
             Text(
@@ -238,28 +233,11 @@ private fun LotRowItem(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            val status = row.status
-            val deadline = status.deadline
-            val statusText =
-                when {
-                    status.expired -> stringResource(R.string.pantry_expired)
-                    status.reason == UseSoonReason.MANUAL -> stringResource(R.string.pantry_use_soon_manual)
-                    status.useSoon && deadline != null -> stringResource(R.string.pantry_use_by, Dates.date(deadline))
-                    else -> null
-                }
-            statusText?.let { Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error) }
         }
         if (lot.presenceOnly) {
             TextButton(onClick = onFinished) { Text(stringResource(R.string.pantry_finished)) }
         } else {
-            IconButton(onClick = onToggleUseSoon) {
-                Icon(
-                    if (row.status.useSoon) Icons.Filled.Bolt else Icons.Outlined.Bolt,
-                    contentDescription =
-                        stringResource(if (row.status.useSoon) R.string.pantry_clear_use_soon else R.string.pantry_toggle_use_soon),
-                    tint = if (row.status.useSoon) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            FilterChip(selected = lot.opened, onClick = onToggleOpened, label = { Text(stringResource(R.string.pantry_field_opened)) })
         }
     }
 }

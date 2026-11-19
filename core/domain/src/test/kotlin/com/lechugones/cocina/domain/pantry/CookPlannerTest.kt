@@ -15,16 +15,12 @@ import com.lechugones.cocina.domain.units.MeasureUnit
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneOffset
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /** AC5.1 and the ordering half of AC5.3. Today is 20/11/2026, default 3-day window. */
 class CookPlannerTest {
-    private val zone = ZoneOffset.UTC
-    private val today = LocalDate.parse("2026-11-20")
     private val now = Instant.parse("2026-11-20T19:00:00Z")
     private val oil = ProductKey("mercadona", "oil")
 
@@ -37,7 +33,6 @@ class CookPlannerTest {
         unit: MeasureUnit = MeasureUnit.G,
         added: Int = 1,
         opened: Boolean = false,
-        bestBefore: LocalDate? = null,
         product: ProductKey? = null,
         manual: Boolean = false,
     ) = PantryLot(
@@ -50,7 +45,6 @@ class CookPlannerTest {
         packageQuantity = Amount.of(amount),
         opened = opened,
         openedAt = if (opened) day(added) else null,
-        bestBefore = bestBefore,
         useSoonManual = manual,
     )
 
@@ -81,40 +75,19 @@ class CookPlannerTest {
         recipe: Recipe,
         lots: List<PantryLot>,
         servings: Int = recipe.servings,
-    ) = CookPlanner.plan(recipe, servings, lots, today, zone)
+    ) = CookPlanner.plan(recipe, servings, lots)
 
     @Test
-    fun `opened lots go first, then the earliest best-before, then the oldest`() {
+    fun `opened lots go first, then the oldest`() {
         val lots =
             listOf(
+                lot("new-sealed", "nata", 200, MeasureUnit.ML, added = 7),
                 lot("old-sealed", "nata", 200, MeasureUnit.ML, added = 1),
                 lot("new-opened", "nata", 200, MeasureUnit.ML, added = 9, opened = true),
-                lot("early-bb", "nata", 200, MeasureUnit.ML, added = 5, bestBefore = today.plusDays(10)),
             )
-        assertEquals(listOf("new-opened", "early-bb", "old-sealed"), CookPlanner.consumptionOrder(lots, today, zone).map { it.id })
+        assertEquals(listOf("new-opened", "old-sealed", "new-sealed"), CookPlanner.consumptionOrder(lots).map { it.id })
         val takes = plan(recipe(ingredient("i", "nata", 300, MeasureUnit.ML)), lots).ingredients.single().takes
-        assertEquals(listOf("new-opened" to 200L, "early-bb" to 100L), takes.map { it.lotId to it.amount.milli / 1000 })
-    }
-
-    @Test
-    fun `usar pronto lots are used before everything else`() {
-        val lots =
-            listOf(
-                lot("opened", "espinacas", 300, opened = true),
-                lot("tagged", "espinacas", 300, manual = true),
-                lot("soon", "espinacas", 300, bestBefore = today.plusDays(1)),
-            )
-        // Both "usar pronto" lots come before the opened one; between them, the earlier best-before.
-        assertEquals(listOf("soon", "tagged", "opened"), CookPlanner.consumptionOrder(lots, today, zone).map { it.id })
-        assertEquals(
-            "soon",
-            plan(recipe(ingredient("i", "espinacas", 100)), lots)
-                .ingredients
-                .single()
-                .takes
-                .single()
-                .lotId,
-        )
+        assertEquals(listOf("new-opened" to 200L, "old-sealed" to 100L), takes.map { it.lotId to it.amount.milli / 1000 })
     }
 
     @Test
@@ -218,8 +191,8 @@ class CookPlannerTest {
     }
 
     @Test
-    fun `coverage ignores staples and optionals and puts recipes that use soon-to-expire food first`() {
-        val soonCream = lot("c", "nata", 200, MeasureUnit.ML, bestBefore = today.plusDays(1))
+    fun `coverage ignores staples and optionals and sorts by what is missing`() {
+        val cream = lot("c", "nata", 200, MeasureUnit.ML)
         val pasta = lot("p", "pasta", 500)
         val carbonara =
             Recipe(
@@ -247,14 +220,13 @@ class CookPlannerTest {
                 Instant.EPOCH,
                 Instant.EPOCH,
             )
-        val result = CookCoverage.evaluate(listOf(missingTwo, plain, carbonara), listOf(pasta, soonCream), today, zone)
-        assertEquals(listOf("carbonara", "plain", "salad"), result.map { it.recipe.id })
+        val result = CookCoverage.evaluate(listOf(missingTwo, plain, carbonara), listOf(pasta, cream))
+        assertEquals(listOf("plain", "carbonara", "salad"), result.map { it.recipe.id }, "both complete first, in list order")
         assertEquals(CoverageStatus.ALL, result[0].status)
-        assertEquals(listOf("nata"), result[0].usesSoon)
         assertEquals(CoverageStatus.FEW_MISSING, result[2].status)
         assertEquals(listOf("lechuga", "tomate"), result[2].missing.map { it.name })
         assertTrue(result[2].partlyMissing.isEmpty(), "pasta is fully covered, the others are not in the pantry at all")
-        val short = CookCoverage.evaluate(listOf(plain), listOf(lot("p", "pasta", 150)), today, zone).single()
+        val short = CookCoverage.evaluate(listOf(plain), listOf(lot("p", "pasta", 150))).single()
         assertEquals(0, BigDecimal("50").compareTo(short.partlyMissing["1"]))
     }
 

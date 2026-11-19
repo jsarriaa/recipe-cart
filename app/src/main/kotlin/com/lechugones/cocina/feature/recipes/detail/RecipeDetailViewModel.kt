@@ -78,7 +78,6 @@ sealed interface RecipeDetailUiState {
         /** Pantry lots, for "Te falta comprar" and "Lo he cocinado". */
         val lots: List<PantryLot> = emptyList(),
         val remembered: Map<String, Set<ProductKey>> = emptyMap(),
-        val useSoonWindow: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
         /** Whole packages still to buy after the pantry; null when the pantry is empty. */
         val toBuy: RecipeCost? = null,
     ) : RecipeDetailUiState
@@ -204,7 +203,6 @@ class RecipeDetailViewModel
                         refreshResult = previous?.refreshResult,
                         lots = pantry.lots(),
                         remembered = linker.rememberedProducts(recipe.ingredients.map { it.nameKey }),
-                        useSoonWindow = s.useSoonWarningDays,
                     ),
                     Duration.ofDays(s.staleAfterDays.toLong()),
                 )
@@ -250,14 +248,7 @@ class RecipeDetailViewModel
         }
 
         private fun planFor(loaded: RecipeDetailUiState.Loaded) =
-            CookPlanner.plan(
-                loaded.recipe,
-                loaded.servings,
-                loaded.lots,
-                LocalDate.now(clock.withZone(zone)),
-                zone,
-                loaded.useSoonWindow,
-            ) { loaded.remembered[it].orEmpty() }
+            CookPlanner.plan(loaded.recipe, loaded.servings, loaded.lots) { loaded.remembered[it].orEmpty() }
 
         // --- "Lo he cocinado" ---------------------------------------------------------------
 

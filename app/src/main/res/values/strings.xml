@@ -43,9 +43,7 @@
     <string name="recipes_sort_cooked">Cocinadas hace poco</string>
     <string name="cookable_title">¿Qué puedo cocinar?</string>
     <string name="cookable_pantry_empty">Tu despensa está vacía: añade lo que tienes en la pestaña Despensa para ver qué puedes cocinar.</string>
-    <string name="cookable_only_use_soon">Aprovechar lo que caduca</string>
     <string name="cookable_none">No hay recetas todavía.</string>
-    <string name="cookable_none_use_soon">Ninguna receta usa lo que tienes que gastar pronto.</string>
     <string name="cookable_all">Lo tienes todo</string>
     <plurals name="cookable_missing">
         <item quantity="one">Te falta %d ingrediente</item>
@@ -54,7 +52,6 @@
     </plurals>
     <string name="cookable_missing_list">Falta: %1$s</string>
     <string name="cookable_partly_missing">%1$s (faltan %2$s)</string>
-    <string name="cookable_uses_soon">Aprovecha: %1$s</string>
     <string name="recipes_cost_per_serving">%1$s/ración</string>
     <string name="recipes_no_results">No hay recetas que coincidan</string>
     <plurals name="recipe_servings">
@@ -286,7 +283,6 @@
     <string name="pantry_empty_title">Tu despensa está vacía</string>
     <string name="pantry_empty_body">Aquí verás lo que tienes en casa, incluidos los paquetes abiertos.</string>
     <string name="pantry_empty_action">Añade lo que tienes en casa con el botón +.</string>
-    <string name="pantry_group_use_soon">Usar pronto</string>
     <string name="pantry_group_opened">Abiertos</string>
     <string name="pantry_group_sealed">Sin abrir</string>
     <string name="pantry_group_staples">Básicos</string>
@@ -299,14 +295,8 @@
     <string name="pantry_location_freezer">Congelador</string>
     <string name="pantry_location_cupboard">Armario</string>
     <string name="pantry_quantity_of">%1$s de %2$s</string>
-    <string name="pantry_opened_on">Abierto el %1$s</string>
-    <string name="pantry_expired">Caducado</string>
-    <string name="pantry_use_by">Usar antes del %1$s</string>
-    <string name="pantry_use_soon_manual">Marcado para usar pronto</string>
     <string name="pantry_have_it">Lo tienes</string>
     <string name="pantry_finished">Se ha acabado</string>
-    <string name="pantry_toggle_use_soon">Usar pronto</string>
-    <string name="pantry_clear_use_soon">Quitar de usar pronto</string>
     <string name="pantry_pick_product_title">Añadir del catálogo</string>
     <string name="pantry_editor_new">Añadir a la despensa</string>
     <string name="pantry_editor_edit">Editar</string>
@@ -315,15 +305,8 @@
     <string name="pantry_field_presence_help">Para básicos como sal o especias: sin cantidades.</string>
     <string name="pantry_field_quantity">Cantidad que queda</string>
     <string name="pantry_field_opened">Abierto</string>
-    <string name="pantry_field_best_before">Consumir preferentemente antes de</string>
-    <string name="pantry_field_best_before_none">Sin fecha</string>
-    <string name="pantry_field_best_before_clear">Quitar fecha</string>
     <string name="pantry_field_location">Dónde está</string>
-    <string name="pantry_field_shelf_life">Una vez abierto se conserva (días)</string>
-    <string name="pantry_field_shelf_life_help">Se recuerda para la próxima vez.</string>
-    <string name="pantry_field_use_soon">Usar pronto</string>
     <string name="pantry_field_invalid_number">Escribe un número</string>
-    <string name="pantry_choose_date">Elegir</string>
     <string name="action_ok">Aceptar</string>
     <string name="shopping_empty_title">La lista de la compra está vacía</string>
     <string name="shopping_empty_body">Añade recetas desde su pantalla con «Añadir a la lista», o cosas sueltas con el botón +.</string>
@@ -550,16 +533,8 @@
     <string name="settings_postal_code_change">Cambiar</string>
     <string name="settings_store_brand_only_body">Oculta las marcas de fabricante en las búsquedas del catálogo.</string>
     <string name="settings_pantry_title">Despensa</string>
-    <string name="settings_use_soon_days">Avisar de lo que caduca</string>
     <string name="settings_add_staples">Añadir básicos que me faltan</string>
     <string name="settings_add_staples_body">Sal, aceite, especias… se añaden a la lista de la compra solo si los usas en la despensa y no queda ninguno.</string>
-    <string name="settings_use_soon_less">Menos días</string>
-    <string name="settings_use_soon_more">Más días</string>
-    <plurals name="settings_use_soon_days_value">
-        <item quantity="one">Con %d día de antelación</item>
-        <item quantity="many">Con %d días de antelación</item>
-        <item quantity="other">Con %d días de antelación</item>
-    </plurals>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>
