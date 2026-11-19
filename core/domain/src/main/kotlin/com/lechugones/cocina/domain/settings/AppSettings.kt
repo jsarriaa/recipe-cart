@@ -13,6 +13,8 @@ data class AppSettings(
     val addMissingStaplesToList: Boolean = true,
     /** "Avisar con antelación de" N days for "Usar pronto" (SPEC § 4.5). */
     val useSoonWarningDays: Int = DEFAULT_USE_SOON_DAYS,
+    /** Shopping list: "Más barato por producto" instead of the primary supermarket. */
+    val shoppingCheapest: Boolean = false,
 ) {
     /** Replaces impossible values (from an old or edited file) with safe ones. */
     fun sanitized(): AppSettings {

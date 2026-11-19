@@ -92,6 +92,7 @@ fun RecipeDetailScreen(
     val cookDone = stringResource(R.string.cook_done)
     val cookUndo = stringResource(R.string.cook_undo)
     val cookUndone = stringResource(R.string.cook_undone)
+    val addedToList = stringResource(R.string.shopping_added)
     val snackbar = remember { SnackbarHostState() }
     var menuOpen by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -127,6 +128,10 @@ fun RecipeDetailScreen(
 
                 RecipeDetailEvent.CookUndone -> {
                     snackbar.showSnackbar(cookUndone)
+                }
+
+                RecipeDetailEvent.AddedToList -> {
+                    snackbar.showSnackbar(addedToList)
                 }
             }
         }
@@ -365,8 +370,13 @@ private fun RecipeDetailContent(
         }
         item { ServingsStepper(servings, recipe.servings, onServings) }
         item {
-            OutlinedButton(onClick = viewModel::openCook, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                Text(stringResource(R.string.cook_action))
+            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = viewModel::addToList, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.shopping_add_recipe))
+                }
+                OutlinedButton(onClick = viewModel::openCook, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.cook_action))
+                }
             }
         }
         item {

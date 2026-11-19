@@ -45,6 +45,16 @@ abstract class RecipeDao {
     @Query("DELETE FROM recipe WHERE id = :id")
     abstract suspend fun delete(id: String)
 
+    @Query("DELETE FROM shopping_recipe WHERE recipe_id = :id")
+    protected abstract suspend fun deleteShoppingEntries(id: String)
+
+    /** Deletes a recipe for good: with its tags, ingredients and links, and off the shopping list. */
+    @Transaction
+    open suspend fun deleteRecipe(id: String) {
+        deleteShoppingEntries(id)
+        delete(id)
+    }
+
     @Insert
     protected abstract suspend fun insertRecipe(recipe: RecipeEntity)
 

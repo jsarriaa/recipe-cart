@@ -18,6 +18,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ShelfLifeMemoryEntity::class,
         CookEventEntity::class,
         CookDeductionEntity::class,
+        ShoppingRecipeEntity::class,
+        ShoppingManualEntity::class,
+        ShoppingCheckEntity::class,
+        ShoppingOverrideEntity::class,
     ],
     version = CocinaDatabase.VERSION,
     exportSchema = true,
@@ -31,9 +35,11 @@ abstract class CocinaDatabase : RoomDatabase() {
 
     abstract fun pantryDao(): PantryDao
 
+    abstract fun shoppingDao(): ShoppingDao
+
     companion object {
         const val NAME = "cocina.db"
-        const val VERSION = 5
+        const val VERSION = 6
     }
 }
 
@@ -132,5 +138,26 @@ object CocinaMigrations {
             }
         }
 
-    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+    /** v6 (phase 6): shopping list inputs (recipes added, manual items, ticks, overrides). */
+    val MIGRATION_5_6 =
+        object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `shopping_recipe` (`id` TEXT NOT NULL, `recipe_id` TEXT NOT NULL, " +
+                        "`servings` INTEGER NOT NULL, `added_at` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_shopping_recipe_recipe_id` ON `shopping_recipe` (`recipe_id`)")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `shopping_manual` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `provider_id` TEXT, " +
+                        "`product_id` TEXT, `packages` INTEGER NOT NULL, `added_at` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+                )
+                db.execSQL("CREATE TABLE IF NOT EXISTS `shopping_check` (`item_key` TEXT NOT NULL, PRIMARY KEY(`item_key`))")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `shopping_override` (`name_key` TEXT NOT NULL, `provider_id` TEXT NOT NULL, " +
+                        "PRIMARY KEY(`name_key`))",
+                )
+            }
+        }
+
+    val ALL: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 }
