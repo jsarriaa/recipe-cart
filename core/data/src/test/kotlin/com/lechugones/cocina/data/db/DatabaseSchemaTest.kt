@@ -221,4 +221,62 @@ class DatabaseSchemaTest {
                 database.close()
             }
         }
+
+    @Test
+    fun `v5 pantry and cook history survive the migration to v6, and editing a recipe keeps it on the list`() =
+        runTest {
+            helper.createDatabase(testDb, 5).use { db ->
+                db.execSQL(
+                    "INSERT INTO recipe (id, uid, title, description, servings, prep_minutes, cook_minutes, image_path, source, " +
+                        "body_md, created_at, updated_at, origin, imported_at, edited_after_import) " +
+                        "VALUES ('r1', 'u1', 'Tacos', NULL, 2, NULL, NULL, NULL, NULL, '', 10, 20, 'created', NULL, 0)",
+                )
+                db.execSQL(
+                    "INSERT INTO pantry_lot (id, provider_id, product_id, name, name_key, quantity_milli, unit, package_quantity_milli, " +
+                        "opened, opened_at, added_at, best_before, location, presence_only, use_soon_manual, use_soon_dismissed_at, " +
+                        "opened_shelf_life_days) VALUES ('l1', NULL, NULL, 'nata', 'nata', 200000, 'ml', 200000, 1, 5, 1, NULL, " +
+                        "'nevera', 0, 0, NULL, 4)",
+                )
+                db.execSQL("INSERT INTO cook_event VALUES ('e1', 'r1', 'Tacos', 2, 9, 0)")
+            }
+            helper.runMigrationsAndValidate(testDb, 6, true, CocinaMigrations.MIGRATION_5_6).close()
+
+            val database =
+                Room
+                    .databaseBuilder(ApplicationProvider.getApplicationContext(), CocinaDatabase::class.java, testDb)
+                    .addMigrations(*CocinaMigrations.ALL)
+                    .allowMainThreadQueries()
+                    .build()
+            try {
+                assertEquals(
+                    "nata",
+                    database
+                        .pantryDao()
+                        .lots()
+                        .single()
+                        .name,
+                )
+                assertEquals(
+                    1,
+                    database
+                        .pantryDao()
+                        .observeLastCooked()
+                        .first()
+                        .size,
+                )
+
+                val shopping = database.shoppingDao()
+                shopping.upsertRecipe(ShoppingRecipeEntity("s1", "r1", 4, 1))
+                val recipes =
+                    com.lechugones.cocina.data.recipe
+                        .RoomRecipeRepository(database.recipeDao())
+                val recipe = checkNotNull(recipes.get("r1"))
+                recipes.save(recipe.copy(title = "Tacos editados"))
+                assertEquals(listOf("r1"), shopping.observeRecipes().first().map { it.recipeId }, "saving re-inserts the recipe row")
+                recipes.delete("r1")
+                assertEquals(emptyList(), shopping.observeRecipes().first(), "deleting the recipe takes it off the list")
+            } finally {
+                database.close()
+            }
+        }
 }

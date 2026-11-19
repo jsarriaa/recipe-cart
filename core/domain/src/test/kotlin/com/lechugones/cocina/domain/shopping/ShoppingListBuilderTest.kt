@@ -123,7 +123,7 @@ class ShoppingListBuilderTest {
         assertEquals(0, BigDecimal("700").compareTo(chickenItem.needed))
         assertEquals(2, chickenItem.packages, "700 g of 550 g packages")
         assertEquals(Money(748), chickenItem.cost)
-        assertEquals(listOf(ItemSource("Tacos", 2), ItemSource("Fajitas", 4)), chickenItem.sources)
+        assertEquals(listOf(ItemSource("Tacos", 2, "1"), ItemSource("Fajitas", 4, "2")), chickenItem.sources)
         assertEquals(2, list.items.single { it.product == tortillas }.packages, "12 tortillas, 6 per package")
     }
 

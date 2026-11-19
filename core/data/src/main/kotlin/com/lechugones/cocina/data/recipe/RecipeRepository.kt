@@ -102,7 +102,7 @@ class RoomRecipeRepository
             )
         }
 
-        override suspend fun delete(id: String) = dao.delete(id)
+        override suspend fun delete(id: String) = dao.deleteRecipe(id)
 
         override suspend fun existing(): List<ExistingRecipe> =
             dao.existingRecipes().map {

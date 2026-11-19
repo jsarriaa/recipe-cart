@@ -41,6 +41,8 @@ enum class ShoppingMode { PRIMARY, CHEAPEST }
 data class ItemSource(
     val recipeTitle: String,
     val servings: Int,
+    /** The [ShoppingContribution.id] this need comes from. */
+    val contributionId: String = "",
 )
 
 /** One line of the list. [key] is stable across rebuilds: it carries the check state. */
@@ -123,7 +125,7 @@ object ShoppingListBuilder {
                 if (ingredient.optional) continue
                 val matchingLots = lots.filter { PantryMatcher.matches(it, ingredient, remembered(ingredient.nameKey)) }
                 if (ingredient.pantryStaple && !stapleMissing(matchingLots, lots, options)) continue
-                val source = ItemSource(recipe.title, contribution.servings)
+                val source = ItemSource(recipe.title, contribution.servings, contribution.id)
                 val scaled = ServingsScaler.scale(ingredient.quantity, ingredient.unit, recipe.servings, contribution.servings)
                 val product = chooseProduct(ingredient, scaled, products, options)
                 val usage =

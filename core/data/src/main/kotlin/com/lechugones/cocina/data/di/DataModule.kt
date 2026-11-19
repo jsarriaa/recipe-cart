@@ -12,6 +12,7 @@ import com.lechugones.cocina.data.db.LinkMemoryDao
 import com.lechugones.cocina.data.db.PantryDao
 import com.lechugones.cocina.data.db.ProductDao
 import com.lechugones.cocina.data.db.RecipeDao
+import com.lechugones.cocina.data.db.ShoppingDao
 import com.lechugones.cocina.data.recipe.RecipeRepository
 import com.lechugones.cocina.data.recipe.RoomRecipeRepository
 import com.lechugones.cocina.data.settings.DataStoreSettingsRepository
@@ -60,6 +61,9 @@ object DataModule {
 
     @Provides
     fun providePantryDao(database: CocinaDatabase): PantryDao = database.pantryDao()
+
+    @Provides
+    fun provideShoppingDao(database: CocinaDatabase): ShoppingDao = database.shoppingDao()
 
     /** Outlives screens: a catalogue sync keeps running when the user leaves the tab. */
     @Provides
