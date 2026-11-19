@@ -123,10 +123,6 @@ fun RecipesScreen(
                         viewModel.setSort(it)
                         sortOpen = false
                     }
-                    SortItem(R.string.recipes_sort_cheapest, RecipeSort.CHEAPEST, state.sort) {
-                        viewModel.setSort(it)
-                        sortOpen = false
-                    }
                     SortItem(R.string.recipes_sort_cooked, RecipeSort.RECENTLY_COOKED, state.sort) {
                         viewModel.setSort(it)
                         sortOpen = false

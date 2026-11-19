@@ -31,7 +31,6 @@ import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.costFigure
-import com.lechugones.cocina.ui.format.leftoverText
 
 /** Display name of a provider id; manual products are "A mano". */
 @Composable
@@ -41,7 +40,7 @@ fun providerName(
 ): String = if (id == ManualProducts.PROVIDER_ID) stringResource(R.string.cost_provider_manual) else names(id) ?: id
 
 /**
- * The cost card of a recipe (SPEC § 4.4): dish cost, per serving, whole packages, leftovers,
+ * The cost card of a recipe (SPEC § 4.4): dish cost, per serving, whole packages,
  * price date with "Actualizar precios", the include toggles, the supermarket mode and the
  * comparison.
  */
@@ -81,7 +80,6 @@ fun CostCard(
                     }
                 }
             }
-            Leftovers(cost)
 
             HorizontalDivider(Modifier.padding(vertical = 4.dp))
             PriceDate(loaded, cost, onRefresh)
@@ -149,22 +147,6 @@ private fun Figure(
             style = if (strong) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge,
             fontWeight = if (strong) FontWeight.SemiBold else null,
         )
-    }
-}
-
-@Composable
-private fun Leftovers(cost: RecipeCost) {
-    val leftovers = cost.purchases.filter { it.leftoverRatio.signum() > 0 }
-    if (leftovers.isEmpty()) return
-    Text(stringResource(R.string.cost_leftovers), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
-    leftovers.forEach { purchase ->
-        leftoverText(purchase.leftoverRatio, purchase.leftover, purchase.leftoverUnit, purchase.product.packaging)?.let { amount ->
-            Text(
-                stringResource(R.string.cost_leftover_line, purchase.product.name, amount),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
     }
 }
 

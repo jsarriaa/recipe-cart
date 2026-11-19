@@ -40,7 +40,6 @@
     <string name="recipes_search_hint">Buscar por nombre, ingrediente o etiqueta</string>
     <string name="recipes_sort_name">Nombre</string>
     <string name="recipes_sort_newest">Más recientes</string>
-    <string name="recipes_sort_cheapest">Más baratas por ración</string>
     <string name="recipes_sort_cooked">Cocinadas hace poco</string>
     <string name="cookable_title">¿Qué puedo cocinar?</string>
     <string name="cookable_pantry_empty">Tu despensa está vacía: añade lo que tienes en la pestaña Despensa para ver qué puedes cocinar.</string>
@@ -463,9 +462,6 @@
         <item quantity="many">%d ingredientes sin precio. Toca para vincular el primero.</item>
         <item quantity="other">%d ingredientes sin precio. Toca para vincular el primero.</item>
     </plurals>
-    <string name="cost_leftovers">Sobras</string>
-    <string name="cost_leftover_line">%1$s: sobra %2$s</string>
-    <string name="cost_leftover_amount">%1$s, %2$s</string>
     <string name="cost_prices_from">Precios del %1$s</string>
     <string name="cost_no_prices">Sin precios todavía</string>
     <string name="cost_stale">Precio antiguo</string>
@@ -490,6 +486,7 @@
     <string name="cost_usage">%1$s, %2$s de %3$s</string>
     <string name="cost_fraction_percent">≈ %1$d %% del envase</string>
     <string name="link_action">Vincular producto</string>
+    <string name="link_in_supermarket">En %1$s</string>
     <string name="manual_add">Añadir un producto a mano</string>
     <string name="manual_title">Producto a mano</string>
     <string name="manual_name">Nombre</string>

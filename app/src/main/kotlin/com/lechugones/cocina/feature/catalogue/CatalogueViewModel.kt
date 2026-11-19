@@ -95,10 +95,12 @@ class CatalogueViewModel
                 picked?.takeIf { it in s.activeProviders && catalogue.provider(it) != null } ?: s.primaryProvider
             }.distinctUntilChanged()
 
+        /** Search follows the chosen supermarket chip (it used to search them all, Mercadona first). */
         private val results =
-            combine(query.debounce(SEARCH_DEBOUNCE_MILLIS), settings.settings.map { it.storeBrandOnly }) { q, brand -> q to brand }
-                .distinctUntilChanged()
-                .flatMapLatest { (q, brand) -> catalogue.search(q, brand) }
+            combine(query.debounce(SEARCH_DEBOUNCE_MILLIS), settings.settings.map { it.storeBrandOnly }, providerId) { q, brand, id ->
+                Triple(q, brand, id)
+            }.distinctUntilChanged()
+                .flatMapLatest { (q, brand, id) -> catalogue.search(q, brand, onlyProvider = id) }
 
         private val selected = selectedKey.flatMapLatest { key -> key?.let(catalogue::observeProduct) ?: flowOf(null) }
 

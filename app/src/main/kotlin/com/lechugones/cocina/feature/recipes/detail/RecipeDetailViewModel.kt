@@ -105,6 +105,8 @@ data class LinkOption(
 data class LinkingState(
     val ingredient: Ingredient,
     val query: String,
+    /** Supermarket the suggestions and search come from (the one the recipe is viewed in). */
+    val providerId: String? = null,
     /** The manual product form is open; [manualErrors] are the fields the last save rejected. */
     val manualOpen: Boolean = false,
     val manualErrors: Set<ManualProductField> = emptySet(),
@@ -191,7 +193,12 @@ class RecipeDetailViewModel
                         products = linker.productsFor(recipe.ingredients.flatMap { it.links }),
                         primaryProvider = s.primaryProvider,
                         mode = previous?.mode ?: CostMode.Primary,
-                        providers = (listOf(s.primaryProvider) + linkedProviders.sorted()).distinct(),
+                        // Every active supermarket, so switching shows what is (or is not) linked there.
+                        providers =
+                            (
+                                listOf(s.primaryProvider) + s.activeProviders.filter { catalogue.provider(it) != null }.sorted() +
+                                    linkedProviders.sorted()
+                            ).distinct(),
                         includeStaples = s.includeStaplesInCost,
                         includeOptionals = s.includeOptionalsInCost,
                         refreshResult = previous?.refreshResult,
@@ -438,11 +445,15 @@ class RecipeDetailViewModel
 
         // --- "Vincular producto" ------------------------------------------------------------
 
-        /** Opens the sheet with suggestions for [ingredient] at the primary provider. */
+        /** The supermarket the recipe is being looked at in: the chosen one, else the primary. */
+        fun viewedProvider(loaded: RecipeDetailUiState.Loaded): String = (loaded.mode as? CostMode.Provider)?.id ?: loaded.primaryProvider
+
+        /** Opens the sheet with suggestions for [ingredient] at the supermarket being viewed. */
         fun openLinking(ingredient: Ingredient) {
             searchJob?.cancel()
-            val primary = (state.value as? RecipeDetailUiState.Loaded)?.primaryProvider.orEmpty()
-            linkingState.value = LinkingState(ingredient, query = "")
+            val loaded = state.value as? RecipeDetailUiState.Loaded
+            val primary = loaded?.let(::viewedProvider).orEmpty()
+            linkingState.value = LinkingState(ingredient, query = "", providerId = primary)
             searchJob =
                 viewModelScope.launch {
                     val match = linker.match(ingredient).firstOrNull { it.providerId == primary }
@@ -469,7 +480,8 @@ class RecipeDetailViewModel
                     delay(SEARCH_DEBOUNCE_MILLIS)
                     linkingState.update { it?.copy(loading = true) }
                     val storeBrandOnly = settings.settings.first().storeBrandOnly
-                    val found = catalogue.search(query, storeBrandOnly).first().map { LinkOption(it, null) }
+                    val provider = linkingState.value?.providerId
+                    val found = catalogue.search(query, storeBrandOnly, onlyProvider = provider).first().map { LinkOption(it, null) }
                     linkingState.update { it?.copy(options = found, loading = false) }
                 }
         }
