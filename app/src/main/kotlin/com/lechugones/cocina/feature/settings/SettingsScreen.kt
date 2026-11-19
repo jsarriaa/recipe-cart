@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.domain.settings.AppSettings
@@ -195,6 +196,28 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_backup_undo_body, Dates.dateTime(taken)), style = MaterialTheme.typography.bodySmall)
                 TextButton(onClick = viewModel::undoLastRestore, enabled = !state.working) {
                     Text(stringResource(R.string.settings_backup_undo))
+                }
+            }
+
+            if (BuildConfig.DEBUG) {
+                HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                Text(stringResource(R.string.settings_dia_probe_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.settings_dia_probe_body), style = MaterialTheme.typography.bodySmall)
+                OutlinedButton(
+                    onClick = viewModel::probeDia,
+                    enabled = !state.working,
+                ) { Text(stringResource(R.string.settings_dia_probe_run)) }
+                state.diaProbe?.forEach { result ->
+                    Text(
+                        stringResource(
+                            R.string.settings_dia_probe_result,
+                            result.step,
+                            result.code?.toString() ?: stringResource(R.string.settings_dia_probe_no_answer),
+                            result.contentType.orEmpty(),
+                            stringResource(if (result.json) R.string.settings_dia_probe_json else R.string.settings_dia_probe_not_json),
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
             }
 

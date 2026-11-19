@@ -36,6 +36,8 @@ data class SettingsUiState(
     val storeBrandOnly: Boolean = false,
     val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
     val addMissingStaples: Boolean = true,
+    /** Debug only: answers of the Día feasibility check. */
+    val diaProbe: List<ProbeResult>? = null,
     val editingPostalCode: Boolean = false,
 )
 
@@ -63,6 +65,7 @@ class SettingsViewModel
         @ApplicationContext private val context: Context,
         private val backups: BackupManager,
         private val settings: SettingsRepository,
+        private val diaProbe: DiaProbe,
         appInfo: AppInfo,
     ) : ViewModel() {
         private val state = MutableStateFlow(SettingsUiState(versionName = appInfo.versionName))
@@ -95,6 +98,14 @@ class SettingsViewModel
             state.update { it.copy(editingPostalCode = false) }
             viewModelScope.launch { settings.update { it.copy(postalCode = code) } }
         }
+
+        /** Debug only: the two requests of the Día feasibility check (docs/providers/dia.md). */
+        fun probeDia() =
+            work {
+                val code = state.value.postalCode ?: AppSettings.SUGGESTED_POSTAL_CODE
+                val results = diaProbe.run(code)
+                state.update { it.copy(diaProbe = results) }
+            }
 
         fun setAddMissingStaples(enabled: Boolean) {
             viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }

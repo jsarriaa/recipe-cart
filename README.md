@@ -7,12 +7,12 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: phase 2 (recipes, recipe packs, backup).** Recipes can be created, edited (imported
-> ones too), photographed, scaled, duplicated, imported from recipe packs, exported and backed up.
-> Supermarket products and prices come in phase 3. See the
+> **Status: 1.0.0 (phase 7).** Every feature below is in the app. Mercadona prices are live;
+> Día depends on the feasibility check in [docs/providers/dia.md](docs/providers/dia.md), and
+> its products can always be added by hand as manual products. See the
 > [development phases](docs/SPEC.md#9-development-phases).
 
-## Features (planned)
+## Features
 
 - **Supermarket catalogue**: one pluggable module per supermarket, starting with Mercadona and
   Día, plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
@@ -80,7 +80,32 @@ Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 | `:app` | Compose UI, navigation, ViewModels, Hilt entry points |
 | `:core:domain` | Pure Kotlin business logic: units, quantities, package fractions, money, cost engine, settings model |
 | `:core:data` | Room database (schemas in `core/data/schemas/`), repositories, DataStore settings |
+| `:provider:api` | Supermarket provider contract, shared rate limiter and request handling |
+| `:provider:mercadona` | Mercadona provider (JSON endpoints, mapper, fixtures) |
 | `build-logic/` | Gradle convention plugins |
+
+## Installing the app (owner and friends)
+
+The app is a sideloaded APK; it is never published on the Play Store.
+
+1. **Build** the release APK: `./gradlew :app:assembleRelease`. The file is
+   `app/build/outputs/apk/release/app-release.apk` (about 3 MB, shrunk with R8).
+2. **Signing**: release builds are signed with the personal keystore in
+   `%USERPROFILE%\.cocina-keys\` (`cocina-release.jks` and `keystore.properties`; copy the
+   properties file to the repo root to sign). **Back up that folder** (password manager
+   attachment or an encrypted drive): an app signed with a lost key can only be replaced by
+   uninstalling it, which deletes its data. Without `keystore.properties` the release APK is
+   produced unsigned.
+3. **Install on a phone**: send the APK (cable, cloud drive, messaging app), open it on the phone
+   and allow "Instalar aplicaciones desconocidas" for the app that opens it. Updates install over
+   the previous version and keep the data, as long as they are signed with the same key.
+4. **Before installing a version with a database change** (the release notes say so), make a
+   backup in the app: Ajustes → Copia de seguridad → Crear copia.
+5. **First use**: Catálogo → "Descargar catálogo" (choose a postal code; it is only sent to
+   Mercadona), then import or write recipes.
+
+For testing the shrunk build on the development phone without touching the installed release
+app, `./gradlew :app:installMinified` installs the same R8 build as the debug app.
 
 ## Contributing workflow
 

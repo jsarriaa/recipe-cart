@@ -196,7 +196,11 @@ expected.)
 |---|---|---|
 | Package | `com.lechugones.cocina.debug` | `com.lechugones.cocina` |
 | Used for | Development and adb testing, test data | Day-to-day use, **real data** |
-| Signed with | `%USERPROFILE%\.android\debug.keystore` | Personal release keystore (outside the repo) |
+| Signed with | `%USERPROFILE%\.android\debug.keystore` | `%USERPROFILE%\.cocina-keys\cocina-release.jks` (created in phase 7) |
+
+The `minified` build type is the release build (R8, resource shrinking) under the debug package
+and debug key: `./gradlew :app:installMinified` replaces the debug app and keeps its data, so the
+shrunk build can be tested without touching the release app.
 
 To try real data in the debug app: in the release app make a backup ("Ajustes → Copia de
 seguridad", from phase 2), then restore that file in the debug app. Never point adb commands at
@@ -209,8 +213,11 @@ uninstalling, which deletes the data on that phone.
 
 1. Copy `%USERPROFILE%\.android\debug.keystore` to a safe place outside the repo (password
    manager attachment, encrypted drive, or both).
-2. From phase 7 on: keep the release keystore and its passwords in the same safe place, and keep
-   `keystore.properties` out of git (already in `.gitignore`).
+2. The release keystore was generated in phase 7 (2026-11-19) in `%USERPROFILE%\.cocina-keys\`:
+   `cocina-release.jks` (PKCS12, RSA 4096, alias `cocina`, valid 10 000 days) and
+   `keystore.properties` with its random passwords. A copy of the properties file sits in the
+   repo root so release builds are signed; both are gitignored. **Back up the whole
+   `.cocina-keys` folder** in the same safe place as the debug keystore.
 
 ## Before installing a build with a database migration
 
