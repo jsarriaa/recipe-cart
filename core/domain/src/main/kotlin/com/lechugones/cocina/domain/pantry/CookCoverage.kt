@@ -28,6 +28,8 @@ data class RecipeCoverage(
     val status: CoverageStatus,
     /** Counted ingredients the pantry does not cover (fully). */
     val missing: List<Ingredient>,
+    /** For ingredients the pantry covers only in part: ingredient id → amount still missing, in its unit. */
+    val partlyMissing: Map<String, BigDecimal> = emptyMap(),
     /** Names of the "usar pronto" lots this recipe would use ("Aprovecha: nata, espinacas"). */
     val usesSoon: List<String>,
     /** Share (0–1) of the dish cost already in the pantry; zero without prices. */
@@ -72,6 +74,10 @@ object CookCoverage {
                             else -> CoverageStatus.MANY_MISSING
                         },
                     missing = missing,
+                    partlyMissing =
+                        counted
+                            .filter { it.takes.isNotEmpty() && it.missing != null && it.presenceLots.isEmpty() }
+                            .associate { it.ingredient.id to checkNotNull(it.missing) },
                     usesSoon = usesSoon,
                     pantryShare = pantryShare(plan, costs[recipe.id]),
                 )

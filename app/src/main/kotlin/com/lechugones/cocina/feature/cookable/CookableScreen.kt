@@ -33,6 +33,7 @@ import com.lechugones.cocina.domain.pantry.CoverageStatus
 import com.lechugones.cocina.domain.pantry.RecipeCoverage
 import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
+import com.lechugones.cocina.ui.format.quantityText
 
 /** "¿Qué puedo cocinar?" (SPEC § 4.5). */
 @Composable
@@ -110,7 +111,15 @@ private fun CoverageRow(
             Text(text, style = MaterialTheme.typography.labelLarge, color = color)
             if (item.missing.isNotEmpty()) {
                 Text(
-                    stringResource(R.string.cookable_missing_list, item.missing.joinToString(", ") { it.name }),
+                    stringResource(
+                        R.string.cookable_missing_list,
+                        item.missing
+                            .map { ingredient ->
+                                item.partlyMissing[ingredient.id]?.let {
+                                    stringResource(R.string.cookable_partly_missing, ingredient.name, quantityText(it, ingredient.unit))
+                                } ?: ingredient.name
+                            }.joinToString(", "),
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

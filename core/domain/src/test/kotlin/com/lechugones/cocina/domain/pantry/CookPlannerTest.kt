@@ -253,6 +253,9 @@ class CookPlannerTest {
         assertEquals(listOf("nata"), result[0].usesSoon)
         assertEquals(CoverageStatus.FEW_MISSING, result[2].status)
         assertEquals(listOf("lechuga", "tomate"), result[2].missing.map { it.name })
+        assertTrue(result[2].partlyMissing.isEmpty(), "pasta is fully covered, the others are not in the pantry at all")
+        val short = CookCoverage.evaluate(listOf(plain), listOf(lot("p", "pasta", 150)), today, zone).single()
+        assertEquals(0, BigDecimal("50").compareTo(short.partlyMissing["1"]))
     }
 
     @Test
