@@ -34,8 +34,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CatalogueUiState(
+    /** The supermarket whose catalogue status and download are shown. */
     val providerId: String = AppSettings.DEFAULT_PROVIDER,
     val providerName: String = "",
+    /** Active supermarkets with an installed provider: id to display name, for the chips. */
+    val providers: List<Pair<String, String>> = emptyList(),
     val status: CatalogueStatus = CatalogueStatus(0, null),
     val sync: SyncState = SyncState.Idle,
     val query: String = "",
@@ -84,7 +87,13 @@ class CatalogueViewModel
             val refreshOutcome: CatalogueEvent? = null,
         )
 
-        private val providerId = settings.settings.map { it.primaryProvider }.distinctUntilChanged()
+        /** Chosen with the chips; null follows the primary supermarket. */
+        private val chosen = MutableStateFlow<String?>(null)
+
+        private val providerId =
+            combine(settings.settings, chosen) { s, picked ->
+                picked?.takeIf { it in s.activeProviders && catalogue.provider(it) != null } ?: s.primaryProvider
+            }.distinctUntilChanged()
 
         private val results =
             combine(query.debounce(SEARCH_DEBOUNCE_MILLIS), settings.settings.map { it.storeBrandOnly }) { q, brand -> q to brand }
@@ -94,10 +103,19 @@ class CatalogueViewModel
         private val selected = selectedKey.flatMapLatest { key -> key?.let(catalogue::observeProduct) ?: flowOf(null) }
 
         private val core =
-            combine(settings.settings, providerId.flatMapLatest(catalogue::status), catalogue.syncState) { s, status, sync ->
+            combine(
+                settings.settings,
+                providerId,
+                providerId.flatMapLatest(catalogue::status),
+                catalogue.syncState,
+            ) { s, id, status, sync ->
                 CatalogueUiState(
-                    providerId = s.primaryProvider,
-                    providerName = catalogue.provider(s.primaryProvider)?.displayName.orEmpty(),
+                    providerId = id,
+                    providerName = catalogue.provider(id)?.displayName.orEmpty(),
+                    providers =
+                        (listOf(s.primaryProvider) + s.activeProviders.sorted())
+                            .distinct()
+                            .mapNotNull { pid -> catalogue.provider(pid)?.let { pid to it.displayName } },
                     status = status,
                     sync = sync,
                     storeBrandOnly = s.storeBrandOnly,
@@ -153,6 +171,10 @@ class CatalogueViewModel
 
         fun cancelSync() = catalogue.cancelSync()
 
+        fun chooseProvider(id: String) {
+            chosen.value = id
+        }
+
         fun dismissPostalCode() {
             local.update { it.copy(askingPostalCode = false) }
         }
@@ -163,7 +185,7 @@ class CatalogueViewModel
             viewModelScope.launch {
                 settings.update { it.copy(postalCode = code) }
                 local.update { it.copy(askingPostalCode = false) }
-                catalogue.startSync(settings.settings.first().primaryProvider)
+                catalogue.startSync(uiState.value.providerId)
             }
         }
 

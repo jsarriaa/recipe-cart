@@ -10,6 +10,7 @@ import com.lechugones.cocina.data.backup.BackupManager
 import com.lechugones.cocina.data.backup.StagedBackup
 import com.lechugones.cocina.data.settings.SettingsRepository
 import com.lechugones.cocina.domain.settings.AppSettings
+import com.lechugones.cocina.provider.SupermarketProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -36,8 +37,10 @@ data class SettingsUiState(
     val storeBrandOnly: Boolean = false,
     val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
     val addMissingStaples: Boolean = true,
-    /** Debug only: answers of the Día feasibility check. */
-    val diaProbe: List<ProbeResult>? = null,
+    /** Installed supermarkets: id to display name. */
+    val providers: List<Pair<String, String>> = emptyList(),
+    val activeProviders: Set<String> = emptySet(),
+    val primaryProvider: String = AppSettings.DEFAULT_PROVIDER,
     val editingPostalCode: Boolean = false,
 )
 
@@ -65,10 +68,16 @@ class SettingsViewModel
         @ApplicationContext private val context: Context,
         private val backups: BackupManager,
         private val settings: SettingsRepository,
-        private val diaProbe: DiaProbe,
+        installed: Set<@JvmSuppressWildcards SupermarketProvider>,
         appInfo: AppInfo,
     ) : ViewModel() {
-        private val state = MutableStateFlow(SettingsUiState(versionName = appInfo.versionName))
+        private val state =
+            MutableStateFlow(
+                SettingsUiState(
+                    versionName = appInfo.versionName,
+                    providers = installed.sortedBy { it.displayName }.map { it.id to it.displayName },
+                ),
+            )
         val uiState: StateFlow<SettingsUiState> = state.asStateFlow()
         private val eventChannel = Channel<SettingsEvent>(Channel.BUFFERED)
         val events: Flow<SettingsEvent> = eventChannel.receiveAsFlow()
@@ -83,6 +92,8 @@ class SettingsViewModel
                             storeBrandOnly = s.storeBrandOnly,
                             useSoonDays = s.useSoonWarningDays,
                             addMissingStaples = s.addMissingStaplesToList,
+                            activeProviders = s.activeProviders,
+                            primaryProvider = s.primaryProvider,
                         )
                     }
                 }
@@ -99,13 +110,22 @@ class SettingsViewModel
             viewModelScope.launch { settings.update { it.copy(postalCode = code) } }
         }
 
-        /** Debug only: the two requests of the Día feasibility check (docs/providers/dia.md). */
-        fun probeDia() =
-            work {
-                val code = state.value.postalCode ?: AppSettings.SUGGESTED_POSTAL_CODE
-                val results = diaProbe.run(code)
-                state.update { it.copy(diaProbe = results) }
+        /** Switches a supermarket on or off; at least one stays on (AppSettings.sanitized). */
+        fun setActive(
+            id: String,
+            active: Boolean,
+        ) {
+            viewModelScope.launch {
+                settings.update {
+                    val ids = if (active) it.activeProviders + id else it.activeProviders - id
+                    if (ids.isEmpty()) it else it.copy(activeProviders = ids)
+                }
             }
+        }
+
+        fun setPrimary(id: String) {
+            viewModelScope.launch { settings.update { it.copy(primaryProvider = id) } }
+        }
 
         fun setAddMissingStaples(enabled: Boolean) {
             viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }

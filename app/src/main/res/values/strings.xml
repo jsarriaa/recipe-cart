@@ -509,7 +509,7 @@
     <string name="link_no_suggestions">No hay sugerencias. Busca el producto por su nombre.</string>
     <string name="link_product_line">%1$s · %2$s</string>
     <string name="postal_code_title">Código postal</string>
-    <string name="postal_code_body">Mercadona usa el código postal para elegir el almacén del que salen los precios. Solo se envía a Mercadona y solo para eso.</string>
+    <string name="postal_code_body">Los supermercados usan el código postal para elegir de qué tienda o almacén salen los precios. Solo se envía a los supermercados activos y solo para eso.</string>
     <string name="postal_code_invalid">Escribe un código postal español de 5 cifras.</string>
 
     <!-- Settings and backup -->
@@ -544,6 +544,8 @@
     <string name="settings_restore_failed">No se pudo restaurar.</string>
     <string name="settings_working">Trabajando…</string>
     <string name="settings_supermarkets_title">Supermercados</string>
+    <string name="settings_provider_primary">Principal: la que se usa por defecto en costes y en la lista</string>
+    <string name="settings_providers_body">Los supermercados activos se buscan en el catálogo y se comparan en cada receta. Descarga el catálogo de cada uno en la pestaña Catálogo.</string>
     <string name="settings_postal_code">Código postal</string>
     <string name="settings_postal_code_none">Sin elegir</string>
     <string name="settings_postal_code_change">Cambiar</string>
@@ -559,13 +561,6 @@
         <item quantity="many">Con %d días de antelación</item>
         <item quantity="other">Con %d días de antelación</item>
     </plurals>
-    <string name="settings_dia_probe_title">Comprobar Día (solo depuración)</string>
-    <string name="settings_dia_probe_body">Hace dos peticiones a la web de Día desde este teléfono para ver si la app puede leer sus precios.</string>
-    <string name="settings_dia_probe_run">Comprobar</string>
-    <string name="settings_dia_probe_result">%1$s: %2$s, %3$s, %4$s</string>
-    <string name="settings_dia_probe_no_answer">sin respuesta</string>
-    <string name="settings_dia_probe_json">datos</string>
-    <string name="settings_dia_probe_not_json">página web o bloqueo</string>
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_privacy">Sin cuentas, sin anuncios y sin analíticas. Tus datos se quedan en este teléfono.</string>

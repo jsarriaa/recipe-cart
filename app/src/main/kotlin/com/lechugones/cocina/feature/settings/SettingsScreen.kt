@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -38,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.R
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.domain.settings.AppSettings
@@ -121,6 +121,27 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_working), style = MaterialTheme.typography.bodySmall)
             }
             Text(stringResource(R.string.settings_supermarkets_title), style = MaterialTheme.typography.titleMedium)
+            state.providers.forEach { (id, name) ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = state.primaryProvider == id,
+                        onClick = { viewModel.setPrimary(id) },
+                        enabled = id in state.activeProviders,
+                    )
+                    Column(Modifier.weight(1f)) {
+                        Text(name, style = MaterialTheme.typography.bodyLarge)
+                        if (state.primaryProvider == id) {
+                            Text(
+                                stringResource(R.string.settings_provider_primary),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Switch(checked = id in state.activeProviders, onCheckedChange = { viewModel.setActive(id, it) })
+                }
+            }
+            Text(stringResource(R.string.settings_providers_body), style = MaterialTheme.typography.bodySmall)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.settings_postal_code), style = MaterialTheme.typography.bodyLarge)
@@ -196,28 +217,6 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_backup_undo_body, Dates.dateTime(taken)), style = MaterialTheme.typography.bodySmall)
                 TextButton(onClick = viewModel::undoLastRestore, enabled = !state.working) {
                     Text(stringResource(R.string.settings_backup_undo))
-                }
-            }
-
-            if (BuildConfig.DEBUG) {
-                HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                Text(stringResource(R.string.settings_dia_probe_title), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.settings_dia_probe_body), style = MaterialTheme.typography.bodySmall)
-                OutlinedButton(
-                    onClick = viewModel::probeDia,
-                    enabled = !state.working,
-                ) { Text(stringResource(R.string.settings_dia_probe_run)) }
-                state.diaProbe?.forEach { result ->
-                    Text(
-                        stringResource(
-                            R.string.settings_dia_probe_result,
-                            result.step,
-                            result.code?.toString() ?: stringResource(R.string.settings_dia_probe_no_answer),
-                            result.contentType.orEmpty(),
-                            stringResource(if (result.json) R.string.settings_dia_probe_json else R.string.settings_dia_probe_not_json),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
                 }
             }
 

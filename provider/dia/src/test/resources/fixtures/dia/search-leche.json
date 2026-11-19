@@ -1,0 +1,160 @@
+{
+  "cart": {
+    "postal_code": "08001",
+    "total_amount": 0,
+    "total_units": 0
+  },
+  "pagination": {
+    "page_number": 1,
+    "page_size": 30,
+    "total_pages": 14
+  },
+  "total_items": 418,
+  "search_items": [
+    {
+      "brand": "Dia Láctea",
+      "dia_brand": true,
+      "display_name": "Leche semidesnatada Dia Láctea pack 6 x 1 L",
+      "image": "/product_images/504P6/504P6_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Leche",
+      "object_id": "504P6",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "LITRO",
+        "price": 4.98,
+        "price_per_unit": 0.83,
+        "strikethrough_price": 4.98
+      },
+      "units_in_stock": 340,
+      "url": "/huevos-leche-y-mantequilla/leche/p/504P6"
+    },
+    {
+      "brand": "Dia Láctea",
+      "dia_brand": true,
+      "display_name": "Leche semidesnatada Dia Láctea 1 L",
+      "image": "/product_images/504/504_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Leche",
+      "object_id": "504",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "LITRO",
+        "price": 0.83,
+        "price_per_unit": 0.83,
+        "strikethrough_price": 0.83
+      },
+      "units_in_stock": 2042,
+      "url": "/huevos-leche-y-mantequilla/leche/p/504"
+    },
+    {
+      "brand": "Dia Láctea",
+      "dia_brand": true,
+      "display_name": "Leche entera Gremlins Dia Láctea 3 x 200 ml",
+      "image": "/product_images/312953/312953_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Leche",
+      "object_id": "312953",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "LITRO",
+        "price": 0.92,
+        "price_per_unit": 1.53,
+        "strikethrough_price": 0.92
+      },
+      "units_in_stock": 74,
+      "url": "/huevos-leche-y-mantequilla/leche/p/312953"
+    },
+    {
+      "brand": "Dia",
+      "dia_brand": true,
+      "display_name": "Huevos medianos M Dia 24 unidades",
+      "image": "/product_images/274009/274009_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Huevos",
+      "object_id": "274009",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "DOCENA",
+        "price": 5.25,
+        "price_per_unit": 2.63,
+        "strikethrough_price": 5.25
+      },
+      "units_in_stock": 55,
+      "url": "/huevos-leche-y-mantequilla/huevos/p/274009"
+    },
+    {
+      "brand": "Asturiana",
+      "display_name": "Leche semidesnatada Asturiana 1 L",
+      "image": "/product_images/17548/17548_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Leche",
+      "object_id": "17548",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "LITRO",
+        "price": 1.17,
+        "price_per_unit": 1.17,
+        "strikethrough_price": 1.17
+      },
+      "units_in_stock": 564,
+      "url": "/huevos-leche-y-mantequilla/leche/p/17548"
+    },
+    {
+      "brand": "El Molino de Dia",
+      "dia_brand": true,
+      "display_name": "Pan de leche El Molino de Dia 350 g",
+      "image": "/product_images/288023/288023_ISO_0_ES.jpg",
+      "l1_category_description": "Bollería, repostería y azúcar",
+      "l2_category_description": "Magdalenas y bollería clásica",
+      "object_id": "288023",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 0,
+        "is_club_price": false,
+        "is_promo_price": false,
+        "measure_unit": "KILO",
+        "price": 1.35,
+        "price_per_unit": 3.86,
+        "strikethrough_price": 1.35
+      },
+      "units_in_stock": 143,
+      "url": "/bolleria-reposteria-y-azucar/magdalenas-y-bolleria-clasica/p/288023"
+    },
+    {
+      "brand": "Asturiana",
+      "display_name": "Leche semidesnatada sin lactosa Asturiana pack 6 x 1 L",
+      "image": "/product_images/148777P6/148777P6_ISO_0_ES.jpg",
+      "l1_category_description": "Huevos, leche y mantequilla",
+      "l2_category_description": "Leche sin lactosa y enriquecidas",
+      "object_id": "148777P6",
+      "prices": {
+        "currency": "EUR",
+        "discount_percentage": 8,
+        "is_club_price": true,
+        "is_promo_price": true,
+        "measure_unit": "LITRO",
+        "price": 7.38,
+        "price_per_unit": 1.23,
+        "strikethrough_price": 8.04
+      },
+      "units_in_stock": 72,
+      "url": "/huevos-leche-y-mantequilla/leche-sin-lactosa-y-enriquecidas/p/148777P6"
+    }
+  ]
+}

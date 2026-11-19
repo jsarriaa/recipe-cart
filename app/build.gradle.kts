@@ -82,6 +82,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":provider:mercadona"))
+    implementation(project(":provider:dia"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

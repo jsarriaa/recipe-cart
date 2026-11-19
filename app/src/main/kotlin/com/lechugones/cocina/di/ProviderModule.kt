@@ -2,6 +2,7 @@ package com.lechugones.cocina.di
 
 import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.provider.SupermarketProvider
+import com.lechugones.cocina.provider.dia.DiaProvider
 import com.lechugones.cocina.provider.mercadona.MercadonaProvider
 import dagger.Module
 import dagger.Provides
@@ -40,6 +41,15 @@ object ProviderModule {
                         .build(),
                 )
             }.build()
+
+    /** Día: verified from the phone on 2026-11-19 (docs/providers/dia.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideDia(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = DiaProvider.create(client, clock)
 
     @Provides
     @Singleton
