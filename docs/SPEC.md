@@ -108,7 +108,7 @@ feature code. See [providers/README.md § Adding a provider](providers/README.md
 | Concern | Choice | Notes |
 |---|---|---|
 | Language | Kotlin 2.4 (K2), JVM target 17 | AGP 9 built-in Kotlin support |
-| UI | Jetpack Compose, Material 3, Navigation Compose with type-safe routes | Dynamic colour on Android 12+, with a green fallback palette |
+| UI | Jetpack Compose, Material 3, Navigation Compose with type-safe routes | Own "cocina mediterránea" theme (tomato, olive, saffron on cream; warm dark mode), serif headings, rounded shapes. Dynamic colour is off so the app looks like itself everywhere |
 | DI | Hilt (KSP) | `hilt-core` in JVM provider modules |
 | DB | Room (KSP); product search with `LIKE` over a normalised key | Schemas exported to `core/data/schemas/` |
 | Settings | DataStore Preferences | |
@@ -166,7 +166,9 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
 - **Search** runs locally over the cached catalogue: every word of the query must appear in
   the product's `search_key` (name, brand and last category, normalised like § 5.4, so it is
   accent-insensitive). Shorter names that start with the query rank first. It is instant and
-  works offline. FTS4 was dropped in phase 3a: its tokenizer cannot fold Spanish accents
+  works offline. In Catálogo the search covers the supermarket chosen with its chip; elsewhere
+  (linking, pantry and list pickers) it covers every active supermarket plus manual products,
+  and each row says which supermarket it belongs to. FTS4 was dropped in phase 3a: its tokenizer cannot fold Spanish accents
   without a custom ICU build, and a few thousand rows scan fast enough with `LIKE`.
 - **Price refresh** ("Actualizar precios") is on demand from a recipe, the shopping list, a
   product, or the catalogue. It refreshes only the products involved, at the rate limit.
@@ -198,10 +200,9 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
 
 #### Behaviour
 
-- **List**: search by title, ingredient or tag; filter by tag; sort by name, recently cooked
-  (phase 5), recently added, or cost per serving ("Más baratas por ración": at the recipe's own
-  servings and the primary supermarket, recipes without any price last). Each row shows its
-  cost per serving when known ("2,40 €/ración").
+- **List**: search by title, ingredient or tag; filter by tag; sort by name, recently cooked,
+  or recently added (sorting by cost was removed at the owner's request). Each row shows its
+  cost per serving when known ("2,40 €/ración", "≥" when some ingredient has no price).
 - **Create / edit**: title, description, servings, prep and cook minutes, tags, photo (§ 4.9),
   source, steps (Markdown editor with preview), and ingredients.
 - **Everything is editable**: no recipe is read-only. Imported recipes can be changed exactly
@@ -318,12 +319,15 @@ The cost card shows:
 | **Por ración** | Dish cost ÷ current servings |
 | **Comprando envases enteros** | Σ over distinct products of ⌈total used ÷ usable package quantity⌉ × package price |
 | **Te falta comprar** | Like the previous row, but after subtracting pantry stock (§ 4.5) |
-| **Sobras** | For each product: packages bought × usable quantity − used, shown as a fraction plus amount ("sobra 1/3 paquete, 120 g") |
 | **Comparativa** | The same figures per active supermarket, with coverage ("5 de 6 ingredientes con precio"), plus a **"Mejor combinación"** that picks, for each ingredient, the provider with the lowest whole-package cost |
 
 Supermarket mode is a selector on the recipe: "Principal" (default), one specific provider, or
-"Más barato". It is not saved, and it is shown (with the comparison) only when the recipe has
-links to more than one provider; manual products count as the provider "A mano".
+"Más barato". It is not saved. It lists every active supermarket (plus "A mano" when manual
+products are linked) and is shown, with the comparison, when there is more than one. In a
+specific supermarket's mode each ingredient shows that supermarket's product, or none (then
+"Vincular producto" suggests and searches products of that supermarket); only "Principal" falls
+back to a product of another supermarket. Leftovers are not shown (owner's request): the card is
+about what the recipe uses.
 
 The card also shows "Precios del ‹fecha del precio más antiguo›" (with a warning icon when a price
 is older than the staleness setting) and **"Actualizar precios"**, which refreshes only the

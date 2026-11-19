@@ -63,15 +63,3 @@ fun costFigure(
         else -> text
     }
 }
-
-/** Leftover share of the bought packages, e.g. "1/3 paquete, 120 g". */
-@Composable
-fun leftoverText(
-    ratio: BigDecimal,
-    amount: BigDecimal,
-    unit: com.lechugones.cocina.domain.units.MeasureUnit,
-    packaging: String?,
-): String? {
-    val fraction = PackageFraction.ofRatio(ratio) ?: return null
-    return stringResource(R.string.cost_leftover_amount, fractionText(fraction, packaging), quantityText(amount, unit))
-}

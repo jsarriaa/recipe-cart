@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.lechugones.cocina.R
 import com.lechugones.cocina.domain.product.SuggestionSource
 import com.lechugones.cocina.provider.ProviderProduct
+import com.lechugones.cocina.ui.components.LocalSupermarketNames
 import com.lechugones.cocina.ui.components.ProductListItem
 
 /**
@@ -54,6 +55,14 @@ fun LinkProductSheet(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
+            state.providerId?.let { LocalSupermarketNames.current[it] }?.let { name ->
+                Text(
+                    stringResource(R.string.link_in_supermarket, name),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
             if (current != null) {
                 Row(
                     Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp),

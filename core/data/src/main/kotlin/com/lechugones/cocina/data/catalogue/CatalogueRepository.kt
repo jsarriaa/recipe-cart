@@ -133,6 +133,8 @@ class CatalogueRepository
             query: String,
             storeBrandOnly: Boolean,
             limit: Int = SEARCH_LIMIT,
+            /** Only this supermarket (the Catálogo chip); null searches every active one plus manual products. */
+            onlyProvider: String? = null,
         ): Flow<List<ProviderProduct>> {
             val words =
                 NameKey
@@ -146,7 +148,7 @@ class CatalogueRepository
             val installed = providers.map { it.id }.toSet()
             val key = NameKey.of(query)
             return settings.settings
-                .map { (it.activeProviders intersect installed) + ManualProducts.PROVIDER_ID }
+                .map { s -> onlyProvider?.let { setOf(it) } ?: ((s.activeProviders intersect installed) + ManualProducts.PROVIDER_ID) }
                 .distinctUntilChanged()
                 .flatMapLatest { ids -> dao.search(ids, first, storeBrandOnly, CANDIDATES) }
                 .map { rows -> rank(rows, words, key, limit) }

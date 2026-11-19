@@ -10,9 +10,6 @@ enum class RecipeSort {
     /** Most recently added first. */
     NEWEST,
 
-    /** Cheapest per serving first; recipes without a price go last, by name. */
-    CHEAPEST,
-
     /** Most recently cooked first; never-cooked recipes go last, by name. */
     RECENTLY_COOKED,
 }
@@ -45,14 +42,6 @@ object RecipeListFilter {
                 filtered.sortedWith(
                     compareBy<RecipeSummary> { it.lastCookedAt == null }
                         .thenByDescending { it.lastCookedAt }
-                        .thenBy(collator) { it.title },
-                )
-            }
-
-            RecipeSort.CHEAPEST -> {
-                filtered.sortedWith(
-                    compareBy<RecipeSummary> { it.costPerServing == null }
-                        .thenBy { it.costPerServing?.cents ?: 0 }
                         .thenBy(collator) { it.title },
                 )
             }

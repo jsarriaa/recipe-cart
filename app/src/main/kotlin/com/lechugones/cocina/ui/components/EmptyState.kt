@@ -62,7 +62,7 @@ fun EmptyState(
 @Preview(showBackground = true)
 @Composable
 private fun EmptyStatePreview() {
-    CocinaTheme(dynamicColor = false) {
+    CocinaTheme {
         EmptyState(Icons.Outlined.Kitchen, R.string.pantry_empty_title, R.string.pantry_empty_body)
     }
 }

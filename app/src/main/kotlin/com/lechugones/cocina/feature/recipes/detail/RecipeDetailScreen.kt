@@ -231,7 +231,10 @@ fun RecipeDetailScreen(
     if (sheet != null && loaded != null) {
         LinkProductSheet(
             state = sheet,
-            current = linkedProduct(sheet.ingredient, loaded),
+            current =
+                sheet.ingredient.links
+                    .filter { it.product.providerId == sheet.providerId }
+                    .firstNotNullOfOrNull { loaded.products[it.product] },
             onQuery = viewModel::onLinkQuery,
             onPick = viewModel::link,
             onUnlink = viewModel::unlink,
@@ -254,7 +257,10 @@ private fun shownProduct(
     ingredient: Ingredient,
     loaded: RecipeDetailUiState.Loaded,
     line: IngredientCostLine?,
-): ProviderProduct? = line?.product?.key?.let { loaded.products[it] } ?: linkedProduct(ingredient, loaded)
+): ProviderProduct? =
+    line?.product?.key?.let { loaded.products[it] }
+        // Only the primary view falls back to another supermarket's product; a chosen one shows its own or none.
+        ?: if (loaded.mode == CostMode.Primary) linkedProduct(ingredient, loaded) else null
 
 /** "1/2 paquete, 250 g de 500 g · 1,87 €", or why there is no cost. Staples left out of the cost say so. */
 @Composable
