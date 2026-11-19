@@ -9,7 +9,7 @@ never knows which supermarkets exist.
 | Provider | Module | Status | Doc |
 |---|---|---|---|
 | Mercadona | `:provider:mercadona` | **Verified 2026-11-18.** Plain requests with a descriptive User-Agent work | [mercadona.md](mercadona.md) |
-| Día | `:provider:dia` | **Blocked / unverified.** Akamai answered 403 to every request from the development network. Endpoints are known only from a third-party project | [dia.md](dia.md) |
+| Día | `:provider:dia` | **Verified 2026-11-19 from the phone.** The development PC (Croatian IP) is blocked; the phone's Spanish connection gets JSON with the honest User-Agent. Search-based catalogue sync | [dia.md](dia.md) |
 | Manual | built into `:core:data` | Always available. Products typed in by the user | this page, § Manual provider |
 
 ## Contract (`:provider:api`)

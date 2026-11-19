@@ -74,6 +74,7 @@ import com.lechugones.cocina.ui.components.ProductListItem
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.components.productReferenceText
 import com.lechugones.cocina.ui.components.productSizeText
+import com.lechugones.cocina.ui.components.supermarketLabel
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.providerErrorMessage
 import com.lechugones.cocina.ui.format.quantityText
@@ -138,6 +139,13 @@ fun CatalogueScreen(
         snackbarHostState = snackbar,
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
+            if (state.providers.size > 1) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    state.providers.forEach { (id, name) ->
+                        FilterChip(selected = state.providerId == id, onClick = { viewModel.chooseProvider(id) }, label = { Text(name) })
+                    }
+                }
+            }
             SyncBar(state, onStart = viewModel::startSync, onCancel = viewModel::cancelSync)
             if (state.status.products == 0 && state.sync !is SyncState.Running) {
                 EmptyCatalogue(state.providerName, onDownload = viewModel::startSync)
@@ -350,6 +358,9 @@ private fun ProductSheet(
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(p.name, style = MaterialTheme.typography.titleMedium)
                     p.brand?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    supermarketLabel(product)?.let {
+                        Text(it, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+                    }
                     if (p.brandKind == BrandKind.STORE) {
                         Text(
                             stringResource(R.string.catalogue_store_brand),

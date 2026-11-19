@@ -22,8 +22,8 @@ android {
     defaultConfig {
         // Never change once real data exists (CLAUDE.md, hard rule 6).
         applicationId = "com.lechugones.cocina"
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 10
+        versionName = "1.0.0"
     }
 
     signingConfigs {
@@ -47,6 +47,16 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release")
+        }
+        // The release build (R8, resource shrinking) installed as the debug app: same package and
+        // debug key, so it can be tested on the phone over the debug app, keeping its data, without
+        // touching the owner's release app.
+        create("minified") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-min"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
         }
     }
 
@@ -72,6 +82,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":provider:mercadona"))
+    implementation(project(":provider:dia"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| Status | **Blocked / unverified.** Nothing on this page has been confirmed against the live site by us |
+| Status | **Verified from the phone on 2026-11-19** (see the verification log). The development PC is still blocked |
 | Base URL (reported) | `https://www.dia.es/api/v1/` |
 | Image base (reported) | `https://www.dia.es/product_images/…` |
 | Location model (reported) | Postal code stored in a **server session** (cookie), not in each request |
-| Bot protection | **Akamai Bot Manager.** It refused every request we made |
+| Bot protection | **Akamai Bot Manager.** It refuses the development PC (Croatian IP); the phone on its Spanish connection is answered with the app's honest User-Agent and no browser headers |
 
 ## What happened during research (2026-11-18)
 
@@ -97,13 +97,33 @@ searches, costs and the shopping list work offline.
 Either outcome is acceptable. There is no third option where we make the client look like a
 browser.
 
+## What the app does (phase 7)
+
+- **Location**: `PUT save-shipping-address` with the postal code answers `204` and sets the
+  session cookie (no earlier request is needed). The cookie lives in an in-memory cookie jar of
+  the Día provider only; it is never written to disk. Every catalogue sync starts by setting it.
+- **Search** (verified): `GET search-back/search/reduced?q=…&page=…`. The answer always has
+  **30 items per page** (`page_size` is ignored). Fields seen, beyond the table above: `brand`,
+  `brand_type` (`D` Día, `N` national), `dia_brand` (boolean), `l1_category_description`,
+  `url` (relative product page), `units_in_stock`, `sku_id`, and `facets` (brand, `dia_brand`,
+  milk type…) and `suggestions`. Bodies are UTF-8.
+- **Catalogue sync**: Día publishes no category JSON we could verify, so the sync runs a fixed
+  list of about 55 everyday food searches (`DiaProvider.SEARCHES`), at most 2 pages each: at most
+  about 110 requests at the shared rate limit. On 2026-11-19 it took about 2 minutes and stored
+  1980 available products.
+- **Price refresh**: no product JSON is known, so the product id is searched (`q={object_id}`)
+  and the exact `object_id` is taken from the answer. Verified on 2026-11-19 with `504`.
+- **Mapping**: package size from the name (`6 x 1 L`, `3 x 200 ml`, `24 unidades`, `350 g`,
+  `1.5 L`), cross-checked with price ÷ price per unit (more than 5 % apart, or no size in the name:
+  `approx`); `dia_brand` → `STORE`; Club Dia prices are not used (the regular
+  `strikethrough_price` is taken when `is_club_price`); images and product pages are prefixed
+  with `https://www.dia.es`.
+
 ## Open questions
 
-- Is the block geographic (non-Spanish IPs), IP-reputation based, or about header fingerprints?
-  Is the phone normally on a Spanish connection?
-- How is the first anonymous `session_id` created?
 - Is there a category listing JSON (`plp`) and a product detail JSON (`pdp`) behind the web pages?
 - Do prices depend on the postal code or the store?
+- The "Precios Club Dia" setting is not offered yet: Club prices are always ignored.
 
 ## Verification log
 
@@ -112,3 +132,7 @@ browser.
 | 2026-11-18 | `GET https://www.dia.es/` (curl, mobile UA) | 403 Akamai "Access Denied" |
 | 2026-11-18 | `https://www.dia.es/` and `/search?q=tortillas%20trigo` in a Chromium browser pane | 403 Akamai "Access Denied" |
 | 2026-11-18 | Network egress check | Cloudflare trace `loc=HR`, WARP off |
+| 2026-11-19 | Feasibility check from the phone (debug app, honest User-Agent): `PUT save-shipping-address?new_postal_code=08001` | `204`, session cookie set |
+| 2026-11-19 | Same session: `GET search-back/search/reduced?q=leche` | `200 application/json`, 30 items, `cart.postal_code` 08001, UTF-8. Recorded as `provider/dia/src/test/resources/fixtures/dia/search-leche.json` (trimmed) |
+| 2026-11-19 | Full catalogue sync from the app (55 searches, ≤ 2 pages) | About 2 minutes, 1980 available products, no error |
+| 2026-11-19 | Price refresh of `504` (search by id) | Found, price unchanged (0,83 €) |

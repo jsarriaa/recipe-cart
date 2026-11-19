@@ -74,6 +74,7 @@ import com.lechugones.cocina.ui.components.ProductImage
 import com.lechugones.cocina.ui.components.RecipePhoto
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.components.productPriceText
+import com.lechugones.cocina.ui.components.supermarketLabel
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.providerErrorMessage
 import com.lechugones.cocina.ui.format.quantityText
@@ -513,7 +514,10 @@ private fun IngredientRow(
             }
             if (product != null) {
                 Text(
-                    stringResource(R.string.link_product_line, product.product.name, productPriceText(product)),
+                    listOfNotNull(
+                        supermarketLabel(product),
+                        stringResource(R.string.link_product_line, product.product.name, productPriceText(product)),
+                    ).joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     maxLines = 1,

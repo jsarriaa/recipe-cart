@@ -509,7 +509,7 @@
     <string name="link_no_suggestions">No hay sugerencias. Busca el producto por su nombre.</string>
     <string name="link_product_line">%1$s · %2$s</string>
     <string name="postal_code_title">Código postal</string>
-    <string name="postal_code_body">Mercadona usa el código postal para elegir el almacén del que salen los precios. Solo se envía a Mercadona y solo para eso.</string>
+    <string name="postal_code_body">Los supermercados usan el código postal para elegir de qué tienda o almacén salen los precios. Solo se envía a los supermercados activos y solo para eso.</string>
     <string name="postal_code_invalid">Escribe un código postal español de 5 cifras.</string>
 
     <!-- Settings and backup -->
@@ -544,6 +544,8 @@
     <string name="settings_restore_failed">No se pudo restaurar.</string>
     <string name="settings_working">Trabajando…</string>
     <string name="settings_supermarkets_title">Supermercados</string>
+    <string name="settings_provider_primary">Principal: la que se usa por defecto en costes y en la lista</string>
+    <string name="settings_providers_body">Los supermercados activos se buscan en el catálogo y se comparan en cada receta. Descarga el catálogo de cada uno en la pestaña Catálogo.</string>
     <string name="settings_postal_code">Código postal</string>
     <string name="settings_postal_code_none">Sin elegir</string>
     <string name="settings_postal_code_change">Cambiar</string>

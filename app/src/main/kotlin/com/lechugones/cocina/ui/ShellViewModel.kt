@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.lechugones.cocina.data.pantry.PantryRepository
 import com.lechugones.cocina.data.settings.SettingsRepository
 import com.lechugones.cocina.domain.pantry.UseSoon
+import com.lechugones.cocina.provider.SupermarketProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,11 @@ class ShellViewModel
         pantry: PantryRepository,
         settings: SettingsRepository,
         clock: Clock,
+        providers: Set<@JvmSuppressWildcards SupermarketProvider>,
     ) : ViewModel() {
+        /** Supermarket display names by provider id, for labels on product rows. */
+        val supermarketNames: Map<String, String> = providers.associate { it.id to it.displayName }
+
         private val zone = ZoneId.systemDefault()
 
         val useSoonCount: StateFlow<Int> =

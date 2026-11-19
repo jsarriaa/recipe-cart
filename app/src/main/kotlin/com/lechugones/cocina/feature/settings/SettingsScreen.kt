@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -120,6 +121,27 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_working), style = MaterialTheme.typography.bodySmall)
             }
             Text(stringResource(R.string.settings_supermarkets_title), style = MaterialTheme.typography.titleMedium)
+            state.providers.forEach { (id, name) ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = state.primaryProvider == id,
+                        onClick = { viewModel.setPrimary(id) },
+                        enabled = id in state.activeProviders,
+                    )
+                    Column(Modifier.weight(1f)) {
+                        Text(name, style = MaterialTheme.typography.bodyLarge)
+                        if (state.primaryProvider == id) {
+                            Text(
+                                stringResource(R.string.settings_provider_primary),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    Switch(checked = id in state.activeProviders, onCheckedChange = { viewModel.setActive(id, it) })
+                }
+            }
+            Text(stringResource(R.string.settings_providers_body), style = MaterialTheme.typography.bodySmall)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.settings_postal_code), style = MaterialTheme.typography.bodyLarge)
