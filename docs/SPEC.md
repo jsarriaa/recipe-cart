@@ -198,8 +198,10 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
 
 #### Behaviour
 
-- **List**: search by title, ingredient or tag; filter by tag; sort by name, recently cooked,
-  recently added, or cost per serving.
+- **List**: search by title, ingredient or tag; filter by tag; sort by name, recently cooked
+  (phase 5), recently added, or cost per serving ("Más baratas por ración": at the recipe's own
+  servings and the primary supermarket, recipes without any price last). Each row shows its
+  cost per serving when known ("2,40 €/ración").
 - **Create / edit**: title, description, servings, prep and cook minutes, tags, photo (§ 4.9),
   source, steps (Markdown editor with preview), and ingredients.
 - **Everything is editable**: no recipe is read-only. Imported recipes can be changed exactly
@@ -320,7 +322,15 @@ The cost card shows:
 | **Comparativa** | The same figures per active supermarket, with coverage ("5 de 6 ingredientes con precio"), plus a **"Mejor combinación"** that picks, for each ingredient, the provider with the lowest whole-package cost |
 
 Supermarket mode is a selector on the recipe: "Principal" (default), one specific provider, or
-"Más barato".
+"Más barato". It is not saved, and it is shown (with the comparison) only when the recipe has
+links to more than one provider; manual products count as the provider "A mano".
+
+The card also shows "Precios del ‹fecha del precio más antiguo›" (with a warning icon when a price
+is older than the staleness setting) and **"Actualizar precios"**, which refreshes only the
+recipe's linked products at the rate limit, skips manual ones, and stops at the first error that
+would make the rest fail too (offline, blocked, rate limited). Cached prices always stay.
+"Incluir básicos" and "Incluir opcionales" are chips on the card; they change the global
+settings of the same name.
 
 Rules:
 
@@ -579,7 +589,9 @@ asks for `unitWeightG` or a different product.
 4. The noun is the product's packaging word lowercased (paquete, bandeja, bote, sobre, pieza,
    tarrina, botella, lata, malla), defaulting to "envase". It is pluralised when `r > 1`
    (vowel → +s, z → ces, otherwise +es).
-5. Template: `{fraction} {noun} de {ingredient name}, {used} de {package}`.
+5. Template: `{fraction} {noun} de {ingredient name}, {used} de {package}`. In the recipe
+   detail the ingredient name is already on the line, so the app shows
+   `{fraction} {noun}, {used} de {package} · {cost}` under it.
    Several packages: `1 1/2 paquetes de ñoquis, 750 g de 2 × 500 g`.
    Count packages: `2/3 paquete de tortilla de trigo maxi, 4 ud de 6 ud`.
 
@@ -708,7 +720,7 @@ the phone.
 | **1 — Foundations** (in review, branch `phase/1-foundations`) | Gradle multi-module skeleton with version catalog and convention plugins; Hilt; Room v1 (recipe tables) with schema export and migration test harness; DataStore settings; M3 theme; navigation shell (Recetas, Despensa, Compra, Catálogo, Ajustes) with empty states; debug/release build types; CI. Domain core: units, quantities, parsing and es-ES formatting, display rounding, package fractions, money, cost engine (on in-memory models), scaling, name normalisation | App installs on the phone and navigates; all domain tests green |
 | **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
 | **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b (schema v4): Manual provider; ingredient linking from the recipe detail; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
-| **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, price snapshots | AC4.* |
+| **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, "Actualizar precios" for a recipe, sort by cost per serving (price snapshots are stored since 3a; showing them stays optional). No schema change | AC4.* |
 | **5 — Pantry and cooking** | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up | AC5.* |
 | **6 — Shopping list** | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text | AC6.* |
 | **7 — Día and release** | Día feasibility check and provider (or a documented manual-price fallback); release signing; R8; friends' APK; polish and performance pass | Signed APK installed on a second phone |
