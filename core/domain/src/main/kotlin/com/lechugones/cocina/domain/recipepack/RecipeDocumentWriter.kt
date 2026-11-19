@@ -20,6 +20,7 @@ object RecipeDocumentWriter {
             }
             draft.image?.let { line("image: ${YamlScalars.scalar(it)}") }
             draft.source?.let { line("source: ${YamlScalars.scalar(it)}") }
+            draft.author?.let { line("author: ${YamlScalars.scalar(it)}") }
             line("ingredients:")
             draft.ingredients.forEach { ingredient(it) }
             line("---")

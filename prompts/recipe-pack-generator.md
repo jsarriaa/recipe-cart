@@ -50,7 +50,7 @@ Top-level fields, in this order:
 - prep_minutes, cook_minutes: integers 0-1440 (optional, recommended)
 - tags: flow list of 1-5 lowercase Spanish tags, e.g. [cena, rápida, vegetariana] (optional)
 - ingredients: list of 1-60 ingredients (required)
-Do NOT write uid, image, source or links fields.
+Do NOT write uid, image, source, author or links fields.
 
 Each ingredient has these fields, in this order:
 - name: generic Spanish name, lowercase, singular unless the food is naturally plural ("garbanzos cocidos"). No quantity, no brand, no preparation in the name. Use the same name for the same food across recipes. Examples: "contramuslo de pollo deshuesado", "tomate triturado", "cebolla", "nata para cocinar".

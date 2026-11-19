@@ -71,6 +71,7 @@ fun RecipesScreen(
     onNewRecipe: () -> Unit,
     onImport: () -> Unit,
     onCookable: () -> Unit,
+    onCommunity: () -> Unit,
     onOpenSettings: () -> Unit,
     viewModel: RecipesViewModel = hiltViewModel(),
 ) {
@@ -134,6 +135,10 @@ fun RecipesScreen(
                     Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.action_more))
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.community_title)) }, onClick = {
+                        menuOpen = false
+                        onCommunity()
+                    })
                     DropdownMenuItem(text = { Text(stringResource(R.string.recipes_import)) }, onClick = {
                         menuOpen = false
                         onImport()

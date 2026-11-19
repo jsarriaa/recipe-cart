@@ -40,6 +40,7 @@ object RecipeDraftValidator {
             if (tag.isEmpty() || tag.length > RecipeRules.TAG_MAX) add(IssueCode.E07, "tags[$i]", tag)
         }
         draft.source?.let { if (it.length > RecipeRules.SOURCE_MAX) add(IssueCode.E07, "source") }
+        draft.author?.let { if (it.length > RecipeRules.AUTHOR_MAX) add(IssueCode.E07, "author") }
         if (draft.body.length > RecipeRules.BODY_MAX) add(IssueCode.E12, "body")
         if (draft.ingredients.size !in RecipeRules.INGREDIENTS) add(IssueCode.E07, "ingredients")
 

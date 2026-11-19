@@ -7,7 +7,7 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: 1.2.0.** Every feature below is in the app. Mercadona and Día prices are
+> **Status: 1.3.0.** Every feature below is in the app. Mercadona and Día prices are
 > live (Día was verified from the phone; see [docs/providers/dia.md](docs/providers/dia.md)), and
 > any other shop's products can be added by hand as manual products. See the
 > [development phases](docs/SPEC.md#9-development-phases).
@@ -33,6 +33,9 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
 - **Shopping list**: built from recipes minus the pantry, grouped by supermarket, with an
   estimated total. Bought items move into the pantry. Shared as text.
 - **Backup and restore** to a single file.
+- **Recetas de la comunidad**: search the shared
+  [recipe book](https://github.com/jsarriaa/recetario) by name, ingredient, author, time and tags,
+  and download a recipe straight into the app.
 - **Updates**: when the app opens it checks for a newer
   [GitHub release](https://github.com/jsarriaa/recipe-cart/releases) and, if there is one, offers
   it in a pop-up. "Actualizar" downloads the APK and opens Android's installer. Ajustes has the

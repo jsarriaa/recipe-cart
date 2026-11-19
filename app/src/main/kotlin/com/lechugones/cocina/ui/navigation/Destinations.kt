@@ -48,6 +48,10 @@ data object ImportRoute
 @Serializable
 data object CookableRoute
 
+/** "Recetas de la comunidad" (SPEC § 4.10). */
+@Serializable
+data object CommunityRoute
+
 /** The four bottom-bar destinations (SPEC § 4). Settings is reached from the top bar. */
 enum class TopLevelDestination(
     val route: Any,
