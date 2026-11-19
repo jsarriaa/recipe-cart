@@ -60,7 +60,9 @@ class DiaProbe
                             .put(ByteArray(0).toRequestBody())
                             .build(),
                     )
-                if (first.code == null || first.code == FORBIDDEN || !first.json && first.code != NO_CONTENT) return@withContext listOf(first)
+                // Stop after a block: the search would only be refused too.
+                val blocked = first.code == null || first.code == FORBIDDEN || (!first.json && first.code != NO_CONTENT)
+                if (blocked) return@withContext listOf(first)
                 val second =
                     call(
                         "search",
