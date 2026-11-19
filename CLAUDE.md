@@ -44,7 +44,8 @@ and what it costs, keeps a pantry, and builds a shopping list. The full specific
 4. **Privacy.** No accounts, analytics, crash reporting, ads, remote config or AI features. No SDK
    that phones home. The only network hosts are the supermarket endpoints listed in
    `docs/providers/` plus their image CDNs, and GitHub (`api.github.com` and its release
-   download hosts) only when the user taps "Buscar actualizaciones" in Ajustes.
+   download hosts) for updates: one check each time the app opens (owner's request) and the
+   "Buscar actualizaciones" button. The APK is downloaded only when the user taps "Actualizar".
    `android:allowBackup="false"`; the in-app backup file is the only backup path.
 5. **No secrets in git.** Keystores, `keystore.properties`, `local.properties` and `.env` files are
    gitignored. Do not copy third-party API keys found in websites' JavaScript into this repo.

@@ -545,6 +545,11 @@
     <string name="settings_updates_install">Descargar e instalar %1$s</string>
     <string name="settings_updates_open_github">Ver en GitHub</string>
     <string name="settings_updates_debug">Esta es la versión de pruebas: descarga la nueva desde GitHub para instalarla.</string>
+    <string name="update_dialog_title">¡Hay una versión nueva!</string>
+    <string name="update_dialog_body">CocinaParaLechugones %1$s ya está disponible. Se descarga e instala sin perder tus recetas ni tu despensa.</string>
+    <string name="update_dialog_body_debug">La versión %1$s ya está en GitHub. Esta es la versión de pruebas: descárgala desde allí.</string>
+    <string name="update_dialog_install">Actualizar</string>
+    <string name="update_dialog_later">Ahora no</string>
     <string name="settings_github_title">Hecha con cariño por @%1$s</string>
     <string name="settings_github_body">CocinaParaLechugones es un proyecto personal y de código abierto. Si te gusta, pásate por mi GitHub: hay más cosas cocinándose.</string>
     <string name="settings_github_profile">Mi GitHub</string>
