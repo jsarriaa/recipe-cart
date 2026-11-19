@@ -34,7 +34,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -85,6 +88,10 @@ fun RecipeDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val linking by viewModel.linking.collectAsStateWithLifecycle()
+    val cookSheet by viewModel.cookSheet.collectAsStateWithLifecycle()
+    val cookDone = stringResource(R.string.cook_done)
+    val cookUndo = stringResource(R.string.cook_undo)
+    val cookUndone = stringResource(R.string.cook_undone)
     val snackbar = remember { SnackbarHostState() }
     var menuOpen by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -97,10 +104,30 @@ fun RecipeDetailScreen(
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
-                RecipeDetailEvent.Deleted -> onBack()
-                is RecipeDetailEvent.Duplicated -> onOpenRecipe(event.id)
-                is RecipeDetailEvent.Exported -> export = event.file
-                RecipeDetailEvent.ExportFailed -> snackbar.showSnackbar(exportError)
+                RecipeDetailEvent.Deleted -> {
+                    onBack()
+                }
+
+                is RecipeDetailEvent.Duplicated -> {
+                    onOpenRecipe(event.id)
+                }
+
+                is RecipeDetailEvent.Exported -> {
+                    export = event.file
+                }
+
+                RecipeDetailEvent.ExportFailed -> {
+                    snackbar.showSnackbar(exportError)
+                }
+
+                is RecipeDetailEvent.Cooked -> {
+                    val result = snackbar.showSnackbar(cookDone, actionLabel = cookUndo, duration = SnackbarDuration.Long)
+                    if (result == SnackbarResult.ActionPerformed) viewModel.undoCook(event.eventId)
+                }
+
+                RecipeDetailEvent.CookUndone -> {
+                    snackbar.showSnackbar(cookUndone)
+                }
             }
         }
     }
@@ -182,6 +209,17 @@ fun RecipeDetailScreen(
         )
     }
     export?.let { ExportDialog(it, snackbar, onDismiss = { export = null }) }
+
+    cookSheet?.let { cook ->
+        CookSheet(
+            state = cook,
+            onAmount = viewModel::setCookAmount,
+            onSkip = viewModel::setCookSkip,
+            onFinished = viewModel::setFinished,
+            onConfirm = viewModel::confirmCook,
+            onDismiss = viewModel::closeCook,
+        )
+    }
 
     val sheet = linking
     if (sheet != null && loaded != null) {
@@ -326,6 +364,11 @@ private fun RecipeDetailContent(
             }
         }
         item { ServingsStepper(servings, recipe.servings, onServings) }
+        item {
+            OutlinedButton(onClick = viewModel::openCook, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                Text(stringResource(R.string.cook_action))
+            }
+        }
         item {
             CostCard(
                 loaded = loaded,

@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.lechugones.cocina.data.catalogue.CatalogueRepository
 import com.lechugones.cocina.data.catalogue.ProductLinker
 import com.lechugones.cocina.data.catalogue.RefreshSummary
+import com.lechugones.cocina.data.pantry.PantryRepository
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.data.settings.SettingsRepository
 import com.lechugones.cocina.domain.cost.CostComparison
@@ -14,6 +15,10 @@ import com.lechugones.cocina.domain.cost.CostOptions
 import com.lechugones.cocina.domain.cost.ProductSelection
 import com.lechugones.cocina.domain.cost.RecipeCost
 import com.lechugones.cocina.domain.cost.RecipeCostCalculator
+import com.lechugones.cocina.domain.pantry.CookCoverage
+import com.lechugones.cocina.domain.pantry.CookPlanner
+import com.lechugones.cocina.domain.pantry.LotDeduction
+import com.lechugones.cocina.domain.pantry.PantryLot
 import com.lechugones.cocina.domain.product.ManualProductField
 import com.lechugones.cocina.domain.product.ManualProductForm
 import com.lechugones.cocina.domain.product.ManualProductResult
@@ -42,6 +47,8 @@ import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 
 sealed interface RecipeDetailUiState {
@@ -67,6 +74,12 @@ sealed interface RecipeDetailUiState {
         val includeOptionals: Boolean = false,
         val refreshingPrices: Boolean = false,
         val refreshResult: RefreshSummary? = null,
+        /** Pantry lots, for "Te falta comprar" and "Lo he cocinado". */
+        val lots: List<PantryLot> = emptyList(),
+        val remembered: Map<String, Set<ProductKey>> = emptyMap(),
+        val useSoonWindow: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
+        /** Whole packages still to buy after the pantry; null when the pantry is empty. */
+        val toBuy: RecipeCost? = null,
     ) : RecipeDetailUiState
 }
 
@@ -112,6 +125,13 @@ sealed interface RecipeDetailEvent {
     ) : RecipeDetailEvent
 
     data object ExportFailed : RecipeDetailEvent
+
+    /** "Lo he cocinado" was applied; the snackbar offers "Deshacer". */
+    data class Cooked(
+        val eventId: String,
+    ) : RecipeDetailEvent
+
+    data object CookUndone : RecipeDetailEvent
 }
 
 @HiltViewModel
@@ -125,7 +145,12 @@ class RecipeDetailViewModel
         private val catalogue: CatalogueRepository,
         private val settings: SettingsRepository,
         private val clock: Clock,
+        private val pantry: PantryRepository,
     ) : ViewModel() {
+        private val zone: ZoneId = ZoneId.systemDefault()
+        private val cookState = MutableStateFlow<CookSheetState?>(null)
+        val cookSheet: StateFlow<CookSheetState?> = cookState.asStateFlow()
+        private var cookPlanLots: Map<String, PantryLot> = emptyMap()
         private val id = savedStateHandle.toRoute<RecipeDetailRoute>().id
         private val state = MutableStateFlow<RecipeDetailUiState>(RecipeDetailUiState.Loading)
         val uiState: StateFlow<RecipeDetailUiState> = state.asStateFlow()
@@ -166,6 +191,9 @@ class RecipeDetailViewModel
                         includeStaples = s.includeStaplesInCost,
                         includeOptionals = s.includeOptionalsInCost,
                         refreshResult = previous?.refreshResult,
+                        lots = pantry.lots(),
+                        remembered = linker.rememberedProducts(recipe.ingredients.map { it.nameKey }),
+                        useSoonWindow = s.useSoonWarningDays,
                     ),
                     Duration.ofDays(s.staleAfterDays.toLong()),
                 )
@@ -194,7 +222,160 @@ class RecipeDetailViewModel
                 } else {
                     null
                 }
-            return loaded.copy(cost = cost, comparison = comparison)
+            val toBuy =
+                if (loaded.lots.none { it.hasStock || it.presenceOnly }) {
+                    null
+                } else {
+                    val plan = planFor(loaded)
+                    RecipeCostCalculator.compute(
+                        CookCoverage.remainingToBuy(loaded.recipe, plan),
+                        loaded.servings,
+                        products,
+                        selection,
+                        options,
+                    )
+                }
+            return loaded.copy(cost = cost, comparison = comparison, toBuy = toBuy)
+        }
+
+        private fun planFor(loaded: RecipeDetailUiState.Loaded) =
+            CookPlanner.plan(
+                loaded.recipe,
+                loaded.servings,
+                loaded.lots,
+                LocalDate.now(clock.withZone(zone)),
+                zone,
+                loaded.useSoonWindow,
+            ) { loaded.remembered[it].orEmpty() }
+
+        // --- "Lo he cocinado" ---------------------------------------------------------------
+
+        /** Plans the deductions at the current servings and opens the confirmation sheet. */
+        fun openCook() {
+            viewModelScope.launch {
+                val loaded = state.value as? RecipeDetailUiState.Loaded ?: return@launch
+                val fresh = loaded.copy(lots = pantry.lots())
+                val lots = fresh.lots.associateBy { it.id }
+                cookPlanLots = lots
+                val plan = planFor(fresh)
+                cookState.value =
+                    CookSheetState(
+                        servings = plan.servings,
+                        rows =
+                            plan.ingredients.map { deduction ->
+                                val takes =
+                                    deduction.takes.mapNotNull { take ->
+                                        val lot = lots[take.lotId] ?: return@mapNotNull null
+                                        CookTake(
+                                            lot.id,
+                                            lot.name,
+                                            checkNotNull(lot.unit),
+                                            checkNotNull(lot.quantity).toBigDecimal(),
+                                            editableAmount(take.amount),
+                                        )
+                                    } +
+                                        deduction.manualLots.mapNotNull { id ->
+                                            val lot = lots[id] ?: return@mapNotNull null
+                                            CookTake(
+                                                lot.id,
+                                                lot.name,
+                                                checkNotNull(lot.unit),
+                                                checkNotNull(lot.quantity).toBigDecimal(),
+                                                "",
+                                            )
+                                        }
+                                CookRow(
+                                    ingredientName = deduction.ingredient.name,
+                                    needed = deduction.needed,
+                                    neededUnit = deduction.ingredient.unit,
+                                    takes = takes,
+                                    missing = deduction.missing,
+                                    presence = deduction.presenceLots.mapNotNull { id -> lots[id]?.let { id to it.name } },
+                                )
+                            },
+                    )
+            }
+        }
+
+        fun setCookAmount(
+            row: Int,
+            take: Int,
+            amount: String,
+        ) = updateTake(row, take) { it.copy(amount = amount) }
+
+        fun setCookSkip(
+            row: Int,
+            take: Int,
+            skip: Boolean,
+        ) = updateTake(row, take) { it.copy(skip = skip) }
+
+        fun setFinished(
+            lotId: String,
+            finished: Boolean,
+        ) {
+            cookState.update { it?.copy(finished = if (finished) it.finished + lotId else it.finished - lotId) }
+        }
+
+        fun closeCook() {
+            cookState.value = null
+        }
+
+        /** Applies the confirmed sheet in one transaction (AC5.2: only from here). */
+        fun confirmCook() {
+            val sheet = cookState.value ?: return
+            val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
+            if (!sheet.valid || sheet.saving) return
+            cookState.value = sheet.copy(saving = true)
+            viewModelScope.launch {
+                // Several ingredients may draw on one lot: their confirmed takes are added up.
+                val takes =
+                    sheet.rows.flatMap { it.takes }.mapNotNull { take -> take.toAmount()?.let { LotDeduction(take.lotId, it) } }
+                val eventId = pantry.cook(loaded.recipe, sheet.servings, takes, sheet.finished)
+                cookState.value = null
+                reload()
+                eventChannel.send(RecipeDetailEvent.Cooked(eventId))
+            }
+        }
+
+        fun undoCook(eventId: String) {
+            viewModelScope.launch {
+                if (pantry.undo(eventId)) {
+                    reload()
+                    eventChannel.send(RecipeDetailEvent.CookUndone)
+                }
+            }
+        }
+
+        private fun updateTake(
+            row: Int,
+            take: Int,
+            transform: (CookTake) -> CookTake,
+        ) {
+            cookState.update { sheet ->
+                sheet?.copy(
+                    rows =
+                        sheet.rows.mapIndexed { r, cookRow ->
+                            if (r !=
+                                row
+                            ) {
+                                cookRow
+                            } else {
+                                cookRow.copy(
+                                    takes =
+                                        cookRow.takes.mapIndexed { t, it ->
+                                            if (t ==
+                                                take
+                                            ) {
+                                                transform(it)
+                                            } else {
+                                                it
+                                            }
+                                        },
+                                )
+                            }
+                        },
+                )
+            }
         }
 
         fun setServings(servings: Int) {

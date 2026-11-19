@@ -44,6 +44,10 @@ data class RecipeEditorRoute(
 @Serializable
 data object ImportRoute
 
+/** "¿Qué puedo cocinar?" (SPEC § 4.5). */
+@Serializable
+data object CookableRoute
+
 /** The four bottom-bar destinations (SPEC § 4). Settings is reached from the top bar. */
 enum class TopLevelDestination(
     val route: Any,

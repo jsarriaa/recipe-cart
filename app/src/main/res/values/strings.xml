@@ -41,6 +41,20 @@
     <string name="recipes_sort_name">Nombre</string>
     <string name="recipes_sort_newest">Más recientes</string>
     <string name="recipes_sort_cheapest">Más baratas por ración</string>
+    <string name="recipes_sort_cooked">Cocinadas hace poco</string>
+    <string name="cookable_title">¿Qué puedo cocinar?</string>
+    <string name="cookable_pantry_empty">Tu despensa está vacía: añade lo que tienes en la pestaña Despensa para ver qué puedes cocinar.</string>
+    <string name="cookable_only_use_soon">Aprovechar lo que caduca</string>
+    <string name="cookable_none">No hay recetas todavía.</string>
+    <string name="cookable_none_use_soon">Ninguna receta usa lo que tienes que gastar pronto.</string>
+    <string name="cookable_all">Lo tienes todo</string>
+    <plurals name="cookable_missing">
+        <item quantity="one">Te falta %d ingrediente</item>
+        <item quantity="many">Te faltan %d ingredientes</item>
+        <item quantity="other">Te faltan %d ingredientes</item>
+    </plurals>
+    <string name="cookable_missing_list">Falta: %1$s</string>
+    <string name="cookable_uses_soon">Aprovecha: %1$s</string>
     <string name="recipes_cost_per_serving">%1$s/ración</string>
     <string name="recipes_no_results">No hay recetas que coincidan</string>
     <plurals name="recipe_servings">
@@ -375,6 +389,22 @@
     <string name="import_match_accept_all">Aceptar todo</string>
     <string name="import_match_without_links">Importar sin vincular</string>
     <string name="import_match_no_catalogue">Aún no has descargado el catálogo de %1$s, así que no hay productos que sugerir. Puedes importar ahora y vincular los productos más tarde desde cada receta.</string>
+    <string name="cook_action">Lo he cocinado</string>
+    <plurals name="cook_title">
+        <item quantity="one">Lo he cocinado: %d ración</item>
+        <item quantity="many">Lo he cocinado: %d raciones</item>
+        <item quantity="other">Lo he cocinado: %d raciones</item>
+    </plurals>
+    <string name="cook_body">Esto se quitará de la despensa. Cambia las cantidades o desmarca lo que no hayas usado.</string>
+    <string name="cook_not_in_pantry">No está en la despensa</string>
+    <string name="cook_missing">No tenías suficiente: faltan %1$s</string>
+    <string name="cook_finished">%1$s: se ha acabado</string>
+    <string name="cook_available">Quedan %1$s</string>
+    <string name="cook_confirm">Confirmar</string>
+    <string name="cook_done">Despensa actualizada</string>
+    <string name="cook_undo">Deshacer</string>
+    <string name="cook_undone">Se ha deshecho. La despensa vuelve a estar como antes.</string>
+    <string name="cost_to_buy">Te falta comprar</string>
     <string name="cost_title">Coste</string>
     <string name="cost_dish">Coste del plato</string>
     <string name="cost_per_serving">Por ración</string>
