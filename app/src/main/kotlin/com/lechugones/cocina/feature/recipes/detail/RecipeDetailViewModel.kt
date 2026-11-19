@@ -10,6 +10,7 @@ import com.lechugones.cocina.data.catalogue.RefreshSummary
 import com.lechugones.cocina.data.pantry.PantryRepository
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.data.shopping.ShoppingRepository
 import com.lechugones.cocina.domain.cost.CostComparison
 import com.lechugones.cocina.domain.cost.CostOptions
 import com.lechugones.cocina.domain.cost.ProductSelection
@@ -132,6 +133,8 @@ sealed interface RecipeDetailEvent {
     ) : RecipeDetailEvent
 
     data object CookUndone : RecipeDetailEvent
+
+    data object AddedToList : RecipeDetailEvent
 }
 
 @HiltViewModel
@@ -146,6 +149,7 @@ class RecipeDetailViewModel
         private val settings: SettingsRepository,
         private val clock: Clock,
         private val pantry: PantryRepository,
+        private val shopping: ShoppingRepository,
     ) : ViewModel() {
         private val zone: ZoneId = ZoneId.systemDefault()
         private val cookState = MutableStateFlow<CookSheetState?>(null)
@@ -334,6 +338,15 @@ class RecipeDetailViewModel
                 cookState.value = null
                 reload()
                 eventChannel.send(RecipeDetailEvent.Cooked(eventId))
+            }
+        }
+
+        /** "Añadir a la lista" at the servings shown (SPEC § 4.6); it can be repeated. */
+        fun addToList() {
+            val loaded = state.value as? RecipeDetailUiState.Loaded ?: return
+            viewModelScope.launch {
+                shopping.addRecipe(loaded.recipe.id, loaded.servings)
+                eventChannel.send(RecipeDetailEvent.AddedToList)
             }
         }
 

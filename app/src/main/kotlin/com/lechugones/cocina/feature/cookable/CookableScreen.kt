@@ -17,9 +17,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +47,10 @@ fun CookableScreen(
     viewModel: CookableViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    ScreenScaffold(title = stringResource(R.string.cookable_title), onBack = onBack) { padding ->
+    val snackbar = remember { SnackbarHostState() }
+    val added = stringResource(R.string.shopping_added)
+    LaunchedEffect(viewModel) { viewModel.added.collect { snackbar.showSnackbar(added) } }
+    ScreenScaffold(title = stringResource(R.string.cookable_title), onBack = onBack, snackbarHostState = snackbar) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             if (state.loading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -72,7 +79,7 @@ fun CookableScreen(
             }
             LazyColumn(Modifier.fillMaxSize()) {
                 items(state.coverage, key = { it.recipe.id }) { item ->
-                    CoverageRow(item, onClick = { onOpenRecipe(item.recipe.id) })
+                    CoverageRow(item, onClick = { onOpenRecipe(item.recipe.id) }, onAddMissing = { viewModel.addMissing(item) })
                     HorizontalDivider()
                 }
             }
@@ -84,6 +91,7 @@ fun CookableScreen(
 private fun CoverageRow(
     item: RecipeCoverage,
     onClick: () -> Unit,
+    onAddMissing: () -> Unit,
 ) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp),
@@ -129,6 +137,9 @@ private fun CoverageRow(
                     onClick = onClick,
                     label = { Text(stringResource(R.string.cookable_uses_soon, item.usesSoon.joinToString(", "))) },
                 )
+            }
+            if (item.missing.isNotEmpty()) {
+                TextButton(onClick = onAddMissing) { Text(stringResource(R.string.shopping_add_missing)) }
             }
         }
     }

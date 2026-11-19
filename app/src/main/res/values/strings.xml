@@ -327,7 +327,54 @@
     <string name="pantry_choose_date">Elegir</string>
     <string name="action_ok">Aceptar</string>
     <string name="shopping_empty_title">La lista de la compra está vacía</string>
-    <string name="shopping_empty_body">Añade recetas y verás lo que te falta, agrupado por supermercado.</string>
+    <string name="shopping_empty_body">Añade recetas desde su pantalla con «Añadir a la lista», o cosas sueltas con el botón +.</string>
+    <string name="shopping_share">Compartir</string>
+    <string name="shopping_share_title">Lista de la compra — %1$s</string>
+    <string name="shopping_no_supermarket">Sin supermercado</string>
+    <string name="shopping_no_supermarket_upper">SIN SUPERMERCADO</string>
+    <string name="shopping_total">Total estimado: %1$s</string>
+    <plurals name="shopping_total_missing">
+        <item quantity="one">Total estimado: %1$s (%2$d artículo sin precio)</item>
+        <item quantity="many">Total estimado: %1$s (%2$d artículos sin precio)</item>
+        <item quantity="other">Total estimado: %1$s (%2$d artículos sin precio)</item>
+    </plurals>
+    <plurals name="shopping_without_price">
+        <item quantity="one">%d artículo sin precio</item>
+        <item quantity="many">%d artículos sin precio</item>
+        <item quantity="other">%d artículos sin precio</item>
+    </plurals>
+    <plurals name="shopping_finish">
+        <item quantity="one">Terminar compra (%d)</item>
+        <item quantity="many">Terminar compra (%d)</item>
+        <item quantity="other">Terminar compra (%d)</item>
+    </plurals>
+    <plurals name="shopping_finished">
+        <item quantity="one">Añadido a la despensa: %d envase</item>
+        <item quantity="many">Añadidos a la despensa: %d envases</item>
+        <item quantity="other">Añadidos a la despensa: %d envases</item>
+    </plurals>
+    <string name="shopping_cheapest">Más barato por producto</string>
+    <string name="shopping_clear">Vaciar lista</string>
+    <string name="shopping_recipes">Recetas en la lista</string>
+    <plurals name="shopping_recipe_line">
+        <item quantity="one">%1$s · %2$d ración</item>
+        <item quantity="many">%1$s · %2$d raciones</item>
+        <item quantity="other">%1$s · %2$d raciones</item>
+    </plurals>
+    <string name="shopping_remove">Quitar de la lista</string>
+    <string name="shopping_add">Añadir</string>
+    <string name="shopping_add_title">Añadir a la lista</string>
+    <string name="shopping_add_hint">Escribe algo o busca un producto</string>
+    <string name="shopping_add_text">Añadir «%1$s»</string>
+    <string name="shopping_needed">faltan %1$s</string>
+    <string name="shopping_for">para %1$s</string>
+    <string name="shopping_no_price">sin precio</string>
+    <string name="shopping_buy_at">Comprar en</string>
+    <string name="shopping_buy_default">Según la lista</string>
+    <string name="shopping_no_options">Se calcula a partir de tus recetas y tu despensa.</string>
+    <string name="shopping_added">Añadido a la lista</string>
+    <string name="shopping_add_recipe">Añadir a la lista</string>
+    <string name="shopping_add_missing">Añadir lo que falta a la lista</string>
     <string name="catalogue_empty_title">Catálogo sin descargar</string>
     <string name="catalogue_empty_body">Descarga los productos de alimentación de %1$s para buscarlos y ver sus precios, también sin conexión. Tarda unos minutos y solo se hace cuando tú lo pides.</string>
     <string name="catalogue_download">Descargar catálogo</string>

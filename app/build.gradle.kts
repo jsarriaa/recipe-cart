@@ -96,4 +96,8 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Plain JVM tests of UI formatting that does not need Android (AC6.2).
+    testImplementation(libs.junit4)
+    testImplementation(libs.kotlin.test)
 }

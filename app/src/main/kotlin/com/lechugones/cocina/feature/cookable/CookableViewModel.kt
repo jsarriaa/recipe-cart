@@ -7,6 +7,7 @@ import com.lechugones.cocina.data.pantry.PantryRepository
 import com.lechugones.cocina.data.recipe.RecipeLibrary
 import com.lechugones.cocina.data.recipe.RecipeRepository
 import com.lechugones.cocina.data.settings.SettingsRepository
+import com.lechugones.cocina.data.shopping.ShoppingRepository
 import com.lechugones.cocina.domain.cost.CostOptions
 import com.lechugones.cocina.domain.cost.ProductSelection
 import com.lechugones.cocina.domain.cost.RecipeCostCalculator
@@ -14,12 +15,16 @@ import com.lechugones.cocina.domain.pantry.CookCoverage
 import com.lechugones.cocina.domain.pantry.RecipeCoverage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -47,7 +52,12 @@ class CookableViewModel
         private val linker: ProductLinker,
         settings: SettingsRepository,
         private val clock: Clock,
+        private val shopping: ShoppingRepository,
     ) : ViewModel() {
+        private val addedChannel = Channel<Unit>(Channel.BUFFERED)
+
+        /** One event per "Añadir lo que falta a la lista", for the snackbar. */
+        val added: Flow<Unit> = addedChannel.receiveAsFlow()
         private val zone = ZoneId.systemDefault()
         private val onlyUseSoon = MutableStateFlow(false)
 
@@ -87,6 +97,17 @@ class CookableViewModel
                     pantryEmpty = empty,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), CookableUiState())
+
+        /**
+         * "Añadir lo que falta a la lista": the recipe at its servings. The list subtracts the
+         * pantry itself, so only what is missing ends up on it.
+         */
+        fun addMissing(coverage: RecipeCoverage) {
+            viewModelScope.launch {
+                shopping.addRecipe(coverage.recipe.id, coverage.recipe.servings)
+                addedChannel.send(Unit)
+            }
+        }
 
         fun toggleOnlyUseSoon() {
             onlyUseSoon.value = !onlyUseSoon.value

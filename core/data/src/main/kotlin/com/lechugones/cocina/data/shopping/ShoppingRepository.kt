@@ -39,6 +39,8 @@ data class ShoppingState(
     /** Recipes added to the list, for "Quitar de la lista". */
     val contributions: List<ShoppingContribution>,
     val mode: ShoppingMode,
+    /** Product pictures for the list rows (SPEC § 4.9). */
+    val images: Map<ProductKey, String?> = emptyMap(),
 )
 
 /**
@@ -89,7 +91,8 @@ class ShoppingRepository
             val links =
                 contributions.flatMap { c -> c.recipe.ingredients.flatMap { it.links } } +
                     manual.mapNotNull { it.product }.map { IngredientLink(it) }
-            val products = linker.productsFor(links).mapValues { it.value.product }
+            val display = linker.productsFor(links)
+            val products = display.mapValues { it.value.product }
             val remembered = linker.rememberedProducts(contributions.flatMap { c -> c.recipe.ingredients.map { it.nameKey } })
             val mode = if (s.shoppingCheapest) ShoppingMode.CHEAPEST else ShoppingMode.PRIMARY
             val options =
@@ -103,7 +106,7 @@ class ShoppingRepository
                     checked = inputs.checks,
                 )
             val list = ShoppingListBuilder.build(contributions, manual, lots, products, options) { remembered[it].orEmpty() }
-            return ShoppingState(list, contributions, mode)
+            return ShoppingState(list, contributions, mode, display.mapValues { it.value.imageUrl })
         }
 
         /** "Añadir a la lista" from a recipe; adding it again adds its needs again. */
