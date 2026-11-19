@@ -49,6 +49,7 @@ object RecipeDocumentParser {
             "tags",
             "image",
             "source",
+            "author",
             "ingredients",
         )
     private val INGREDIENT_KEYS =
@@ -299,6 +300,7 @@ object RecipeDocumentParser {
                     tags = tags,
                     image = image,
                     source = string(fields, "source", "")?.ifEmpty { null },
+                    author = string(fields, "author", "")?.ifEmpty { null },
                     body = body,
                 )
 

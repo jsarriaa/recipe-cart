@@ -239,6 +239,7 @@ class RecipeDocumentWriterTest {
             tags = (1..random.nextInt(0, 4)).map { "tag$it " + text(random, 20, allowNewlines = false).lowercase() }.distinct(),
             image = if (random.nextBoolean()) "images/foto-${random.nextInt(100)}.jpg" else null,
             source = if (random.nextBoolean()) text(random, 300) else null,
+            author = if (random.nextBoolean()) text(random, 60) else null,
             body = "## Preparación\n\n1. " + text(random, 200) + "\n2. Servir **caliente** y *rápido*.",
         )
     }

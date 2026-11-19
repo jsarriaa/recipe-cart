@@ -21,6 +21,8 @@ data class RecipeDraft(
     /** Pack-relative image path, `images/<file>`. */
     val image: String? = null,
     val source: String? = null,
+    /** Who wrote it: the name shown in the community recipe book ("por Joan"). */
+    val author: String? = null,
     val body: String = "",
 )
 
@@ -56,6 +58,7 @@ object RecipeRules {
     const val TAGS_MAX = 15
     const val TAG_MAX = 30
     const val SOURCE_MAX = 300
+    const val AUTHOR_MAX = 60
     val INGREDIENTS = 1..60
     const val NAME_MAX = 80
     const val NOTE_MAX = 120

@@ -36,6 +36,22 @@
     <string name="recipes_empty_body">Crea una con el botón + o importa un pack de recetas desde el menú.</string>
     <string name="recipes_new">Nueva receta</string>
     <string name="recipes_import">Importar recetas</string>
+    <string name="community_title">Recetas de la comunidad</string>
+    <string name="community_search_hint">Buscar receta, ingrediente o autor</string>
+    <string name="community_max_minutes">≤ %1$d min</string>
+    <string name="community_minutes">%1$d min</string>
+    <string name="community_by">por %1$s</string>
+    <string name="community_download">Descargar</string>
+    <string name="community_download_failed">No se ha podido descargar la receta. Inténtalo más tarde.</string>
+    <string name="community_load_failed">No se ha podido abrir el recetario. ¿Tienes conexión?</string>
+    <string name="community_retry">Reintentar</string>
+    <string name="community_empty">El recetario aún está vacío.</string>
+    <string name="community_none">Ninguna receta coincide con la búsqueda.</string>
+    <plurals name="community_count">
+        <item quantity="one">%1$d receta</item>
+        <item quantity="many">%1$d recetas</item>
+        <item quantity="other">%1$d recetas</item>
+    </plurals>
     <string name="recipes_export_all">Exportar todas</string>
     <string name="recipes_search_hint">Buscar por nombre, ingrediente o etiqueta</string>
     <string name="recipes_sort_name">Nombre</string>

@@ -534,6 +534,30 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
 
 ---
 
+### 4.10 Community recipe book ("Recetas de la comunidad", 1.3.0)
+
+Full design: [COMMUNITY.md](COMMUNITY.md).
+
+- A public GitHub repository, [`jsarriaa/recetario`](https://github.com/jsarriaa/recetario),
+  holds one `cpl-recipe/1` file per recipe under `recipes/`. A GitHub Action rebuilds
+  `index.json` (title, author, servings, total time, tags, ingredient names) on every change, so
+  the owner can edit or delete any recipe on GitHub and the index follows.
+- **Recetas → ⋮ → Recetas de la comunidad** downloads `index.json` when the screen opens (no
+  cache, no background work) and filters it on the phone: text over title, author, description,
+  tags and ingredients (every word must match, ignoring case and accents), time chips (≤ 15,
+  ≤ 30, ≤ 60 min) and tag chips (all chosen tags must be present).
+- Each card shows the title, "por <author>", servings, time, tags and description.
+  **Descargar** downloads the file and opens the normal import (§ 4.3): preview, duplicates and
+  product matching.
+- Only paths `recipes/….md` from the index are downloaded, at most 200 000 characters.
+- Publishing from the app is phase B (§ 9): a first-time name prompt, then a small Cloudflare
+  Worker that commits the recipe to the book; the owner removes anything unwanted on GitHub.
+
+#### AC
+
+- AC10.1 Search and filters are pure domain code (`CommunitySearch`), tested.
+- AC10.2 A failed index download shows "Reintentar"; a failed recipe download shows a snackbar.
+
 ## 5. Domain rules
 
 ### 5.1 Units
@@ -736,7 +760,8 @@ the phone.
 supermarket switch and added the "cocina mediterránea" theme; 1.1.0 removed every pantry date
 (only "Abierto" is left), and added "Buscar actualizaciones" and the GitHub card in Ajustes. The
 repository is public from 1.1.0 and releases carry the signed APK. 1.2.0 checks for updates when
-the app opens and offers them in a pop-up.
+the app opens and offers them in a pop-up. 1.3.0 adds the community recipe book (§ 4.10);
+publishing from the app comes next.
 
 Phases 4–6 depend on 3 for real prices, but their domain logic is already exercised from
 phase 1 with in-memory products.

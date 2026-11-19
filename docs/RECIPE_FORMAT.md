@@ -124,6 +124,7 @@ pack (`P03`).
 | `tags` | list of strings | no | ≤ 15 tags, each 1–30 chars. Lowercased, trimmed and de-duplicated on import |
 | `image` | string | no | `images/<file>` with `<file>` matching `[A-Za-z0-9._-]+\.(jpg\|jpeg\|png\|webp)`. No URLs, no absolute paths, no `..`. An invalid value is ignored (`W04`) |
 | `source` | string | no | ≤ 300 chars. Free text or a URL. Informational, never fetched |
+| `author` | string | no | ≤ 60 chars. Who wrote the recipe, shown as "por …" in the [community recipe book](COMMUNITY.md). Added in app 1.3.0 without a format version change; older apps warn `W01` and ignore it. The app does not store it yet, so its own exports leave it out |
 | `ingredients` | list of Ingredient | **yes** | 1–60 items. Order is preserved |
 
 ### 4.2 Ingredient

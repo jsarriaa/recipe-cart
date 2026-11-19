@@ -38,6 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lechugones.cocina.R
 import com.lechugones.cocina.feature.catalogue.CatalogueScreen
+import com.lechugones.cocina.feature.community.CommunityScreen
 import com.lechugones.cocina.feature.cookable.CookableScreen
 import com.lechugones.cocina.feature.importer.ImportScreen
 import com.lechugones.cocina.feature.pantry.PantryScreen
@@ -49,6 +50,7 @@ import com.lechugones.cocina.feature.settings.update.AppLinks
 import com.lechugones.cocina.feature.shopping.ShoppingScreen
 import com.lechugones.cocina.ui.components.LocalSupermarketNames
 import com.lechugones.cocina.ui.navigation.CatalogueRoute
+import com.lechugones.cocina.ui.navigation.CommunityRoute
 import com.lechugones.cocina.ui.navigation.CookableRoute
 import com.lechugones.cocina.ui.navigation.ImportRoute
 import com.lechugones.cocina.ui.navigation.PantryRoute
@@ -119,8 +121,12 @@ fun CocinaApp(
                         onNewRecipe = { navController.navigate(RecipeEditorRoute()) },
                         onImport = { navController.navigate(ImportRoute) },
                         onCookable = { navController.navigate(CookableRoute) },
+                        onCommunity = { navController.navigate(CommunityRoute) },
                         onOpenSettings = openSettings,
                     )
+                }
+                composable<CommunityRoute> {
+                    CommunityScreen(onBack = { navController.popBackStack() })
                 }
                 composable<CookableRoute> {
                     CookableScreen(
