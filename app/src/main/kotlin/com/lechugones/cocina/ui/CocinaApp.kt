@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import com.lechugones.cocina.feature.recipes.detail.RecipeDetailScreen
 import com.lechugones.cocina.feature.recipes.editor.RecipeEditorScreen
 import com.lechugones.cocina.feature.settings.SettingsScreen
 import com.lechugones.cocina.feature.shopping.ShoppingScreen
+import com.lechugones.cocina.ui.components.LocalSupermarketNames
 import com.lechugones.cocina.ui.navigation.CatalogueRoute
 import com.lechugones.cocina.ui.navigation.CookableRoute
 import com.lechugones.cocina.ui.navigation.ImportRoute
@@ -67,92 +69,94 @@ fun CocinaApp(
         pendingImport.filterNotNull().collect { navController.navigate(ImportRoute) }
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0),
-        bottomBar = {
-            if (topLevel != null) {
-                NavigationBar {
-                    TopLevelDestination.entries.forEach { destination ->
-                        val selected = destination == topLevel
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = { navController.navigateToTopLevel(destination) },
-                            icon = {
-                                BadgedBox(
-                                    badge = {
-                                        if (destination == TopLevelDestination.PANTRY && useSoon > 0) Badge { Text(useSoon.toString()) }
-                                    },
-                                ) {
-                                    Icon(
-                                        if (selected) destination.selectedIcon else destination.unselectedIcon,
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                            label = { Text(stringResource(destination.label)) },
-                        )
+    CompositionLocalProvider(LocalSupermarketNames provides shell.supermarketNames) {
+        Scaffold(
+            contentWindowInsets = WindowInsets(0),
+            bottomBar = {
+                if (topLevel != null) {
+                    NavigationBar {
+                        TopLevelDestination.entries.forEach { destination ->
+                            val selected = destination == topLevel
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = { navController.navigateToTopLevel(destination) },
+                                icon = {
+                                    BadgedBox(
+                                        badge = {
+                                            if (destination == TopLevelDestination.PANTRY && useSoon > 0) Badge { Text(useSoon.toString()) }
+                                        },
+                                    ) {
+                                        Icon(
+                                            if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                                label = { Text(stringResource(destination.label)) },
+                            )
+                        }
                     }
                 }
+            },
+        ) { padding ->
+            val openSettings = { navController.navigate(SettingsRoute) { launchSingleTop = true } }
+            NavHost(
+                navController = navController,
+                startDestination = RecipesRoute,
+                modifier = Modifier.padding(padding),
+            ) {
+                composable<RecipesRoute> {
+                    RecipesScreen(
+                        onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
+                        onNewRecipe = { navController.navigate(RecipeEditorRoute()) },
+                        onImport = { navController.navigate(ImportRoute) },
+                        onCookable = { navController.navigate(CookableRoute) },
+                        onOpenSettings = openSettings,
+                    )
+                }
+                composable<CookableRoute> {
+                    CookableScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
+                    )
+                }
+                composable<RecipeDetailRoute> {
+                    RecipeDetailScreen(
+                        onBack = { navController.popBackStack() },
+                        onEdit = { navController.navigate(RecipeEditorRoute(it)) },
+                        onOpenRecipe = { id ->
+                            navController.navigate(RecipeDetailRoute(id)) {
+                                popUpTo<RecipeDetailRoute> { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable<RecipeEditorRoute> {
+                    RecipeEditorScreen(
+                        onClose = { navController.popBackStack() },
+                        onSavedNew = { id ->
+                            navController.navigate(RecipeDetailRoute(id)) {
+                                popUpTo<RecipeEditorRoute> { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable<ImportRoute> {
+                    ImportScreen(
+                        onBack = { navController.popBackStack() },
+                        // Pop back to the list. navigateToTopLevel would restore the saved stack, which
+                        // contains this import screen, and appear to do nothing.
+                        onDone = {
+                            if (!navController.popBackStack<RecipesRoute>(inclusive = false)) navController.navigate(RecipesRoute)
+                        },
+                        onOpenSettings = openSettings,
+                    )
+                }
+                composable<PantryRoute> { PantryScreen(onOpenSettings = openSettings) }
+                composable<ShoppingRoute> { ShoppingScreen(onOpenSettings = openSettings) }
+                composable<CatalogueRoute> { CatalogueScreen(onOpenSettings = openSettings) }
+                composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
             }
-        },
-    ) { padding ->
-        val openSettings = { navController.navigate(SettingsRoute) { launchSingleTop = true } }
-        NavHost(
-            navController = navController,
-            startDestination = RecipesRoute,
-            modifier = Modifier.padding(padding),
-        ) {
-            composable<RecipesRoute> {
-                RecipesScreen(
-                    onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
-                    onNewRecipe = { navController.navigate(RecipeEditorRoute()) },
-                    onImport = { navController.navigate(ImportRoute) },
-                    onCookable = { navController.navigate(CookableRoute) },
-                    onOpenSettings = openSettings,
-                )
-            }
-            composable<CookableRoute> {
-                CookableScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
-                )
-            }
-            composable<RecipeDetailRoute> {
-                RecipeDetailScreen(
-                    onBack = { navController.popBackStack() },
-                    onEdit = { navController.navigate(RecipeEditorRoute(it)) },
-                    onOpenRecipe = { id ->
-                        navController.navigate(RecipeDetailRoute(id)) {
-                            popUpTo<RecipeDetailRoute> { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable<RecipeEditorRoute> {
-                RecipeEditorScreen(
-                    onClose = { navController.popBackStack() },
-                    onSavedNew = { id ->
-                        navController.navigate(RecipeDetailRoute(id)) {
-                            popUpTo<RecipeEditorRoute> { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable<ImportRoute> {
-                ImportScreen(
-                    onBack = { navController.popBackStack() },
-                    // Pop back to the list. navigateToTopLevel would restore the saved stack, which
-                    // contains this import screen, and appear to do nothing.
-                    onDone = {
-                        if (!navController.popBackStack<RecipesRoute>(inclusive = false)) navController.navigate(RecipesRoute)
-                    },
-                    onOpenSettings = openSettings,
-                )
-            }
-            composable<PantryRoute> { PantryScreen(onOpenSettings = openSettings) }
-            composable<ShoppingRoute> { ShoppingScreen(onOpenSettings = openSettings) }
-            composable<CatalogueRoute> { CatalogueScreen(onOpenSettings = openSettings) }
-            composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
         }
     }
 }

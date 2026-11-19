@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.lechugones.cocina.R
 import com.lechugones.cocina.domain.format.SpanishNumberFormat
+import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.units.MeasureUnit
 import com.lechugones.cocina.provider.ProviderProduct
 import com.lechugones.cocina.ui.format.quantityText
@@ -86,7 +88,19 @@ fun productReferenceText(item: ProviderProduct): String? {
 fun productPriceText(item: ProviderProduct): String =
     item.product.price?.let(SpanishNumberFormat::money) ?: stringResource(R.string.catalogue_no_price)
 
-/** One product in a list: picture, name, size, price and price per unit. */
+/** Supermarket names by provider id, provided by the app shell; empty in previews. */
+val LocalSupermarketNames = staticCompositionLocalOf<Map<String, String>> { emptyMap() }
+
+/** "Día", "Mercadona", or "A mano"; null when only one supermarket is installed (no need to say). */
+@Composable
+fun supermarketLabel(item: ProviderProduct): String? {
+    val names = LocalSupermarketNames.current
+    if (names.size < 2) return null
+    val id = item.product.key.providerId
+    return if (id == ManualProducts.PROVIDER_ID) stringResource(R.string.cost_provider_manual) else names[id]
+}
+
+/** One product in a list: picture, name, supermarket, size, price and price per unit. */
 @Composable
 fun ProductListItem(
     item: ProviderProduct,
@@ -102,7 +116,11 @@ fun ProductListItem(
         ProductImage(item.imageUrl, 56.dp)
         Column(Modifier.weight(1f)) {
             Text(item.product.name, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(productSizeText(item), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                listOfNotNull(supermarketLabel(item), productSizeText(item)).joinToString(" · "),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             supporting?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary) }
         }
         Column(horizontalAlignment = Alignment.End) {

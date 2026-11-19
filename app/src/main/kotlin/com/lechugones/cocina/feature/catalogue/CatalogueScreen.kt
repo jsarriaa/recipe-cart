@@ -74,6 +74,7 @@ import com.lechugones.cocina.ui.components.ProductListItem
 import com.lechugones.cocina.ui.components.ScreenScaffold
 import com.lechugones.cocina.ui.components.productReferenceText
 import com.lechugones.cocina.ui.components.productSizeText
+import com.lechugones.cocina.ui.components.supermarketLabel
 import com.lechugones.cocina.ui.format.Dates
 import com.lechugones.cocina.ui.format.providerErrorMessage
 import com.lechugones.cocina.ui.format.quantityText
@@ -357,6 +358,9 @@ private fun ProductSheet(
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(p.name, style = MaterialTheme.typography.titleMedium)
                     p.brand?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    supermarketLabel(product)?.let {
+                        Text(it, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.secondary)
+                    }
                     if (p.brandKind == BrandKind.STORE) {
                         Text(
                             stringResource(R.string.catalogue_store_brand),

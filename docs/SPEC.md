@@ -151,8 +151,8 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
 - A **provider** module turns a supermarket's internal website JSON into the normalised
   `ProviderProduct` model ([providers/README.md](providers/README.md)). Initial providers:
   - **Mercadona**: verified, see [providers/mercadona.md](providers/mercadona.md).
-  - **Día**: endpoints reported by third parties, **blocked from our network during research**.
-    Implemented only if the feasibility check in [providers/dia.md](providers/dia.md) passes.
+  - **Día**: verified from the phone in phase 7 ([providers/dia.md](providers/dia.md)). Its
+    catalogue sync is search-based (a fixed list of food searches), and prices ignore Club Dia.
   - **Manual**: built in, always available. The user types a product (name, brand, store-brand
     flag, package size, price, shop name). This covers shops without an API and providers that
     are down or refuse us. Manual products are stored in the catalogue table with provider id
@@ -741,7 +741,7 @@ the phone.
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, "Actualizar precios" for a recipe, sort by cost per serving (price snapshots are stored since 3a; showing them stays optional). No schema change | AC4.* |
 | **5 — Pantry and cooking** (schema v5) | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic) with the tab badge, "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up, "Te falta comprar", sort by "Cocinadas hace poco" | AC5.* |
 | **6 — Shopping list** (schema v6) | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text, "Añadir a la lista" and "Añadir lo que falta" | AC6.* |
-| **7 — Día and release** | Día feasibility check and provider (or a documented manual-price fallback); release signing; R8; friends' APK; polish and performance pass | Signed APK installed on a second phone |
+| **7 — Día and release** | Día feasibility check (passed from the phone) and `:provider:dia`; supermarket switches and "principal" in Ajustes; supermarket chips in Catálogo and a supermarket label on product rows; release signing; R8 with a `minified` build type for testing; version 1.0.0; install guide in README | Signed APK installed on a second phone (by the owner) |
 
 Phases 4–6 depend on 3 for real prices, but their domain logic is already exercised from
 phase 1 with in-memory products.

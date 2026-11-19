@@ -7,9 +7,9 @@ it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
 Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
-> **Status: 1.0.0 (phase 7).** Every feature below is in the app. Mercadona prices are live;
-> Día depends on the feasibility check in [docs/providers/dia.md](docs/providers/dia.md), and
-> its products can always be added by hand as manual products. See the
+> **Status: 1.0.0 (phase 7).** Every feature below is in the app. Mercadona and Día prices are
+> live (Día was verified from the phone; see [docs/providers/dia.md](docs/providers/dia.md)), and
+> any other shop's products can be added by hand as manual products. See the
 > [development phases](docs/SPEC.md#9-development-phases).
 
 ## Features
@@ -82,6 +82,7 @@ Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 | `:core:data` | Room database (schemas in `core/data/schemas/`), repositories, DataStore settings |
 | `:provider:api` | Supermarket provider contract, shared rate limiter and request handling |
 | `:provider:mercadona` | Mercadona provider (JSON endpoints, mapper, fixtures) |
+| `:provider:dia` | Día provider (search-based sync, session cookie in memory, mapper, fixtures) |
 | `build-logic/` | Gradle convention plugins |
 
 ## Installing the app (owner and friends)
