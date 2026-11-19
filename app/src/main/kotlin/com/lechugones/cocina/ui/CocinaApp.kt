@@ -2,6 +2,8 @@ package com.lechugones.cocina.ui
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -49,7 +53,9 @@ import kotlinx.coroutines.flow.filterNotNull
 fun CocinaApp(
     pendingImport: StateFlow<ImportSource?>,
     navController: NavHostController = rememberNavController(),
+    shell: ShellViewModel = hiltViewModel(),
 ) {
+    val useSoon by shell.useSoonCount.collectAsStateWithLifecycle()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val topLevel = TopLevelDestination.entries.firstOrNull { currentDestination.isOn(it) }
@@ -70,10 +76,16 @@ fun CocinaApp(
                             selected = selected,
                             onClick = { navController.navigateToTopLevel(destination) },
                             icon = {
-                                Icon(
-                                    if (selected) destination.selectedIcon else destination.unselectedIcon,
-                                    contentDescription = null,
-                                )
+                                BadgedBox(
+                                    badge = {
+                                        if (destination == TopLevelDestination.PANTRY && useSoon > 0) Badge { Text(useSoon.toString()) }
+                                    },
+                                ) {
+                                    Icon(
+                                        if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                        contentDescription = null,
+                                    )
+                                }
                             },
                             label = { Text(stringResource(destination.label)) },
                         )
