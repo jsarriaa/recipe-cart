@@ -1,15 +1,22 @@
 package com.lechugones.cocina.feature.settings
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.data.backup.AppInfo
 import com.lechugones.cocina.data.backup.BackupInspection
 import com.lechugones.cocina.data.backup.BackupManager
 import com.lechugones.cocina.data.backup.StagedBackup
 import com.lechugones.cocina.data.settings.SettingsRepository
 import com.lechugones.cocina.domain.settings.AppSettings
+import com.lechugones.cocina.feature.settings.update.AppUpdates
+import com.lechugones.cocina.feature.settings.update.UpdateCheck
 import com.lechugones.cocina.provider.SupermarketProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.time.Instant
@@ -35,14 +43,36 @@ data class SettingsUiState(
     val lastAutomaticBackup: Instant? = null,
     val postalCode: String? = null,
     val storeBrandOnly: Boolean = false,
-    val useSoonDays: Int = AppSettings.DEFAULT_USE_SOON_DAYS,
     val addMissingStaples: Boolean = true,
     /** Installed supermarkets: id to display name. */
     val providers: List<Pair<String, String>> = emptyList(),
     val activeProviders: Set<String> = emptySet(),
     val primaryProvider: String = AppSettings.DEFAULT_PROVIDER,
+    val update: UpdateUi = UpdateUi.Idle,
     val editingPostalCode: Boolean = false,
 )
+
+/** "Buscar actualizaciones" (owner request after 1.0.0). */
+sealed interface UpdateUi {
+    data object Idle : UpdateUi
+
+    data object Checking : UpdateUi
+
+    data object UpToDate : UpdateUi
+
+    data class Available(
+        val version: String,
+        val sizeBytes: Long,
+    ) : UpdateUi
+
+    data class NoApk(
+        val version: String,
+    ) : UpdateUi
+
+    data object Downloading : UpdateUi
+
+    data object Failed : UpdateUi
+}
 
 sealed interface SettingsEvent {
     data class BackupCreated(
@@ -68,6 +98,7 @@ class SettingsViewModel
         @ApplicationContext private val context: Context,
         private val backups: BackupManager,
         private val settings: SettingsRepository,
+        private val updates: AppUpdates,
         installed: Set<@JvmSuppressWildcards SupermarketProvider>,
         appInfo: AppInfo,
     ) : ViewModel() {
@@ -90,7 +121,6 @@ class SettingsViewModel
                         it.copy(
                             postalCode = s.postalCode,
                             storeBrandOnly = s.storeBrandOnly,
-                            useSoonDays = s.useSoonWarningDays,
                             addMissingStaples = s.addMissingStaplesToList,
                             activeProviders = s.activeProviders,
                             primaryProvider = s.primaryProvider,
@@ -127,13 +157,67 @@ class SettingsViewModel
             viewModelScope.launch { settings.update { it.copy(primaryProvider = id) } }
         }
 
-        fun setAddMissingStaples(enabled: Boolean) {
-            viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }
+        private var available: UpdateCheck.Available? = null
+
+        /** Debug builds are a different app: they may check, but never install the release APK. */
+        val canInstallUpdates: Boolean = !BuildConfig.APPLICATION_ID.endsWith(".debug")
+
+        fun checkUpdates() {
+            if (state.value.update == UpdateUi.Checking || state.value.update == UpdateUi.Downloading) return
+            state.update { it.copy(update = UpdateUi.Checking) }
+            viewModelScope.launch {
+                val result = updates.check(BuildConfig.VERSION_NAME)
+                available = result as? UpdateCheck.Available
+                state.update {
+                    it.copy(
+                        update =
+                            when (result) {
+                                UpdateCheck.UpToDate -> UpdateUi.UpToDate
+                                is UpdateCheck.Available -> UpdateUi.Available(result.version, result.apk.size)
+                                is UpdateCheck.NoApk -> UpdateUi.NoApk(result.version)
+                                UpdateCheck.Failed -> UpdateUi.Failed
+                            },
+                    )
+                }
+            }
         }
 
-        fun setUseSoonDays(days: Int) {
-            val value = days.coerceIn(AppSettings.USE_SOON_RANGE)
-            viewModelScope.launch { settings.update { it.copy(useSoonWarningDays = value) } }
+        /** Downloads the new APK and hands it to Android's installer, which asks the user to confirm. */
+        fun downloadAndInstall() {
+            val update = available ?: return
+            if (!canInstallUpdates) return
+            state.update { it.copy(update = UpdateUi.Downloading) }
+            viewModelScope.launch {
+                val file = updates.download(update.apk, File(context.cacheDir, UPDATES_DIR))
+                if (file == null) {
+                    state.update { it.copy(update = UpdateUi.Failed) }
+                    return@launch
+                }
+                state.update { it.copy(update = UpdateUi.Available(update.version, update.apk.size)) }
+                install(file)
+            }
+        }
+
+        private fun install(file: File) {
+            val packages = context.packageManager
+            if (!packages.canRequestPackageInstalls()) {
+                // Android asks once per app: "Permitir desde esta fuente". Then the user taps again.
+                context.startActivity(
+                    Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, ("package:" + context.packageName).toUri())
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                )
+                return
+            }
+            val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, "application/vnd.android.package-archive")
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }
+
+        fun setAddMissingStaples(enabled: Boolean) {
+            viewModelScope.launch { settings.update { it.copy(addMissingStaplesToList = enabled) } }
         }
 
         fun setStoreBrandOnly(enabled: Boolean) {
@@ -217,5 +301,9 @@ class SettingsViewModel
                     refreshAutomatic()
                 }
             }
+        }
+
+        private companion object {
+            const val UPDATES_DIR = "updates"
         }
     }

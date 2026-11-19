@@ -64,15 +64,9 @@ fun CookableScreen(
                     modifier = Modifier.padding(16.dp),
                 )
             }
-            FilterChip(
-                selected = state.onlyUseSoon,
-                onClick = viewModel::toggleOnlyUseSoon,
-                label = { Text(stringResource(R.string.cookable_only_use_soon)) },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
             if (state.coverage.isEmpty()) {
                 Text(
-                    stringResource(if (state.onlyUseSoon) R.string.cookable_none_use_soon else R.string.cookable_none),
+                    stringResource(R.string.cookable_none),
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -130,12 +124,6 @@ private fun CoverageRow(
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            if (item.usesSoon.isNotEmpty()) {
-                AssistChip(
-                    onClick = onClick,
-                    label = { Text(stringResource(R.string.cookable_uses_soon, item.usesSoon.joinToString(", "))) },
                 )
             }
             if (item.missing.isNotEmpty()) {

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -28,15 +29,11 @@ import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import javax.inject.Inject
 
 data class CookableUiState(
     val loading: Boolean = true,
     val coverage: List<RecipeCoverage> = emptyList(),
-    /** "Aprovechar lo que caduca": only recipes that use "usar pronto" food. */
-    val onlyUseSoon: Boolean = false,
     val pantryEmpty: Boolean = false,
 )
 
@@ -58,8 +55,6 @@ class CookableViewModel
 
         /** One event per "Añadir lo que falta a la lista", for the snackbar. */
         val added: Flow<Unit> = addedChannel.receiveAsFlow()
-        private val zone = ZoneId.systemDefault()
-        private val onlyUseSoon = MutableStateFlow(false)
 
         private val coverage =
             combine(library.observeSummaries(), pantry.observeLots(), settings.settings) { _, lots, s -> lots to s }
@@ -78,25 +73,14 @@ class CookableViewModel
                     val costs = all.associate { it.id to RecipeCostCalculator.compute(it, it.servings, products, selection, options) }
                     val remembered = linker.rememberedProducts(all.flatMap { r -> r.ingredients.map { it.nameKey } })
                     lots.isEmpty() to
-                        CookCoverage.evaluate(
-                            all,
-                            lots,
-                            LocalDate.now(clock.withZone(zone)),
-                            zone,
-                            s.useSoonWarningDays,
-                            costs,
-                        ) { remembered[it].orEmpty() }
+                        CookCoverage.evaluate(all, lots, costs) { remembered[it].orEmpty() }
                 }
 
         val uiState: StateFlow<CookableUiState> =
-            combine(coverage, onlyUseSoon) { (empty, list), only ->
-                CookableUiState(
-                    loading = false,
-                    coverage = if (only) list.filter { it.usesSoon.isNotEmpty() } else list,
-                    onlyUseSoon = only,
-                    pantryEmpty = empty,
-                )
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), CookableUiState())
+            coverage
+                .map { (empty, list) ->
+                    CookableUiState(loading = false, coverage = list, pantryEmpty = empty)
+                }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), CookableUiState())
 
         /**
          * "Añadir lo que falta a la lista": the recipe at its servings. The list subtracts the
@@ -107,10 +91,6 @@ class CookableViewModel
                 shopping.addRecipe(coverage.recipe.id, coverage.recipe.servings)
                 addedChannel.send(Unit)
             }
-        }
-
-        fun toggleOnlyUseSoon() {
-            onlyUseSoon.value = !onlyUseSoon.value
         }
 
         private companion object {

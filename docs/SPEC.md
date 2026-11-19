@@ -57,7 +57,6 @@ files are the only ways to move data between phones.
 | Memoria de vínculos | `LinkMemory` | Remembered links per normalised ingredient name |
 | Básico de despensa | `pantry staple` | Ingredient flagged `pantry: true` (salt, oil, spices) |
 | Despensa | `Pantry` / `PantryLot` | What is at home. One lot is one package or one opened remainder |
-| Usar pronto | `useSoon` | A pantry lot to use up first: tagged by hand, close to its best-before date, or opened for too long (§ 4.5) |
 | Lista de la compra | `ShoppingList` | Items to buy, grouped by provider |
 | Pack de recetas | `RecipePack` | `.md` or `.zip` in the [recipe format](RECIPE_FORMAT.md) |
 | Copia de seguridad | `Backup` | Single file with all app data |
@@ -365,32 +364,19 @@ Rules:
 #### Behaviour
 
 - A **pantry lot** is one package or one opened remainder: product (or generic name only),
-  remaining quantity, package size, `opened` flag, `openedAt`, `addedAt`, optional best-before
-  date, optional location ("nevera", "congelador", "armario").
+  remaining quantity, package size, `opened` flag, `addedAt`, optional location ("nevera",
+  "congelador", "armario"). There are **no dates to enter** (owner decision after 1.0.0): no
+  best-before, no shelf life, no "usar pronto" warnings.
 - Staples can be tracked **presence-only** ("tengo sal" / "se ha acabado") with no quantity.
 - Adding: from the catalogue (a full sealed package, measured like the cost engine measures it:
   pieces first, so "Maxi tortillas" is 6 ud), manually with a generic name, and from the shopping
   list ("Terminar compra", § 4.6). Lots are edited in a sheet: quantity left (g, ml or ud),
-  opened, best-before date, location, shelf life once opened, and the "Usar pronto" tag.
+  "Abierto", and location. Each row also has an **Abierto** chip to toggle it in one tap.
 - Each lot shows its product's photo (§ 4.9) when it is linked to a product.
-- **"Usar pronto"** marks food to use up first. A lot is *usar pronto* when any of these holds:
-  - the user tagged it by hand (the ⚡ button on each lot, or the switch in its editor);
-  - its best-before date is within the warning window (setting "Avisar de lo que caduca" in
-    Ajustes, 0–30 days, default 3), or has passed (shown as **Caducado**, still listed so the
-    user decides);
-  - it is opened and has an "after opening, keeps for N days" value whose limit falls within
-    the warning window. N is optional per lot and remembered per product (or name key), so it
-    is asked only once ("Nata abierta: se conserva 4 días").
-
-  The tag can be cleared by hand; an automatic one comes back only if its trigger changes
-  (a new best-before date, or the lot is opened again). There are no notifications: the app does
-  no background work.
-- The list is grouped: **Usar pronto** (first, with a count badge on the Despensa tab),
-  Abiertos, Sin abrir, Básicos, with search and a location filter.
+- The list is grouped: Abiertos, Sin abrir, Básicos, with search and a location filter.
 - **"Lo he cocinado"** on a recipe (at the current servings):
   1. The domain plans deductions: for each ingredient, matching lots (§ 5.5) are consumed
-     **"usar pronto" lots first, then opened lots, then the earliest best-before, then FIFO by
-     `addedAt`**. A sealed lot that is partly used becomes opened.
+     **opened lots first, then FIFO by `addedAt`**. A sealed lot that is partly used becomes opened.
   2. A confirmation sheet lists every deduction, editable: amount, which lot, or skip. Missing
      amounts are shown ("No tenías suficiente: faltan 50 g").
   3. Confirm applies it in one transaction and records a `CookEvent`. A snackbar offers
@@ -399,9 +385,8 @@ Rules:
      "Se ha acabado" for each.
 - **"¿Qué puedo cocinar?"**: every recipe, at its default servings, gets a coverage status
   ignoring staples and optional ingredients: **Lo tienes todo**, **Te falta 1–2**, **Te faltan
-  más**. Recipes that use at least one "usar pronto" lot come first within each status, with a
-  chip naming them ("Aprovecha: nata, espinacas"), and a filter "Aprovechar lo que caduca" shows
-  only those. Then they are sorted by the share of the dish cost already in the pantry. Each card
+  más**. Within each status they are sorted by the share of the dish cost already in the
+  pantry. Each card
   lists the missing items and has "Añadir lo que falta a la lista" (it adds the recipe; the list
   subtracts the pantry, so only what is missing appears). The screen opens from the Recetas top
   bar.
@@ -410,13 +395,12 @@ Rules:
 
 #### AC
 
-- AC5.1 Deduction planning is pure domain code, tested for: opened-first order, best-before
-  order, partial lots, insufficient stock, unit conversion (cda of oil from a 1 l bottle),
+- AC5.1 Deduction planning is pure domain code, tested for: opened-first order, partial lots, insufficient stock, unit conversion (cda of oil from a 1 l bottle),
   count units, and undo restoring the exact previous state.
 - AC5.2 Nothing is deducted without the confirmation sheet.
-- AC5.3 The "usar pronto" rule is pure domain code, tested for: manual tag, best-before inside
-  and outside the window, expired lots, opened shelf life, clearing an automatic tag, and the
-  ordering it imposes on deductions and on "¿Qué puedo cocinar?".
+- AC5.3 The `best_before`, `use_soon_manual`, `use_soon_dismissed_at` columns and the
+  `shelf_life_memory` table from schema v5 stay in the
+  database (no migration) but the app no longer reads or writes them.
 
 ### 4.6 Shopping list ("Lista de la compra")
 
@@ -518,8 +502,9 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
 | Incluir opcionales en el coste | off |
 | Precio antiguo a partir de | 14 days |
 | Añadir básicos que me faltan a la lista | on |
-| Avisar de "usar pronto" con antelación de | 3 days |
 | Copia de seguridad | Create / Restore |
+| Actualizaciones | "Buscar actualizaciones": asks `api.github.com` for the latest release of `jsarriaa/recipe-cart`. If its version is newer and it has an `.apk` asset, "Descargar e instalar" downloads it to the cache and opens Android's installer (the user confirms there; the first time Android asks to allow installs from this app). Only on tap, never in the background. The debug build only checks and links to the release page, because the release APK is a different app |
+| GitHub | A card "Hecha con cariño por @jsarriaa" with buttons to the owner's GitHub profile and the app's repository (opened in the browser; the app fetches nothing) |
 | Acerca de | Version, open-source licences, legal note (not affiliated with any supermarket) |
 
 ### 4.9 Pictures
@@ -743,9 +728,14 @@ the phone.
 | **2 — Recipes, packs and backup** (in review, branch `phase/2-recipes`) | Recipe list, detail, editor, duplicate, delete, scaling, staples; **recipe photos** from gallery or camera; every recipe editable, with origin tracking (schema v2 + migration); recipe pack parser/validator/serializer; import via share sheet and picker, with validation, preview and edit-safe duplicate handling (no product matching yet); export `.md`/`.zip`; **backup/restore** (shipped as soon as real data exists) | AC2.*, AC3.1–3.4, AC3.6, AC7.* |
 | **3 — Providers and catalogue** (two PRs: **3a** provider layer, catalogue and search; **3b** linking, import matching and product photos) | 3a: `:provider:api`, rate limiter, Mercadona module, user-chosen postal code → warehouse, catalogue sync (schema v3), search, product detail, price refresh with fallback, store-brand filter, supermarket settings. 3b (schema v4): Manual provider; ingredient linking from the recipe detail; **product photos** next to ingredients (§ 4.9); import matching, link memory, "Aceptar todo" | AC1.*, AC3.5 |
 | **4 — Costs and comparison** | Package fraction lines, cost card, whole packages, leftovers, comparison across supermarkets, "Más barato", price staleness, "Actualizar precios" for a recipe, sort by cost per serving (price snapshots are stored since 3a; showing them stays optional). No schema change | AC4.* |
-| **5 — Pantry and cooking** (schema v5) | Pantry lots, opened packages, presence-only staples, **"Usar pronto"** (manual and automatic) with the tab badge, "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up, "Te falta comprar", sort by "Cocinadas hace poco" | AC5.* |
+| **5 — Pantry and cooking** (schema v5) | Pantry lots, opened packages, presence-only staples, "Usar pronto" (removed in 1.1.0), "Lo he cocinado" with editable confirmation and undo, "¿Qué puedo cocinar?" prioritising food to use up, "Te falta comprar", sort by "Cocinadas hace poco" | AC5.* |
 | **6 — Shopping list** (schema v6) | Build from recipes minus pantry, grouping, totals, overrides, check-off, "Terminar compra" → pantry, share as text, "Añadir a la lista" and "Añadir lo que falta" | AC6.* |
 | **7 — Día and release** | Día feasibility check (passed from the phone) and `:provider:dia`; supermarket switches and "principal" in Ajustes; supermarket chips in Catálogo and a supermarket label on product rows; release signing; R8 with a `minified` build type for testing; version 1.0.0; install guide in README | Signed APK installed on a second phone (by the owner) |
+
+**After 1.0.0** (owner feedback, no phase): 1.0.x removed "Sobras" and the cost sort, fixed the
+supermarket switch and added the "cocina mediterránea" theme; 1.1.0 removed every pantry date
+(only "Abierto" is left), and added "Buscar actualizaciones" and the GitHub card in Ajustes. The
+repository is public from 1.1.0 and releases carry the signed APK.
 
 Phases 4–6 depend on 3 for real prices, but their domain logic is already exercised from
 phase 1 with in-memory products.

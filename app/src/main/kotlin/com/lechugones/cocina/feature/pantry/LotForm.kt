@@ -7,7 +7,6 @@ import com.lechugones.cocina.domain.quantity.Amount
 import com.lechugones.cocina.domain.units.MeasureUnit
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDate
 
 /** A pantry lot as typed in the editor. Numbers are text with a decimal comma. */
 data class LotForm(
@@ -21,17 +20,12 @@ data class LotForm(
     val packageQuantity: Amount? = null,
     val opened: Boolean = false,
     val openedAt: Instant? = null,
-    val bestBefore: LocalDate? = null,
     val location: PantryLocation? = null,
     val presenceOnly: Boolean = false,
-    val useSoonManual: Boolean = false,
-    val useSoonDismissedAt: Instant? = null,
-    val shelfLifeDays: String = "",
 ) {
     val nameValid: Boolean get() = name.isNotBlank()
     val quantityValid: Boolean get() = presenceOnly || quantity.isBlank() || parsedQuantity() != null
-    val shelfLifeValid: Boolean get() = shelfLifeDays.isBlank() || shelfLifeDays.toIntOrNull()?.let { it in 1..MAX_SHELF_LIFE } == true
-    val valid: Boolean get() = nameValid && quantityValid && shelfLifeValid
+    val valid: Boolean get() = nameValid && quantityValid
 
     private fun parsedQuantity(): Amount? =
         quantity
@@ -55,18 +49,12 @@ data class LotForm(
             packageQuantity = packageQuantity.takeIf { amount != null },
             opened = opened && !presenceOnly,
             openedAt = if (opened && !presenceOnly) openedAt ?: now else null,
-            bestBefore = bestBefore,
             location = location,
             presenceOnly = presenceOnly,
-            useSoonManual = useSoonManual,
-            useSoonDismissedAt = useSoonDismissedAt,
-            openedShelfLifeDays = shelfLifeDays.toIntOrNull(),
         )
     }
 
     companion object {
-        const val MAX_SHELF_LIFE = 365
-
         /** Units offered for lots: what packages are measured in. */
         val UNITS = listOf(MeasureUnit.G, MeasureUnit.ML, MeasureUnit.UD)
 
@@ -84,12 +72,8 @@ data class LotForm(
             packageQuantity = lot.packageQuantity,
             opened = lot.opened,
             openedAt = lot.openedAt,
-            bestBefore = lot.bestBefore,
             location = lot.location,
             presenceOnly = lot.presenceOnly,
-            useSoonManual = lot.useSoonManual,
-            useSoonDismissedAt = lot.useSoonDismissedAt,
-            shelfLifeDays = lot.openedShelfLifeDays?.toString().orEmpty(),
         )
 
         /** `1,5`, `360`: decimal comma, no grouping, so it can be typed back. */

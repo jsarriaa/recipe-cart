@@ -47,7 +47,6 @@ class DataStoreSettingsRepository
             val INCLUDE_OPTIONALS = booleanPreferencesKey("include_optionals_in_cost")
             val STALE_AFTER_DAYS = intPreferencesKey("stale_after_days")
             val ADD_MISSING_STAPLES = booleanPreferencesKey("add_missing_staples_to_list")
-            val USE_SOON_DAYS = intPreferencesKey("use_soon_warning_days")
             val SHOPPING_CHEAPEST = booleanPreferencesKey("shopping_cheapest")
         }
 
@@ -63,7 +62,6 @@ class DataStoreSettingsRepository
                 includeOptionalsInCost = this[Keys.INCLUDE_OPTIONALS] ?: defaults.includeOptionalsInCost,
                 staleAfterDays = this[Keys.STALE_AFTER_DAYS] ?: defaults.staleAfterDays,
                 addMissingStaplesToList = this[Keys.ADD_MISSING_STAPLES] ?: defaults.addMissingStaplesToList,
-                useSoonWarningDays = this[Keys.USE_SOON_DAYS] ?: defaults.useSoonWarningDays,
                 shoppingCheapest = this[Keys.SHOPPING_CHEAPEST] ?: defaults.shoppingCheapest,
             ).sanitized()
         }
@@ -79,7 +77,6 @@ class DataStoreSettingsRepository
             this[Keys.INCLUDE_OPTIONALS] = settings.includeOptionalsInCost
             this[Keys.STALE_AFTER_DAYS] = settings.staleAfterDays
             this[Keys.ADD_MISSING_STAPLES] = settings.addMissingStaplesToList
-            this[Keys.USE_SOON_DAYS] = settings.useSoonWarningDays
             this[Keys.SHOPPING_CHEAPEST] = settings.shoppingCheapest
         }
     }

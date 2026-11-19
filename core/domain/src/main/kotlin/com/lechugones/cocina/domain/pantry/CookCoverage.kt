@@ -8,8 +8,6 @@ import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.units.Dimension
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.ZoneId
 
 /** "¿Qué puedo cocinar?" status (SPEC § 4.5). */
 enum class CoverageStatus {
@@ -30,8 +28,6 @@ data class RecipeCoverage(
     val missing: List<Ingredient>,
     /** For ingredients the pantry covers only in part: ingredient id → amount still missing, in its unit. */
     val partlyMissing: Map<String, BigDecimal> = emptyMap(),
-    /** Names of the "usar pronto" lots this recipe would use ("Aprovecha: nata, espinacas"). */
-    val usesSoon: List<String>,
     /** Share (0–1) of the dish cost already in the pantry; zero without prices. */
     val pantryShare: BigDecimal,
 )
@@ -41,30 +37,21 @@ object CookCoverage {
 
     /**
      * Coverage of every recipe at its default servings, ignoring staples and optional
-     * ingredients, sorted by status, then recipes that use "usar pronto" food, then by
-     * [pantryShare][RecipeCoverage.pantryShare]. [costs] are optional, by recipe id.
+     * ingredients, sorted by status, then by [pantryShare][RecipeCoverage.pantryShare]. [costs]
+     * are optional, by recipe id.
      */
     fun evaluate(
         recipes: List<Recipe>,
         lots: List<PantryLot>,
-        today: LocalDate,
-        zone: ZoneId,
-        windowDays: Int = UseSoon.DEFAULT_WINDOW_DAYS,
         costs: Map<String, RecipeCost> = emptyMap(),
         remembered: (String) -> Set<ProductKey> = { emptySet() },
-    ): List<RecipeCoverage> {
-        val soon = lots.filter { UseSoon.evaluate(it, today, zone, windowDays).useSoon }.associateBy { it.id }
-        return recipes
+    ): List<RecipeCoverage> =
+        recipes
             .map { recipe ->
-                val plan = CookPlanner.plan(recipe, recipe.servings, lots, today, zone, windowDays, remembered)
+                val plan = CookPlanner.plan(recipe, recipe.servings, lots, remembered)
                 val counted = plan.ingredients.filter { counts(it.ingredient) }
                 val missing =
                     counted.filter { it.missing != null && it.presenceLots.isEmpty() }.map { it.ingredient }
-                val usesSoon =
-                    plan.ingredients
-                        .flatMap { it.takes }
-                        .mapNotNull { soon[it.lotId]?.name }
-                        .distinct()
                 RecipeCoverage(
                     recipe = recipe,
                     status =
@@ -78,15 +65,12 @@ object CookCoverage {
                         counted
                             .filter { it.takes.isNotEmpty() && it.missing != null && it.presenceLots.isEmpty() }
                             .associate { it.ingredient.id to checkNotNull(it.missing) },
-                    usesSoon = usesSoon,
                     pantryShare = pantryShare(plan, costs[recipe.id]),
                 )
             }.sortedWith(
                 compareBy<RecipeCoverage> { it.status.ordinal }
-                    .thenBy { it.usesSoon.isEmpty() }
                     .thenByDescending { it.pantryShare },
             )
-    }
 
     /**
      * The part of [recipe] still to buy after [plan] ("Te falta comprar"): each counted

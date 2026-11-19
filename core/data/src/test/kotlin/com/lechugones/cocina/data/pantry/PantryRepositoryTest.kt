@@ -75,7 +75,7 @@ class PantryRepositoryTest {
     fun `cooking deducts in one go and undo restores the exact lots`() =
         runTest {
             val lot = repository.save(repository.newLotFor(tortillas).copy(name = "tortilla de trigo maxi"))
-            val plan = CookPlanner.plan(recipe, 2, repository.lots(), LocalDate.parse("2026-11-20"), ZoneOffset.UTC)
+            val plan = CookPlanner.plan(recipe, 2, repository.lots())
             val event = repository.cook(recipe, 2, plan.ingredients.flatMap { it.takes }, emptySet())
 
             val after = checkNotNull(repository.lot(lot.id))
@@ -97,7 +97,7 @@ class PantryRepositoryTest {
                 repository.save(
                     PantryLot("l1", "tortilla de trigo maxi", now, quantity = Amount.of(4), unit = MeasureUnit.UD),
                 )
-            val plan = CookPlanner.plan(recipe, 2, repository.lots(), LocalDate.parse("2026-11-20"), ZoneOffset.UTC)
+            val plan = CookPlanner.plan(recipe, 2, repository.lots())
             val event = repository.cook(recipe, 2, plan.ingredients.flatMap { it.takes }, emptySet())
             assertNull(repository.lot("l1"))
             repository.undo(event)

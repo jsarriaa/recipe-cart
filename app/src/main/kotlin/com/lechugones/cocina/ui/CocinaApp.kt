@@ -2,8 +2,6 @@ package com.lechugones.cocina.ui
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -59,7 +57,6 @@ fun CocinaApp(
     navController: NavHostController = rememberNavController(),
     shell: ShellViewModel = hiltViewModel(),
 ) {
-    val useSoon by shell.useSoonCount.collectAsStateWithLifecycle()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val topLevel = TopLevelDestination.entries.firstOrNull { currentDestination.isOn(it) }
@@ -81,16 +78,10 @@ fun CocinaApp(
                                 selected = selected,
                                 onClick = { navController.navigateToTopLevel(destination) },
                                 icon = {
-                                    BadgedBox(
-                                        badge = {
-                                            if (destination == TopLevelDestination.PANTRY && useSoon > 0) Badge { Text(useSoon.toString()) }
-                                        },
-                                    ) {
-                                        Icon(
-                                            if (selected) destination.selectedIcon else destination.unselectedIcon,
-                                            contentDescription = null,
-                                        )
-                                    }
+                                    Icon(
+                                        if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                        contentDescription = null,
+                                    )
                                 },
                                 label = { Text(stringResource(destination.label)) },
                             )
