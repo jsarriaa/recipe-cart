@@ -1,5 +1,12 @@
 package com.lechugones.cocina.feature.settings.update
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import com.lechugones.cocina.BuildConfig
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -11,6 +18,7 @@ import okhttp3.Request
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /** The app's public GitHub repository: releases carry the signed APK. */
 object AppLinks {
@@ -82,11 +90,44 @@ sealed interface UpdateCheck {
  * "Buscar actualizaciones": asks GitHub for the latest release of [AppLinks.REPO] and downloads its
  * APK. Only when the user taps the button (CLAUDE.md, hard rule 4 lists GitHub for this).
  */
+@Singleton
 class AppUpdates
     @Inject
     constructor(
         private val client: OkHttpClient,
+        @param:ApplicationContext private val context: Context,
     ) {
+        /** Debug builds are a different app: they may check, but never install the release APK. */
+        val canInstall: Boolean = !BuildConfig.APPLICATION_ID.endsWith(".debug")
+
+        /**
+         * Downloads [update]'s APK and hands it to Android's installer, which asks the user to
+         * confirm. False when the download fails.
+         */
+        suspend fun downloadAndInstall(update: UpdateCheck.Available): Boolean {
+            if (!canInstall) return false
+            val file = download(update.apk, File(context.cacheDir, UPDATES_DIR)) ?: return false
+            install(file)
+            return true
+        }
+
+        private fun install(file: File) {
+            if (!context.packageManager.canRequestPackageInstalls()) {
+                // Android asks once per app: "Permitir desde esta fuente". Then the user taps again.
+                context.startActivity(
+                    Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, ("package:" + context.packageName).toUri())
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                )
+                return
+            }
+            val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(uri, "application/vnd.android.package-archive")
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }
+
         private val json = Json { ignoreUnknownKeys = true }
 
         suspend fun check(currentVersion: String): UpdateCheck =
@@ -139,4 +180,8 @@ class AppUpdates
                     null
                 }
             }
+
+        private companion object {
+            const val UPDATES_DIR = "updates"
+        }
     }

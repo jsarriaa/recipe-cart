@@ -503,7 +503,7 @@ Total estimado: ≈ 8,56 € (1 artículo sin precio)
 | Precio antiguo a partir de | 14 days |
 | Añadir básicos que me faltan a la lista | on |
 | Copia de seguridad | Create / Restore |
-| Actualizaciones | "Buscar actualizaciones": asks `api.github.com` for the latest release of `jsarriaa/recipe-cart`. If its version is newer and it has an `.apk` asset, "Descargar e instalar" downloads it to the cache and opens Android's installer (the user confirms there; the first time Android asks to allow installs from this app). Only on tap, never in the background. The debug build only checks and links to the release page, because the release APK is a different app |
+| Actualizaciones | "Buscar actualizaciones": asks `api.github.com` for the latest release of `jsarriaa/recipe-cart`. If its version is newer and it has an `.apk` asset, "Descargar e instalar" downloads it to the cache and opens Android's installer (the user confirms there; the first time Android asks to allow installs from this app). From 1.2.0 the app also checks once each time it opens; if a newer release has an APK, a pop-up "¡Hay una versión nueva!" offers "Actualizar" or "Ahora no" (it asks again on the next open). A failed check shows nothing. The APK is downloaded only on "Actualizar". The debug build only checks and links to the release page, because the release APK is a different app |
 | GitHub | A card "Hecha con cariño por @jsarriaa" with buttons to the owner's GitHub profile and the app's repository (opened in the browser; the app fetches nothing) |
 | Acerca de | Version, open-source licences, legal note (not affiliated with any supermarket) |
 
@@ -735,7 +735,8 @@ the phone.
 **After 1.0.0** (owner feedback, no phase): 1.0.x removed "Sobras" and the cost sort, fixed the
 supermarket switch and added the "cocina mediterránea" theme; 1.1.0 removed every pantry date
 (only "Abierto" is left), and added "Buscar actualizaciones" and the GitHub card in Ajustes. The
-repository is public from 1.1.0 and releases carry the signed APK.
+repository is public from 1.1.0 and releases carry the signed APK. 1.2.0 checks for updates when
+the app opens and offers them in a pop-up.
 
 Phases 4–6 depend on 3 for real prices, but their domain logic is already exercised from
 phase 1 with in-memory products.

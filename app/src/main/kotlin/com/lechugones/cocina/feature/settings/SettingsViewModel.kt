@@ -1,11 +1,7 @@
 package com.lechugones.cocina.feature.settings
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import android.provider.Settings
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lechugones.cocina.BuildConfig
@@ -159,8 +155,7 @@ class SettingsViewModel
 
         private var available: UpdateCheck.Available? = null
 
-        /** Debug builds are a different app: they may check, but never install the release APK. */
-        val canInstallUpdates: Boolean = !BuildConfig.APPLICATION_ID.endsWith(".debug")
+        val canInstallUpdates: Boolean = updates.canInstall
 
         fun checkUpdates() {
             if (state.value.update == UpdateUi.Checking || state.value.update == UpdateUi.Downloading) return
@@ -185,35 +180,13 @@ class SettingsViewModel
         /** Downloads the new APK and hands it to Android's installer, which asks the user to confirm. */
         fun downloadAndInstall() {
             val update = available ?: return
-            if (!canInstallUpdates) return
             state.update { it.copy(update = UpdateUi.Downloading) }
             viewModelScope.launch {
-                val file = updates.download(update.apk, File(context.cacheDir, UPDATES_DIR))
-                if (file == null) {
-                    state.update { it.copy(update = UpdateUi.Failed) }
-                    return@launch
+                val ok = updates.downloadAndInstall(update)
+                state.update {
+                    it.copy(update = if (ok) UpdateUi.Available(update.version, update.apk.size) else UpdateUi.Failed)
                 }
-                state.update { it.copy(update = UpdateUi.Available(update.version, update.apk.size)) }
-                install(file)
             }
-        }
-
-        private fun install(file: File) {
-            val packages = context.packageManager
-            if (!packages.canRequestPackageInstalls()) {
-                // Android asks once per app: "Permitir desde esta fuente". Then the user taps again.
-                context.startActivity(
-                    Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, ("package:" + context.packageName).toUri())
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
-                return
-            }
-            val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
-            context.startActivity(
-                Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(uri, "application/vnd.android.package-archive")
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
         }
 
         fun setAddMissingStaples(enabled: Boolean) {
@@ -301,9 +274,5 @@ class SettingsViewModel
                     refreshAutomatic()
                 }
             }
-        }
-
-        private companion object {
-            const val UPDATES_DIR = "updates"
         }
     }
