@@ -560,7 +560,7 @@
         <item quantity="other">Con %d días de antelación</item>
     </plurals>
     <string name="settings_dia_probe_title">Comprobar Día (solo depuración)</string>
-    <string name="settings_dia_probe_body">Hace dos peticiones a dia.es desde este teléfono para ver si la app puede leer sus precios.</string>
+    <string name="settings_dia_probe_body">Hace dos peticiones a la web de Día desde este teléfono para ver si la app puede leer sus precios.</string>
     <string name="settings_dia_probe_run">Comprobar</string>
     <string name="settings_dia_probe_result">%1$s: %2$s, %3$s, %4$s</string>
     <string name="settings_dia_probe_no_answer">sin respuesta</string>
