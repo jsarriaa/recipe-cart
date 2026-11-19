@@ -11,6 +11,8 @@ data class AppSettings(
     val includeOptionalsInCost: Boolean = false,
     val staleAfterDays: Int = DEFAULT_STALE_AFTER_DAYS,
     val addMissingStaplesToList: Boolean = true,
+    /** "Avisar con antelación de" N days for "Usar pronto" (SPEC § 4.5). */
+    val useSoonWarningDays: Int = DEFAULT_USE_SOON_DAYS,
 ) {
     /** Replaces impossible values (from an old or edited file) with safe ones. */
     fun sanitized(): AppSettings {
@@ -20,6 +22,7 @@ data class AppSettings(
             primaryProvider = primaryProvider.takeIf { it in active } ?: active.sorted().first(),
             postalCode = postalCode?.trim()?.takeIf(::isValidPostalCode),
             staleAfterDays = staleAfterDays.takeIf { it in STALE_AFTER_RANGE } ?: DEFAULT_STALE_AFTER_DAYS,
+            useSoonWarningDays = useSoonWarningDays.takeIf { it in USE_SOON_RANGE } ?: DEFAULT_USE_SOON_DAYS,
         )
     }
 
@@ -27,6 +30,8 @@ data class AppSettings(
         const val DEFAULT_PROVIDER = "mercadona"
         const val DEFAULT_STALE_AFTER_DAYS = 14
         val STALE_AFTER_RANGE = 1..365
+        const val DEFAULT_USE_SOON_DAYS = 3
+        val USE_SOON_RANGE = 0..30
         val POSTAL_CODE = Regex("""^\d{5}$""")
 
         /** Suggested when the user has not chosen one: central Barcelona. */
