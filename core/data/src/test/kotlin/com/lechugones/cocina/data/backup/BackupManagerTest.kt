@@ -7,6 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lechugones.cocina.data.db.CocinaDatabase
 import com.lechugones.cocina.data.db.CocinaMigrations
 import com.lechugones.cocina.data.image.RecipeImageStore
+import com.lechugones.cocina.data.pantry.toDomain
+import com.lechugones.cocina.data.pantry.toEntity
 import com.lechugones.cocina.data.recipe.RoomRecipeRepository
 import com.lechugones.cocina.data.recipe.testRecipe
 import kotlinx.coroutines.test.runTest
@@ -68,10 +70,25 @@ class BackupManagerTest {
     fun `backup then restore brings everything back`() =
         runTest {
             seed()
+            val lot =
+                com.lechugones.cocina.domain.pantry.PantryLot(
+                    "lot1",
+                    "nata",
+                    java.time.Instant.parse("2026-11-20T10:00:00Z"),
+                    quantity =
+                        com.lechugones.cocina.domain.quantity.Amount
+                            .of(200),
+                    unit = com.lechugones.cocina.domain.units.MeasureUnit.ML,
+                    opened = true,
+                    openedAt = java.time.Instant.parse("2026-11-20T11:00:00Z"),
+                    openedShelfLifeDays = 4,
+                )
+            database.pantryDao().upsertLots(listOf(lot.toEntity()))
             val bytes = backupBytes()
 
             // Change everything after the backup.
             RoomRecipeRepository(database.recipeDao()).delete("r1")
+            database.pantryDao().deleteLots(listOf("lot1"))
             File(imagesDir, "tacos.jpg").delete()
             settingsFile.writeBytes(byteArrayOf(0))
 
@@ -83,6 +100,7 @@ class BackupManagerTest {
 
             database = openDatabase()
             assertEquals(testRecipe(imagePath = "tacos.jpg"), RoomRecipeRepository(database.recipeDao()).get("r1"))
+            assertEquals(listOf(lot), database.pantryDao().lots().mapNotNull { it.toDomain() }, "the pantry is in the backup")
             assertTrue(File(imagesDir, "tacos.jpg").readBytes().contentEquals(byteArrayOf(9, 8, 7)))
             assertTrue(settingsFile.readBytes().contentEquals(byteArrayOf(42)))
             assertEquals(listOf("tacos.jpg"), imagesDir.list()?.toList(), "the restored photo set replaces the old one")

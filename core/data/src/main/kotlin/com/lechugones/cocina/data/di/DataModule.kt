@@ -9,6 +9,7 @@ import androidx.room.Room
 import com.lechugones.cocina.data.db.CocinaDatabase
 import com.lechugones.cocina.data.db.CocinaMigrations
 import com.lechugones.cocina.data.db.LinkMemoryDao
+import com.lechugones.cocina.data.db.PantryDao
 import com.lechugones.cocina.data.db.ProductDao
 import com.lechugones.cocina.data.db.RecipeDao
 import com.lechugones.cocina.data.recipe.RecipeRepository
@@ -56,6 +57,9 @@ object DataModule {
 
     @Provides
     fun provideLinkMemoryDao(database: CocinaDatabase): LinkMemoryDao = database.linkMemoryDao()
+
+    @Provides
+    fun providePantryDao(database: CocinaDatabase): PantryDao = database.pantryDao()
 
     /** Outlives screens: a catalogue sync keeps running when the user leaves the tab. */
     @Provides
