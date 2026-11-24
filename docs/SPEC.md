@@ -80,12 +80,12 @@ files are the only ways to move data between phones.
                         rate limiter, shared OkHttp/Json configuration, ProviderResult errors.
 :provider:mercadona     Pure Kotlin (JVM). Retrofit service, DTOs, mapper → provider:api model.
 :provider:dia           Same for Día (phase 7, subject to the feasibility check in providers/dia.md).
-:provider:carrefour     Same for Carrefour (after 1.4.0; its public search index only).
-:provider:aldi          Same for Aldi (after 1.4.0; the data its category pages embed).
-:provider:bonarea       Same for bonÀrea (after 1.4.0; its shop's search).
-:provider:ahorramas     Same for Ahorramás (after 1.4.0; HTML grid parsed with jsoup).
-:provider:consum        Same for Consum (after 1.4.0; its shop API).
-:provider:tapestry      Eroski and Caprabo (after 1.4.0; their shared Tapestry storefront, jsoup).
+:provider:carrefour     Same for Carrefour (1.5.0; its public search index only).
+:provider:aldi          Same for Aldi (1.5.0; the data its category pages embed).
+:provider:bonarea       Same for bonÀrea (1.5.0; its shop's search).
+:provider:ahorramas     Same for Ahorramás (1.5.0; HTML grid parsed with jsoup).
+:provider:consum        Same for Consum (1.5.0; its shop API).
+:provider:tapestry      Eroski and Caprabo (1.5.0; their shared Tapestry storefront, jsoup).
 build-logic/            Gradle convention plugins (android-app, android-library, jvm-library, hilt, room).
 ```
 
@@ -158,18 +158,18 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   - **Mercadona**: verified, see [providers/mercadona.md](providers/mercadona.md).
   - **Día**: verified from the phone in phase 7 ([providers/dia.md](providers/dia.md)). Its
     catalogue sync is search-based (a fixed list of food searches), and prices ignore Club Dia.
-  - **Carrefour** (after 1.4.0): its public search index only, national online prices,
+  - **Carrefour** (1.5.0): its public search index only, national online prices,
     search-based sync ([providers/carrefour.md](providers/carrefour.md)). Ported from
     supermercapy (MIT). New supermarkets start switched off.
-  - **Aldi** (after 1.4.0): shelf prices from its category pages (it has no online shop),
+  - **Aldi** (1.5.0): shelf prices from its category pages (it has no online shop),
     península region ([providers/aldi.md](providers/aldi.md)). Ported from supermercapy.
-  - **bonÀrea** (after 1.4.0): national catalogue and prices, search-based sync
+  - **bonÀrea** (1.5.0): national catalogue and prices, search-based sync
     ([providers/bonarea.md](providers/bonarea.md)). Ported from supermercapy.
-  - **Ahorramás** (after 1.4.0): its HTML product grid, one price list, search-based sync
+  - **Ahorramás** (1.5.0): its HTML product grid, one price list, search-based sync
     ([providers/ahorramas.md](providers/ahorramas.md)). Ported from supermercapy.
-  - **Consum** (after 1.4.0): its shop API, national prices, full walk of the food categories
+  - **Consum** (1.5.0): its shop API, national prices, full walk of the food categories
     ([providers/consum.md](providers/consum.md)). Ported from supermercapy.
-  - **Eroski** and **Caprabo** (after 1.4.0): one shared module for their Tapestry storefront,
+  - **Eroski** and **Caprabo** (1.5.0): one shared module for their Tapestry storefront,
     search-based sync, prices of the shop an anonymous visitor is pinned to (Basque and Catalan)
     ([providers/eroski.md](providers/eroski.md), [providers/caprabo.md](providers/caprabo.md)).
     Ported from supermercapy.
