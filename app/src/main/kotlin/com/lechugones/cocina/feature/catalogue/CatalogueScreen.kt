@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,6 +52,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -92,6 +94,15 @@ fun CatalogueScreen(
     val snackbar = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val latest by rememberUpdatedState(state)
+
+    // The phone cuts an app's network when the screen locks, which would stop a download
+    // halfway, so the screen stays on while one runs.
+    val view = LocalView.current
+    val downloading = state.sync is SyncState.Running
+    DisposableEffect(view, downloading) {
+        view.keepScreenOn = downloading
+        onDispose { view.keepScreenOn = false }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->

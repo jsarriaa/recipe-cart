@@ -1,0 +1,197 @@
+{
+ "totalCount": 35,
+ "totalRecipeCount": 0,
+ "hasMore": true,
+ "products": [
+  {
+   "id": 4687,
+   "productType": 3,
+   "code": "26104",
+   "ean": "8422837201160",
+   "type": "product",
+   "productData": {
+    "name": "Plátano Canario IGP",
+    "brand": {
+     "id": "",
+     "name": ""
+    },
+    "url": "https://tienda.consum.es/es/p/platano-canario-igp/26104",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/26104.jpg?t=20260901075710",
+    "description": "Plátano Canario IGP",
+    "seo": "platano-canario-igp",
+    "seoTitle": "",
+    "seoDescription": "platano-canario-igp",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "Pieza precio aprox.",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/26104_001.jpg?t=20240223040000",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 0.59,
+       "centUnitAmount": 3.2
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5229,
+     "name": "Plátano y banana",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 8268,
+   "productType": 1,
+   "code": "4507471",
+   "ean": "8410100017563",
+   "type": "product",
+   "productData": {
+    "name": "Yogolino de Plátano Pack de 4",
+    "brand": {
+     "id": "NESTLE",
+     "name": "NESTLE",
+     "url": "nestle",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/yogolino-de-platano-pack-de-4/4507471",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/4507471.jpg?t=20260827095751",
+    "description": "Yogolino de Plátano Pack de 4 4 x 100 Gr",
+    "seo": "yogolino-de-platano-pack-de-4",
+    "seoTitle": "",
+    "seoDescription": "yogolino-de-platano-pack-de-4",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/4507471_001.jpg?t=20200910083003",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 2.95,
+       "centUnitAmount": 7.38
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 4525,
+     "name": "Yogures",
+     "type": 0
+    },
+    {
+     "id": 2126,
+     "name": "Petit e infantiles",
+     "type": 0
+    },
+    {
+     "id": 2298,
+     "name": "Alimentación infantil",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  }
+ ]
+}

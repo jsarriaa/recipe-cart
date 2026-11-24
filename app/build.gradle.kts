@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":provider:aldi"))
     implementation(project(":provider:bonarea"))
     implementation(project(":provider:ahorramas"))
+    implementation(project(":provider:consum"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

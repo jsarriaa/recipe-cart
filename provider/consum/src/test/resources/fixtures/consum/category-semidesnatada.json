@@ -1,0 +1,404 @@
+{
+ "totalCount": 10,
+ "totalRecipeCount": 0,
+ "hasMore": false,
+ "products": [
+  {
+   "id": 4753,
+   "productType": 1,
+   "code": "176974",
+   "ean": "8411700004250",
+   "type": "product",
+   "productData": {
+    "name": "Leche Semidesnatada Brik",
+    "brand": {
+     "id": "PULEVA",
+     "name": "PULEVA",
+     "url": "puleva",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-semidesnatada-brik/176974",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/176974.jpg?t=20260827095225",
+    "description": "Leche Semidesnatada Brik 1 L",
+    "seo": "leche-semidesnatada-brik",
+    "seoTitle": "",
+    "seoDescription": "leche-semidesnatada-brik",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/176974_001.jpg?t=20250606091502",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.13,
+       "centUnitAmount": 1.13
+      }
+     },
+     {
+      "id": "OFFER_PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 0.99,
+       "centUnitAmount": 0.99
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2075,
+     "name": "Semidesnatada",
+     "type": 0
+    },
+    {
+     "id": 999992811,
+     "name": "Ofertas en despensa",
+     "type": 1
+    }
+   ],
+   "offers": [
+    {
+     "id": 13686157,
+     "from": "2026-11-18T23:00:00.000Z",
+     "to": "2026-12-16T22:59:00.000Z",
+     "minDescription": "Ahora ",
+     "shortDescription": "Ahora más barato",
+     "longDescription": "Ahora más barato",
+     "image": "https://cdn-consum.aktiosdigitalservices.com/assets/promotion/es/oferta-inmediato.png",
+     "promotionId": 454403425,
+     "promotionType": 1,
+     "inmediate": true,
+     "applicationTargetType": 1,
+     "applicationActionType": 2,
+     "visiblePromotionWidget": false,
+     "visibleValidate": false,
+     "visibleProductWidget": true,
+     "amount": 0.99,
+     "pictoType": "default"
+    }
+   ],
+   "coupons": []
+  },
+  {
+   "id": 4766,
+   "productType": 1,
+   "code": "203745",
+   "ean": "8410297111150",
+   "type": "product",
+   "productData": {
+    "name": "Leche Semidesnatada Botella",
+    "brand": {
+     "id": "ASTURIANA",
+     "name": "ASTURIANA",
+     "url": "asturiana",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-semidesnatada-botella/203745",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/203745.jpg?t=20260827095233",
+    "description": "Leche Semidesnatada Botella 1,5 L",
+    "seo": "leche-semidesnatada-botella",
+    "seoTitle": "",
+    "seoDescription": "leche-semidesnatada-botella",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/203745_001.jpg?t=20250402091501",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.79,
+       "centUnitAmount": 1.19
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2075,
+     "name": "Semidesnatada",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 5932,
+   "productType": 1,
+   "code": "7080604",
+   "ean": "8414807514219",
+   "type": "product",
+   "productData": {
+    "name": "Leche Semidesnatada Brik",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-semidesnatada-brik/7080604",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7080604.jpg?t=20260812080202",
+    "description": "Leche Semidesnatada Brik 1 L",
+    "seo": "leche-semidesnatada-brik",
+    "seoTitle": "",
+    "seoDescription": "leche-semidesnatada-brik",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7080604_001.jpg?t=20250522091502",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 0.83,
+       "centUnitAmount": 0.83
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 60.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2075,
+     "name": "Semidesnatada",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 23820,
+   "productType": 1,
+   "code": "7353290",
+   "ean": "8410297110986",
+   "type": "product",
+   "productData": {
+    "name": "Leche Semidesnatada Botella",
+    "brand": {
+     "id": "ASTURIANA",
+     "name": "ASTURIANA",
+     "url": "asturiana",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-semidesnatada-botella/7353290",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7353290.jpg?t=20260826075930",
+    "description": "Leche Semidesnatada Botella 2,2 L",
+    "seo": "leche-semidesnatada-botella",
+    "seoTitle": "",
+    "seoDescription": "leche-semidesnatada-botella",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7353290_001.jpg?t=20240802170001",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 2.38,
+       "centUnitAmount": 1.08
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2075,
+     "name": "Semidesnatada",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  }
+ ]
+}
