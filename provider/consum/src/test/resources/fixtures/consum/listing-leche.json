@@ -1,0 +1,232 @@
+{
+ "totalCount": 305,
+ "totalRecipeCount": 0,
+ "hasMore": true,
+ "products": [
+  {
+   "id": 5932,
+   "productType": 1,
+   "code": "7080604",
+   "ean": "8414807514219",
+   "type": "product",
+   "productData": {
+    "name": "Leche Semidesnatada Brik",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-semidesnatada-brik/7080604",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7080604.jpg?t=20260812080202",
+    "description": "Leche Semidesnatada Brik 1 L",
+    "seo": "leche-semidesnatada-brik",
+    "seoTitle": "",
+    "seoDescription": "leche-semidesnatada-brik",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7080604_001.jpg?t=20250522091502",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 0.83,
+       "centUnitAmount": 0.83
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 60.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2075,
+     "name": "Semidesnatada",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 43662,
+   "productType": 1,
+   "code": "7461007",
+   "ean": "8410285311364",
+   "type": "product",
+   "productData": {
+    "name": "Leche Calcio Colágeno Desnatada",
+    "brand": {
+     "id": "PULEVA",
+     "name": "PULEVA",
+     "url": "puleva",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/leche-calcio-colageno-desnatada/7461007",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7461007.jpg?t=20260827104903",
+    "description": "Leche Calcio Colágeno Desnatada 1 L",
+    "seo": "leche-calcio-colageno-desnatada",
+    "seoTitle": "",
+    "seoDescription": "leche-calcio-colageno-desnatada",
+    "attributes": [
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": true,
+    "actions": [
+     {
+      "key": "adbutler_eligible_url",
+      "value": "https://servedbyadbutler.com/adserve/;MID=185979;type=e959fb862;placementID=3481986;setID=724476;channelID=0;CID=1685594;BID=524376849;TAID=0;place=0;rnd=3142026208;psrtype=api;matches=%5B%22leche%22%5D;referrer=;request_uuid=7ff728c3-df45-4a07-ab2c-2e8f1ed02339;mt=1795557050273563;hc=8265146a114be60df8b7d5da393e10dd7e3a3fde"
+     },
+     {
+      "key": "adbutler_redirect_url",
+      "value": "https://servedbyadbutler.com/redirect.spark?MID=185979&plid=3481986&setID=724476&channelID=0&CID=1685594&scheduleID=3663874&placementScheduleId=3663874&adItemScheduleId=0&banID=524376849&PID=0&textadID=0&tc=1&type=tclickcb&matches=%5B%22leche%22%5D&spr=1&request_uuid=7ff728c3-df45-4a07-ab2c-2e8f1ed02339&mt=1&hc=f7edb83b465947e2a3c47e835e9000e20d802734&location=1"
+     },
+     {
+      "key": "adbutler_viewable_url",
+      "value": "https://servedbyadbutler.com/adserve/;MID=185979;type=v959fb862;placementID=3481986;setID=724476;channelID=0;CID=1685594;BID=524376849;TAID=0;place=0;rnd=3142026208;psrtype=api;matches=%5B%22leche%22%5D;referrer=;request_uuid=7ff728c3-df45-4a07-ab2c-2e8f1ed02339;mt=1795557050273560;hc=351dcbb23dffcac6684f4af9726ed40488feb24e"
+     },
+     {
+      "key": "adbutler_accupixel_url",
+      "value": "https://servedbyadbutler.com/adserve/;ID=185979;size=1x1;type=p959fb862;setID=724476;plid=3481986;BID=524376849;place=0;rnd=3142026208;psrtype=json;matches=%5B%22leche%22%5D;metadata=%5B%5D;request_uuid=7ff728c3-df45-4a07-ab2c-2e8f1ed02339;currency=EUR;mt=1795557050273557;hc=5ad7572daf016c8480219c4a251ae3443a5a2fe3;rnd=9206946"
+     },
+     {
+      "key": "adbutler_track_url",
+      "value": "https://servedbyadbutler.com/convtrack.spark?MID=185979&ad_item_id=524376849&placement_id=3481986&timestamp=0&zone_id=724476&conversion_type=single-ad&productID=7461007"
+     }
+    ],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7461007_001.jpg?t=20250701091503",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.69,
+       "centUnitAmount": 1.69
+      }
+     },
+     {
+      "id": "OFFER_PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.29,
+       "centUnitAmount": 1.29
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2082,
+     "name": "Leche con calcio",
+     "type": 0
+    },
+    {
+     "id": 999992811,
+     "name": "Ofertas en despensa",
+     "type": 1
+    }
+   ],
+   "offers": [
+    {
+     "id": 13792615,
+     "from": "2026-11-18T23:00:00.000Z",
+     "to": "2027-01-06T22:59:00.000Z",
+     "minDescription": "Ahora ",
+     "shortDescription": "Ahora más barato",
+     "longDescription": "Ahora más barato",
+     "image": "https://cdn-consum.aktiosdigitalservices.com/assets/promotion/es/oferta-inmediato.png",
+     "promotionId": 454540633,
+     "promotionType": 1,
+     "inmediate": true,
+     "applicationTargetType": 1,
+     "applicationActionType": 2,
+     "visiblePromotionWidget": false,
+     "visibleValidate": false,
+     "visibleProductWidget": true,
+     "amount": 1.29,
+     "pictoType": "default"
+    }
+   ],
+   "coupons": []
+  }
+ ]
+}

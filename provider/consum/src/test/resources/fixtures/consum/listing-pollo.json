@@ -1,0 +1,475 @@
+{
+ "totalCount": 204,
+ "totalRecipeCount": 0,
+ "hasMore": true,
+ "products": [
+  {
+   "id": 4785,
+   "productType": 3,
+   "code": "218115",
+   "ean": "8436041980469",
+   "type": "product",
+   "productData": {
+    "name": "Pollo Limpio",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/pollo-limpio/218115",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/218115.jpg?t=20260818075645",
+    "description": "Pollo Limpio",
+    "seo": "pollo-limpio",
+    "seoTitle": "",
+    "seoDescription": "pollo-limpio",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "Bandeja precio aprox.",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/218115_001.jpg?t=20251210170002",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 7.0,
+       "centUnitAmount": 3.5
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 6.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2156,
+     "name": "Aves",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 24729,
+   "productType": 1,
+   "code": "7358232",
+   "ean": "8436590821176",
+   "type": "product",
+   "productData": {
+    "name": "Pollo Burger Meat",
+    "brand": {
+     "id": "",
+     "name": ""
+    },
+    "url": "https://tienda.consum.es/es/p/pollo-burger-meat/7358232",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7358232.jpg?t=20260901080714",
+    "description": "Pollo Burger Meat 120 Gr",
+    "seo": "pollo-burger-meat",
+    "seoTitle": "",
+    "seoDescription": "pollo-burger-meat",
+    "attributes": [
+     {
+      "code": "food.allergen.information.html",
+      "languages": [
+       {
+        "lang": "es",
+        "values": [
+         "Contiene: Sulfitos. Los productos del mostrador pueden contener apio, gluten, mostaza, huevo, leche, soja y/o sulfitos, por manipulación de elaborados cárnicos. Cocinar completamente antes de su consumo. Para más información, contacta con el servicio de atención al cliente de manera gratuita, llamando al 900 500 126."
+        ]
+       }
+      ],
+      "detailProductBottom": {
+       "name": "",
+       "tooltip": "",
+       "remarks": "",
+       "showValue": true,
+       "colorBackground": ""
+      }
+     },
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7358232_001.jpg?t=20230922040003",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.19,
+       "centUnitAmount": 9.92
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 15.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 4065,
+     "name": "Picadas y hamburguesas",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 39821,
+   "productType": 2,
+   "code": "7454739",
+   "ean": "8437000405054",
+   "type": "product",
+   "productData": {
+    "name": "Pollo Relleno Almendra 0.25% y 97% Carne",
+    "brand": {
+     "id": "CARLOTEÑA",
+     "name": "CARLOTEÑA",
+     "url": "carlotena",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/pollo-relleno-almendra-025-y-97-carne/7454739",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7454739.jpg?t=20260901080742",
+    "description": "Pollo Relleno Almendra 0.25% y 97% Carne",
+    "seo": "pollo-relleno-almendra-025-y-97-carne",
+    "seoTitle": "",
+    "seoDescription": "pollo-relleno-almendra-025-y-97-carne",
+    "attributes": [
+     {
+      "code": "filter.id.weight",
+      "languages": [
+       {
+        "values": [
+         "true"
+        ]
+       }
+      ],
+      "detailProductImageTopRight": {
+       "image": "https://cdn-consum.aktiosdigitalservices.com/assets/product/es/icon-weight.png",
+       "name": "Al peso",
+       "tooltip": "Venta de productos a peso. El precio que se muestra es aproximado y puede variar en función del tamaño de las piezas y del peso final de las mismas.",
+       "remarks": "",
+       "showValue": false,
+       "colorBackground": "#707070"
+      },
+      "widgetProductBottomRight": {
+       "image": "https://cdn-consum.aktiosdigitalservices.com/assets/product/es/icon-weight.png",
+       "name": "Al peso",
+       "tooltip": "Venta de productos a peso. El precio que se muestra es aproximado y puede variar en función del tamaño de las piezas y del peso final de las mismas.",
+       "remarks": "",
+       "showValue": false,
+       "colorBackground": "#707070"
+      }
+     },
+     {
+      "code": "corte.dados",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "true"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "corte.filetes.finos",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "true"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "corte.tajadas",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "true"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "lonchas.muy.finas",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "true"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "lonchas.gruesas",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "true"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "food.allergen.information.html",
+      "languages": [
+       {
+        "lang": "es",
+        "values": [
+         "CONTIENE: ALMENDRA, LECHE Y SOJA. TRAZAS: HUEVO, FRUTOS CÁSCARA, MOSTAZA Y PESCADO. SIN GLUTEN. PARA MÁS INFORMACIÓN, CONTACTA CON EL SERVICIO DE ATENCIÓN AL CLIENTE DE MANERA GRATUITA, LLAMANDO AL 900 500 126."
+        ]
+       }
+      ],
+      "detailProductBottom": {
+       "name": "",
+       "tooltip": "",
+       "remarks": "",
+       "showValue": true,
+       "colorBackground": ""
+      }
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7454739_001.jpg?t=20260821130004",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 17.5,
+       "centUnitAmount": 17.5
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "kg",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 0.1,
+    "maximumUnit": 10.0,
+    "intervalUnit": 0.05
+   },
+   "purchaseData": {
+    "allowComments": true
+   },
+   "categories": [
+    {
+     "id": 5187,
+     "name": "Cocidos de pollo",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 4789,
+   "productType": 3,
+   "code": "220707",
+   "ean": "8436041980247",
+   "type": "product",
+   "productData": {
+    "name": "Muslitos de Pollo",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/muslitos-de-pollo/220707",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/220707.jpg?t=20260812080130",
+    "description": "Muslitos de Pollo",
+    "seo": "muslitos-de-pollo",
+    "seoTitle": "",
+    "seoDescription": "muslitos-de-pollo",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "Bandeja 700 g aprox.",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/220707_001.jpg?t=20251210170002",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 2.85,
+       "centUnitAmount": 4.05
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 6.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 2156,
+     "name": "Aves",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  }
+ ]
+}

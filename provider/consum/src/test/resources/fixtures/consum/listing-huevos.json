@@ -1,0 +1,451 @@
+{
+ "totalCount": 483,
+ "totalRecipeCount": 0,
+ "hasMore": true,
+ "products": [
+  {
+   "id": 24492,
+   "productType": 1,
+   "code": "7359040",
+   "ean": "8437004036131",
+   "type": "product",
+   "productData": {
+    "name": "Huevo Campero M Decena",
+    "brand": {
+     "id": "MONTERDE",
+     "name": "MONTERDE",
+     "url": "monterde",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/huevo-campero-m-decena/7359040",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7359040.jpg?t=20260812080335",
+    "description": "Huevo Campero M Decena 0,83 Dc",
+    "seo": "huevo-campero-m-decena",
+    "seoTitle": "",
+    "seoDescription": "huevo-campero-m-decena",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7359040_001.jpg?t=20250121170002",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 2.9,
+       "centUnitAmount": 3.49
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Dc",
+    "minimumUnit": 1.0,
+    "maximumUnit": 20.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5353,
+     "name": "Huevos frescos",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 17180,
+   "productType": 1,
+   "code": "7300853",
+   "ean": "8437004036803",
+   "type": "product",
+   "productData": {
+    "name": "Huevo Codorniz Cartón 18 Unidades",
+    "brand": {
+     "id": "MONTERDE",
+     "name": "MONTERDE",
+     "url": "monterde",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/huevo-codorniz-carton-18-unidades/7300853",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7300853.jpg?t=20260812080306",
+    "description": "Huevo Codorniz Cartón 18 Unidades 1,5 Dc",
+    "seo": "huevo-codorniz-carton-18-unidades",
+    "seoTitle": "",
+    "seoDescription": "huevo-codorniz-carton-18-unidades",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7300853_001.jpg?t=20201126105926",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.85,
+       "centUnitAmount": 1.23
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Dc",
+    "minimumUnit": 1.0,
+    "maximumUnit": 20.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5353,
+     "name": "Huevos frescos",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 6104,
+   "productType": 1,
+   "code": "7098411",
+   "ean": "8437004036537",
+   "type": "product",
+   "productData": {
+    "name": "Huevos L Grandes 1/2 Docena",
+    "brand": {
+     "id": "MONTERDE",
+     "name": "MONTERDE",
+     "url": "monterde",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/huevos-l-grandes-1-2-docena/7098411",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7098411.jpg?t=20260812080205",
+    "description": "Huevos L Grandes 1/2 Docena 0,5 Dc",
+    "seo": "huevos-l-grandes-1-2-docena",
+    "seoTitle": "",
+    "seoDescription": "huevos-l-grandes-1-2-docena",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7098411_001.jpg?t=20201018083003",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.8,
+       "centUnitAmount": 3.6
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Dc",
+    "minimumUnit": 1.0,
+    "maximumUnit": 20.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5353,
+     "name": "Huevos frescos",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 6102,
+   "productType": 1,
+   "code": "7098382",
+   "ean": "8437004036544",
+   "type": "product",
+   "productData": {
+    "name": "Huevos M Medianos Docena",
+    "brand": {
+     "id": "MONTERDE",
+     "name": "MONTERDE",
+     "url": "monterde",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/huevos-m-medianos-docena/7098382",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7098382.jpg?t=20260812080205",
+    "description": "Huevos M Medianos Docena 1 Dc",
+    "seo": "huevos-m-medianos-docena",
+    "seoTitle": "",
+    "seoDescription": "huevos-m-medianos-docena",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7098382_001.jpg?t=20201204073002",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 2.85,
+       "centUnitAmount": 2.85
+      }
+     }
+    ],
+    "taxPercentage": 4.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Dc",
+    "minimumUnit": 1.0,
+    "maximumUnit": 20.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5353,
+     "name": "Huevos frescos",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 27806,
+   "productType": 1,
+   "code": "7385719",
+   "ean": "8437004009753",
+   "type": "product",
+   "productData": {
+    "name": "Clara de Huevo Botella",
+    "brand": {
+     "id": "MONTERDE",
+     "name": "MONTERDE",
+     "url": "monterde",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/clara-de-huevo-botella/7385719",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7385719.jpg?t=20260818080130",
+    "description": "Clara de Huevo Botella 300 ml",
+    "seo": "clara-de-huevo-botella",
+    "seoTitle": "",
+    "seoDescription": "clara-de-huevo-botella",
+    "attributes": [
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7385719_001.jpg?t=20211015040003",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 1.7,
+       "centUnitAmount": 5.67
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 L",
+    "minimumUnit": 1.0,
+    "maximumUnit": 20.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 5354,
+     "name": "Otros huevos y claras de huevo",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  }
+ ]
+}

@@ -6,6 +6,7 @@ import com.lechugones.cocina.provider.ahorramas.AhorramasProvider
 import com.lechugones.cocina.provider.aldi.AldiProvider
 import com.lechugones.cocina.provider.bonarea.BonareaProvider
 import com.lechugones.cocina.provider.carrefour.CarrefourProvider
+import com.lechugones.cocina.provider.consum.ConsumProvider
 import com.lechugones.cocina.provider.dia.DiaProvider
 import com.lechugones.cocina.provider.mercadona.MercadonaProvider
 import dagger.Module
@@ -98,4 +99,13 @@ object ProviderModule {
         client: OkHttpClient,
         clock: Clock,
     ): SupermarketProvider = AhorramasProvider.create(client, clock)
+
+    /** Consum: its shop API, national prices; verified from the phone on 2026-11-24 (docs/providers/consum.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideConsum(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = ConsumProvider.create(client, clock)
 }

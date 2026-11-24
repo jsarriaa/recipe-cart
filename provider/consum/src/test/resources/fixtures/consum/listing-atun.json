@@ -1,0 +1,269 @@
+{
+ "totalCount": 77,
+ "totalRecipeCount": 0,
+ "hasMore": true,
+ "products": [
+  {
+   "id": 5963,
+   "productType": 1,
+   "code": "7083231",
+   "ean": "8414807514844",
+   "type": "product",
+   "productData": {
+    "name": "Atún Claro  Aceite Oliva Pack de 6",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/atun-claro-aceite-oliva-pack-de-6/7083231",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7083231.jpg?t=20260812080203",
+    "description": "Atún Claro  Aceite Oliva Pack de 6 6 x 52 Gr",
+    "seo": "atun-claro-aceite-oliva-pack-de-6",
+    "seoTitle": "",
+    "seoDescription": "atun-claro-aceite-oliva-pack-de-6",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7083231_001.jpg?t=20240509040001",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 4.9,
+       "centUnitAmount": 15.71
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 1546,
+     "name": "Atún y bonito",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 29292,
+   "productType": 1,
+   "code": "7369890",
+   "ean": "8414807551719",
+   "type": "product",
+   "productData": {
+    "name": "Ventresca de Atún Claro en Aceite de Oliva",
+    "brand": {
+     "id": "CONSUM",
+     "name": "CONSUM",
+     "url": "consum",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/ventresca-de-atun-claro-en-aceite-de-oliva/7369890",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7369890.jpg?t=20260812080340",
+    "description": "Ventresca de Atún Claro en Aceite de Oliva 72,5 Gr",
+    "seo": "ventresca-de-atun-claro-en-aceite-de-oliva",
+    "seoTitle": "",
+    "seoDescription": "ventresca-de-atun-claro-en-aceite-de-oliva",
+    "attributes": [
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7369890_001.jpg?t=20240210040001",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 3.09,
+       "centUnitAmount": 42.62
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 1546,
+     "name": "Atún y bonito",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  },
+  {
+   "id": 10714,
+   "productType": 1,
+   "code": "7168677",
+   "ean": "8410090051097",
+   "type": "product",
+   "productData": {
+    "name": "Atún Claro Aceite Oliva Pack de 3",
+    "brand": {
+     "id": "CALVO",
+     "name": "CALVO",
+     "url": "calvo",
+     "landing": false
+    },
+    "url": "https://tienda.consum.es/es/p/atun-claro-aceite-oliva-pack-de-3/7168677",
+    "imageURL": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7168677.jpg?t=20260812080216",
+    "description": "Atún Claro Aceite Oliva Pack de 3 3 x 72 Gr",
+    "seo": "atun-claro-aceite-oliva-pack-de-3",
+    "seoTitle": "",
+    "seoDescription": "atun-claro-aceite-oliva-pack-de-3",
+    "attributes": [
+     {
+      "code": "hidden.midiadia",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "1"
+        ]
+       }
+      ]
+     },
+     {
+      "code": "filter.id.brand.distributor",
+      "languages": [
+       {
+        "lang": "00",
+        "values": [
+         "0"
+        ]
+       }
+      ]
+     }
+    ],
+    "format": "",
+    "novelty": false,
+    "featured": false,
+    "sponsored": false,
+    "actions": [],
+    "containAllergensIntolernacies": false,
+    "availability": "1",
+    "temporaryOutOfStock": false
+   },
+   "media": [
+    {
+     "url": "https://cdn-consum.aktiosdigitalservices.com/tol/consum/media/product/img/300x300/7168677_001.jpg?t=20230817040001",
+     "order": 1,
+     "type": "P"
+    }
+   ],
+   "priceData": {
+    "prices": [
+     {
+      "id": "PRICE",
+      "toDate": "2099-12-31T22:59:59Z",
+      "value": {
+       "centAmount": 6.79,
+       "centUnitAmount": 31.44
+      }
+     }
+    ],
+    "taxPercentage": 10.0,
+    "priceUnitType": "",
+    "unitPriceUnitType": "1 Kg",
+    "minimumUnit": 1.0,
+    "maximumUnit": 49.0,
+    "intervalUnit": 1.0
+   },
+   "purchaseData": {
+    "allowComments": false
+   },
+   "categories": [
+    {
+     "id": 1546,
+     "name": "Atún y bonito",
+     "type": 0
+    }
+   ],
+   "offers": [],
+   "coupons": []
+  }
+ ]
+}
