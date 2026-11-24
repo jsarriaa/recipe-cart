@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (JSON, 200). Not yet checked from the phone |
+| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (JSON, 200). Synced from the phone on the same day |
 | Base URL | `https://api.empathy.co/search/v1/query/carrefour/` (Carrefour's search index, hosted by Empathy) |
 | Images | `https://static.carrefour.es/hd_350x_/img_pim_food/…` (absolute URLs in the documents) |
 | Location model | None. National online prices (see below) |
@@ -78,3 +78,4 @@ About 55 requests (one per `FoodSearches` term, 120 rows each), at the default 1
 |---|---|---|
 | 2026-11-24 | `GET …/search?query=leche&lang=es&catalog=food&rows=5` from the PC, app User-Agent | 200 JSON, 2,024 hits, prices present |
 | 2026-11-24 | Same for `platano` and `yogur natural` (fixtures) | 200 JSON; variable-weight and multipack documents recorded |
+| 2026-11-24 | Full catalogue sync from the phone (debug app), search `leche`, photos | 3262 products, sizes, prices and photos correct. |

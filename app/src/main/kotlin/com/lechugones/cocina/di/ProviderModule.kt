@@ -9,6 +9,8 @@ import com.lechugones.cocina.provider.carrefour.CarrefourProvider
 import com.lechugones.cocina.provider.consum.ConsumProvider
 import com.lechugones.cocina.provider.dia.DiaProvider
 import com.lechugones.cocina.provider.mercadona.MercadonaProvider
+import com.lechugones.cocina.provider.tapestry.TapestryChain
+import com.lechugones.cocina.provider.tapestry.TapestryProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -108,4 +110,22 @@ object ProviderModule {
         client: OkHttpClient,
         clock: Clock,
     ): SupermarketProvider = ConsumProvider.create(client, clock)
+
+    /** Eroski: its Tapestry storefront, Basque shop prices; verified from the phone on 2026-11-24 (docs/providers/eroski.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideEroski(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = TapestryProvider.create(TapestryChain.EROSKI, client, clock)
+
+    /** Caprabo: the same storefront, Catalan prices; verified from the phone on 2026-11-24 (docs/providers/caprabo.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideCaprabo(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = TapestryProvider.create(TapestryChain.CAPRABO, client, clock)
 }

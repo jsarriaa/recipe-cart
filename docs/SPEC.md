@@ -47,7 +47,7 @@ files are the only ways to move data between phones.
 
 | UI (es-ES) | Code (English) | Meaning |
 |---|---|---|
-| Supermercado | `Provider` | A product source: Mercadona, Día, Carrefour, Aldi, bonÀrea, Ahorramás, Consum, or Manual |
+| Supermercado | `Provider` | A product source: Mercadona, Día, Carrefour, Aldi, bonÀrea, Ahorramás, Consum, Eroski, Caprabo, or Manual |
 | Producto | `Product` | A sellable item at one provider, with package size and price |
 | Envase / paquete | `Package` | One sellable unit of a product (paquete, bandeja, bote, pieza…) |
 | Marca blanca | `StoreBrand` | The provider's own brand (Hacendado, Dia…) |
@@ -85,6 +85,7 @@ files are the only ways to move data between phones.
 :provider:bonarea       Same for bonÀrea (after 1.4.0; its shop's search).
 :provider:ahorramas     Same for Ahorramás (after 1.4.0; HTML grid parsed with jsoup).
 :provider:consum        Same for Consum (after 1.4.0; its shop API).
+:provider:tapestry      Eroski and Caprabo (after 1.4.0; their shared Tapestry storefront, jsoup).
 build-logic/            Gradle convention plugins (android-app, android-library, jvm-library, hilt, room).
 ```
 
@@ -168,6 +169,10 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
     ([providers/ahorramas.md](providers/ahorramas.md)). Ported from supermercapy.
   - **Consum** (after 1.4.0): its shop API, national prices, full walk of the food categories
     ([providers/consum.md](providers/consum.md)). Ported from supermercapy.
+  - **Eroski** and **Caprabo** (after 1.4.0): one shared module for their Tapestry storefront,
+    search-based sync, prices of the shop an anonymous visitor is pinned to (Basque and Catalan)
+    ([providers/eroski.md](providers/eroski.md), [providers/caprabo.md](providers/caprabo.md)).
+    Ported from supermercapy.
   - **Manual**: built in, always available. The user types a product (name, brand, store-brand
     flag, package size, price, shop name). This covers shops without an API and providers that
     are down or refuse us. Manual products are stored in the catalogue table with provider id

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (HTML pages, 200). Not yet checked from the phone |
+| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (HTML pages, 200). Synced from the phone on the same day |
 | Base URL | `https://www.aldi.es/` |
 | Images | `https://s7g10.scene7.com/is/image/aldinord/…` (absolute URLs in the records) |
 | Location model | None. Península shelf prices |
@@ -80,3 +80,4 @@ brands.
 |---|---|---|
 | 2026-11-24 | `productos.html`, the 16 food top-level pages and three subcategory pages, from the PC, app User-Agent, 1.5 s apart | 200 HTML with `__NEXT_DATA__`; 30, 59 and 25 records |
 | 2026-11-24 | `producto/p-80500.html` (placeholder slug) and `producto/p-1.html` | 200 with the record; 404 |
+| 2026-11-24 | Full catalogue sync from the phone (debug app), search `leche`, photos | 1867 products, sizes, prices and photos correct. |
