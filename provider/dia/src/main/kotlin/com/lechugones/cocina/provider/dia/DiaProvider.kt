@@ -1,5 +1,6 @@
 package com.lechugones.cocina.provider.dia
 
+import com.lechugones.cocina.provider.FoodSearches
 import com.lechugones.cocina.provider.ProviderCategory
 import com.lechugones.cocina.provider.ProviderError
 import com.lechugones.cocina.provider.ProviderLocation
@@ -126,65 +127,8 @@ class DiaProvider(
         const val MAX_PAGES = 2
         private const val NOT_SERVED = 206
 
-        /** The catalogue sync's searches: everyday food, about 55 terms. */
-        val SEARCHES =
-            listOf(
-                "leche",
-                "yogur",
-                "queso",
-                "huevos",
-                "mantequilla",
-                "nata",
-                "pan",
-                "harina",
-                "arroz",
-                "pasta",
-                "garbanzos",
-                "lentejas",
-                "alubias",
-                "aceite",
-                "vinagre",
-                "sal",
-                "azucar",
-                "especias",
-                "tomate",
-                "salsa",
-                "atun",
-                "conservas",
-                "pollo",
-                "ternera",
-                "cerdo",
-                "carne picada",
-                "jamon",
-                "embutido",
-                "pescado",
-                "marisco",
-                "verdura",
-                "fruta",
-                "patata",
-                "cebolla",
-                "ajo",
-                "lechuga",
-                "zanahoria",
-                "pimiento",
-                "manzana",
-                "platano",
-                "naranja",
-                "limon",
-                "cafe",
-                "cacao",
-                "galletas",
-                "cereales",
-                "chocolate",
-                "pizza",
-                "caldo",
-                "mayonesa",
-                "tortillas",
-                "congelados",
-                "zumo",
-                "agua",
-                "legumbres",
-            )
+        /** The catalogue sync's searches (shared with other search-based providers). */
+        val SEARCHES = FoodSearches.TERMS
 
         private val json =
             Json {

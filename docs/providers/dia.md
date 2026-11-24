@@ -119,6 +119,13 @@ browser.
   `strikethrough_price` is taken when `is_club_price`); images and product pages are prefixed
   with `https://www.dia.es`.
 
+## robots.txt
+
+Día's `robots.txt` lists `*/search/reduced?*`, the path every search and sync uses (noted by
+supermercapy, [third_party/supermercapy](../../third_party/supermercapy/README.md)). The owner
+accepted this on 2026-11-24 for paced requests the user starts (providers/README.md, etiquette
+rule 8).
+
 ## Open questions
 
 - Is there a category listing JSON (`plp`) and a product detail JSON (`pdp`) behind the web pages?

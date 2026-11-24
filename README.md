@@ -1,7 +1,7 @@
 # CocinaParaLechugones
 
 A private, non-commercial Android app for cooking at home with real supermarket products. It
-links recipes to Mercadona and Día products, shows how much of each package a dish uses and what
+links recipes to Mercadona, Día and Carrefour products, shows how much of each package a dish uses and what
 it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
@@ -14,8 +14,8 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
 
 ## Features
 
-- **Supermarket catalogue**: one pluggable module per supermarket, starting with Mercadona and
-  Día, plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
+- **Supermarket catalogue**: one pluggable module per supermarket (Mercadona, Día and
+  Carrefour; turn each on in Ajustes), plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
   back to cached prices when a shop fails. Optional "store brand only" filter.
 - **Recipes**: create, edit, duplicate, delete, scale servings, with a photo from the gallery or
   the camera. Every recipe stays editable, imported ones included. Each ingredient has a
@@ -50,7 +50,7 @@ No accounts, analytics, ads or AI features. All data stays on the phone.
 |---|---|
 | [docs/SPEC.md](docs/SPEC.md) | Full specification: architecture, features with acceptance criteria, domain rules, data model, phases, risks |
 | [docs/RECIPE_FORMAT.md](docs/RECIPE_FORMAT.md) | Exact recipe pack format `cpl-recipe/1`: fields, units, validation, canonical export |
-| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md) and [Día](docs/providers/dia.md) |
+| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md), [Día](docs/providers/dia.md), [Carrefour](docs/providers/carrefour.md) and [Lidl](docs/providers/lidl.md) (skipped) |
 | [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md) | Phone and PC setup, adb over USB and Wi-Fi, logs, screenshots, data-safety rules |
 | [prompts/recipe-pack-generator.md](prompts/recipe-pack-generator.md) | Prompt to paste into an external Claude chat to get importable recipes |
 | [examples/recipe-packs/](examples/recipe-packs/) | Sample recipe pack (also used as a test fixture) |
@@ -93,6 +93,7 @@ Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 | `:provider:api` | Supermarket provider contract, shared rate limiter and request handling |
 | `:provider:mercadona` | Mercadona provider (JSON endpoints, mapper, fixtures) |
 | `:provider:dia` | Día provider (search-based sync, session cookie in memory, mapper, fixtures) |
+| `:provider:carrefour` | Carrefour provider (public search index, search-based sync, mapper, fixtures) |
 | `build-logic/` | Gradle convention plugins |
 
 ## Installing the app (owner and friends)
@@ -225,9 +226,14 @@ and is cached on the phone. See [docs/providers/README.md § Etiquette](docs/pro
 
 ## Credits and third-party code
 
-No source code has been copied from other projects. Everything in this repository was written
-for it, except the open-source libraries below, which are used as dependencies under their own
-licences.
+Everything in this repository was written for it, except the open-source libraries below (used
+as dependencies under their own licences) and the work ported from supermercapy.
+
+### Ported code
+
+| Project | What was taken | Licence |
+|---|---|---|
+| [jtayped/supermercapy](https://github.com/jtayped/supermercapy), Copyright (c) 2024 Joel Taylor | Python library documenting Spanish supermarkets' storefront APIs. The Carrefour provider follows its docs (endpoint, parameters, field meanings) and translates its search-document parsing (sizes from the unit conversion factor, computed price per unit) to Kotlin. Its recorded responses are used as test fixtures (`supermercapy-*.json`). Licence text in [third_party/supermercapy/LICENSE](third_party/supermercapy/LICENSE) | MIT |
 
 ### Projects consulted during research
 

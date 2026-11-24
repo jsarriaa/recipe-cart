@@ -1,0 +1,283 @@
+{
+ "catalog": {
+  "content": [
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.001,
+    "active_marketplace": false,
+    "sms_size_color": "7790250000",
+    "variable_weight": true,
+    "ean13": "2956027000005",
+    "unit_short_name": "kg",
+    "average_weight": 900,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/779025_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/platano-de-canarias-igp-bolsa-de-900-g-aprox/R-VC4AECOMM-779025/p"
+    },
+    "product_id": "VC4AECOMM-779025",
+    "parent_category": {
+     "food": "cat220011"
+    },
+    "sms": "779025",
+    "brand": "CARREFOUR",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "22012",
+    "catalog_ref_id": "7790250000",
+    "start_date_food": "2021-10-09T14:06:42.022+02:00",
+    "color_rollup": "VC4AECOMM-779025",
+    "active_price": 2.84,
+    "active": false,
+    "end_date_food": "2126-10-09T14:06:42.022+02:00",
+    "display_name": "Plátano de Canarias IGP bolsa de 900 g aprox",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/platano-de-canarias-igp-bolsa-de-900-g-aprox/R-VC4AECOMM-779025/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/779025_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "900 g aprox",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.001,
+    "active_marketplace": false,
+    "sms_size_color": "8102520000",
+    "variable_weight": true,
+    "ean13": "2966175000000",
+    "unit_short_name": "kg",
+    "average_weight": 1000,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/810252_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/platano-de-canarias-ecologico1-kg-aprox/R-715402070/p"
+    },
+    "product_id": "715402070",
+    "parent_category": {
+     "food": "cat220011"
+    },
+    "sms": "810252",
+    "brand": "MARCA NACIONAL SIN MARCA",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "22012",
+    "info_tags": [
+     {
+      "message": "Bio",
+      "color_code": "#4BD074"
+     }
+    ],
+    "catalog_ref_id": "8102520000",
+    "color_rollup": "715402070",
+    "start_date_food": "2021-10-09T14:06:10.186+02:00",
+    "active_price": 2.95,
+    "active": false,
+    "end_date_food": "2126-10-09T14:06:10.186+02:00",
+    "display_name": "Plátano de Canarias ecológico1 Kg aprox",
+    "num_images": 2,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/platano-de-canarias-ecologico1-kg-aprox/R-715402070/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/810252_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "Envase de",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.001,
+    "active_marketplace": false,
+    "sms_size_color": "5454240000",
+    "variable_weight": true,
+    "ean13": "2936944000005",
+    "unit_short_name": "kg",
+    "average_weight": 800,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/545424_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/platano-de-canarias-igp-carrefour-bio-800g-aprox/R-VC4AECOMM-545424/p"
+    },
+    "product_id": "VC4AECOMM-545424",
+    "parent_category": {
+     "food": "cat220011"
+    },
+    "sms": "545424",
+    "brand": "CARREFOUR BIO",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "22012",
+    "info_tags": [
+     {
+      "message": "Bio",
+      "color_code": "#4BD074"
+     }
+    ],
+    "catalog_ref_id": "5454240000",
+    "start_date_food": "2021-10-09T14:06:34.640+02:00",
+    "color_rollup": "VC4AECOMM-545424",
+    "active_price": 2.95,
+    "active": false,
+    "end_date_food": "2126-10-09T14:06:34.640+02:00",
+    "display_name": "Plátano de Canarias IGP Carrefour Bio 800g aprox",
+    "num_images": 2,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/platano-de-canarias-igp-carrefour-bio-800g-aprox/R-VC4AECOMM-545424/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/545424_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "800 g",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.001,
+    "active_marketplace": false,
+    "sms_size_color": "0358340000",
+    "variable_weight": true,
+    "ean13": "2902266000009",
+    "unit_short_name": "kg",
+    "average_weight": 1000,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/035834_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/banana-a-granel-1-kg-aprox/R-529921745/p"
+    },
+    "product_id": "529921745",
+    "parent_category": {
+     "food": "cat21078000"
+    },
+    "sms": "035834",
+    "brand": "MARCA NACIONAL SIN MARCA",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "22012",
+    "catalog_ref_id": "0358340000",
+    "start_date_food": "2021-11-05T11:04:02.316+01:00",
+    "color_rollup": "529921745",
+    "active_price": 0.99,
+    "active": false,
+    "end_date_food": "2126-11-05T11:04:02.316+01:00",
+    "display_name": "Banana a granel 1 Kg aprox",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/banana-a-granel-1-kg-aprox/R-529921745/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/035834_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "Bandeja de ",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.001,
+    "active_marketplace": false,
+    "sms_size_color": "0537610000",
+    "variable_weight": true,
+    "ean13": "2901568000007",
+    "unit_short_name": "kg",
+    "average_weight": 1000,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/053761_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/platano-de-freir-a-granel-1-kg-aprox/R-547901617/p"
+    },
+    "product_id": "547901617",
+    "parent_category": {
+     "food": "cat220011"
+    },
+    "sms": "053761",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "22034",
+    "catalog_ref_id": "0537610000",
+    "start_date_food": "2021-10-09T14:06:00.024+02:00",
+    "color_rollup": "547901617",
+    "active_price": 2.9,
+    "active": false,
+    "end_date_food": "2126-10-09T14:06:00.024+02:00",
+    "display_name": "Plátano de freir a granel 1 Kg aprox",
+    "num_images": 2,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/platano-de-freir-a-granel-1-kg-aprox/R-547901617/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/053761_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "Bandeja de "
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.075,
+    "active_marketplace": false,
+    "sms_size_color": "5307090000",
+    "ean13": "0832697000564",
+    "unit_short_name": "kg",
+    "average_weight": 75,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/530709_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/chips-de-platano-deshidratado-con-sal-samai-sin-gluten-75-g/R-VC4AECOMM-530709/p"
+    },
+    "product_id": "VC4AECOMM-530709",
+    "parent_category": {
+     "food": "cat390004"
+    },
+    "sms": "530709",
+    "brand": "MARCA NACIONAL SIN MARCA",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "14135",
+    "info_tags": [
+     {
+      "message": "Sin gluten",
+      "color_code": "#f9e9de"
+     }
+    ],
+    "catalog_ref_id": "5307090000",
+    "start_date_food": "2021-11-20T13:32:53.787+01:00",
+    "color_rollup": "VC4AECOMM-530709",
+    "active_price": 1.36,
+    "active": false,
+    "end_date_food": "2126-11-20T13:32:53.787+01:00",
+    "display_name": "Chips de plátano deshidratado con sal Samai sin gluten 75 g.",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/chips-de-platano-deshidratado-con-sal-samai-sin-gluten-75-g/R-VC4AECOMM-530709/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/530709_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "75 g",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   }
+  ],
+  "numFound": 285,
+  "pagination": {
+   "start": 0,
+   "total": 285,
+   "rows": 6
+  }
+ }
+}

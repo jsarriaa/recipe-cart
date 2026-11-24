@@ -47,7 +47,7 @@ files are the only ways to move data between phones.
 
 | UI (es-ES) | Code (English) | Meaning |
 |---|---|---|
-| Supermercado | `Provider` | A product source: Mercadona, Día, or Manual |
+| Supermercado | `Provider` | A product source: Mercadona, Día, Carrefour, or Manual |
 | Producto | `Product` | A sellable item at one provider, with package size and price |
 | Envase / paquete | `Package` | One sellable unit of a product (paquete, bandeja, bote, pieza…) |
 | Marca blanca | `StoreBrand` | The provider's own brand (Hacendado, Dia…) |
@@ -80,6 +80,7 @@ files are the only ways to move data between phones.
                         rate limiter, shared OkHttp/Json configuration, ProviderResult errors.
 :provider:mercadona     Pure Kotlin (JVM). Retrofit service, DTOs, mapper → provider:api model.
 :provider:dia           Same for Día (phase 7, subject to the feasibility check in providers/dia.md).
+:provider:carrefour     Same for Carrefour (after 1.4.0; its public search index only).
 build-logic/            Gradle convention plugins (android-app, android-library, jvm-library, hilt, room).
 ```
 
@@ -152,6 +153,9 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   - **Mercadona**: verified, see [providers/mercadona.md](providers/mercadona.md).
   - **Día**: verified from the phone in phase 7 ([providers/dia.md](providers/dia.md)). Its
     catalogue sync is search-based (a fixed list of food searches), and prices ignore Club Dia.
+  - **Carrefour** (after 1.4.0): its public search index only, national online prices,
+    search-based sync ([providers/carrefour.md](providers/carrefour.md)). Ported from
+    supermercapy (MIT). New supermarkets start switched off.
   - **Manual**: built in, always available. The user types a product (name, brand, store-brand
     flag, package size, price, shop name). This covers shops without an API and providers that
     are down or refuse us. Manual products are stored in the catalogue table with provider id
