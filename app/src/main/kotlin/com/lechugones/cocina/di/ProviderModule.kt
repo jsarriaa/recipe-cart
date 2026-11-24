@@ -3,6 +3,7 @@ package com.lechugones.cocina.di
 import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.provider.SupermarketProvider
 import com.lechugones.cocina.provider.aldi.AldiProvider
+import com.lechugones.cocina.provider.bonarea.BonareaProvider
 import com.lechugones.cocina.provider.carrefour.CarrefourProvider
 import com.lechugones.cocina.provider.dia.DiaProvider
 import com.lechugones.cocina.provider.mercadona.MercadonaProvider
@@ -78,4 +79,13 @@ object ProviderModule {
         client: OkHttpClient,
         clock: Clock,
     ): SupermarketProvider = AldiProvider.create(client, clock)
+
+    /** bonÀrea: its online shop's search, national catalogue and prices (docs/providers/bonarea.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBonarea(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = BonareaProvider.create(client, clock)
 }

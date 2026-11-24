@@ -1,6 +1,7 @@
 package com.lechugones.cocina.provider.dia
 
 import com.lechugones.cocina.provider.FoodSearches
+import com.lechugones.cocina.provider.MemoryCookieJar
 import com.lechugones.cocina.provider.ProviderCategory
 import com.lechugones.cocina.provider.ProviderError
 import com.lechugones.cocina.provider.ProviderLocation
@@ -10,9 +11,6 @@ import com.lechugones.cocina.provider.RateLimiter
 import com.lechugones.cocina.provider.SupermarketProvider
 import com.lechugones.cocina.provider.providerCall
 import kotlinx.serialization.json.Json
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.HttpException
@@ -155,25 +153,5 @@ class DiaProvider(
                     .build()
             return DiaProvider(retrofit.create(DiaApi::class.java), limiter, clock, sleep)
         }
-    }
-}
-
-/** Session cookies for one provider, in memory only (never written to disk). */
-private class MemoryCookieJar : CookieJar {
-    private val cookies = mutableMapOf<String, Cookie>()
-
-    @Synchronized
-    override fun saveFromResponse(
-        url: HttpUrl,
-        cookies: List<Cookie>,
-    ) {
-        cookies.forEach { this.cookies[it.name + "@" + it.domain + it.path] = it }
-    }
-
-    @Synchronized
-    override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        val now = System.currentTimeMillis()
-        this.cookies.values.removeAll { it.expiresAt < now }
-        return this.cookies.values.filter { it.matches(url) }
     }
 }
