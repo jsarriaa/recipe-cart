@@ -56,3 +56,4 @@ requests; the food part is roughly 70 requests, about 85 s at one request per 1.
 |---|---|---|
 | 2026-11-24 | `catalog/product?q=leche` from the PC, app User-Agent | 403 (Imperva) |
 | 2026-11-24 | Same from the phone, then `q=platano|huevos|atun|pollo`, the menu, `catalog/product/code/7080604` and `categories=2075`, 2 s apart | 200 JSON for all; recorded as the test fixtures |
+| 2026-11-24 | Full catalogue sync from the phone (debug app), search `leche`, photos | 6379 products, sizes, prices and photos correct. |

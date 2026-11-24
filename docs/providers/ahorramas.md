@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (HTML, 200). Not yet checked from the phone |
+| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (HTML, 200). Synced from the phone on the same day |
 | Base URL | `https://www.ahorramas.com/` (Salesforce Commerce Cloud) |
 | Images | `https://www.ahorramas.com/dw/image/v2/…?sw=260&sh=260&sm=fit` (same host; the CDN resizes) |
 | Location model | None. One price list (the chain sells in the Madrid area) |
@@ -34,7 +34,7 @@ with `X-Requested-With: XMLHttpRequest`.
 | `.unit-price-per-unit.grey` | `referencePrice`, `referenceFormat` | `0,83€/LITRO`, `3,48€/Kg`, `3,05€/DOCENA`, `15,71€/KG.PESO ESC` (per kilo of **drained** weight, on tins and jars), `UNIDAD`. `LAVADO` (doses) is dropped |
 | name, or price ÷ unit price | `net`, `approx` | When the name has no size (`Atún claro pack 6`), the content is derived from the unit price and marked approximate. For tins this is the drained weight |
 | `[data-price-kg="true"]` | `net` = 1 kg, approximate | Fresh food sold by weight: the price is per kilogram. `data-mediumweight` is one piece in kg (not used yet) |
-| `pack 6`, `P4`, `4x100g` in the name | `unitCount` | |
+| `pack 6`, `P4`, `4x100g` in the name | `unitCount` | A size followed by a pack count (`Atún 52G pack 3`) is one piece's: when price ÷ unit price agrees, `net` is the total (156 g) |
 | `[data-available]` | `available` | |
 | `img.tile-image` | `imageUrl` | Rewritten to `?sw=260&sh=260&sm=fit` |
 | `a.product-pdp-link[href]` | `webUrl` | |
@@ -64,3 +64,4 @@ about 76 pages and 88 MB.
 |---|---|---|
 | 2026-11-24 | `Search-UpdateGrid?q=leche&sz=5`, then `q=leche|platano|huevos|atun&sz=12`, from the PC, app User-Agent, 1.5 s apart | 200 HTML tiles |
 | 2026-11-24 | `Search-UpdateGrid?q=70865&sz=5` | Exactly the tile of product 70865 |
+| 2026-11-24 | Full catalogue sync from the phone (debug app), search `leche`, photos | 1708 products; prices and photos correct. One size wrong: `Atún Alipende 52G pack 3` showed 52 g; it is now 156 g, three tins |

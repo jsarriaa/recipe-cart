@@ -5,8 +5,9 @@
     api.empathy.co (Carrefour's search index), static.carrefour.es (Carrefour images),
     www.aldi.es (Aldi's pages), s7g10.scene7.com (Aldi images), www.bonarea-online.com
     (bonÀrea's shop), images.bonarea.com (bonÀrea images), www.ahorramas.com (Ahorramás's
-    grid and images), tienda.consum.es (Consum's API) and cdn-consum.aktiosdigitalservices.com
-    (Consum images).
+    grid and images), tienda.consum.es (Consum's API), cdn-consum.aktiosdigitalservices.com
+    (Consum images), supermercado.eroski.es (Eroski's shop and images) and
+    www.capraboacasa.com (Caprabo's shop and images).
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />

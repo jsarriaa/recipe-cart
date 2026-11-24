@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (JSON, 200). Not yet checked from the phone |
+| Status | **Verified 2026-11-24** from the development PC with the app's User-Agent (JSON, 200). Synced from the phone on the same day |
 | Base URL | `https://www.bonarea-online.com/` |
 | Images | `https://images.bonarea.com/{file}?width=300&height=300` (the CDN resizes; originals are about 1 MB) |
 | Location model | None. One national catalogue and national prices |
@@ -60,3 +60,4 @@ of JSON. Walking the category tree instead would cost 491 requests (supermercapy
 |---|---|---|
 | 2026-11-24 | `GET /es` then `POST /es/shop/search strQuery=leche`, from the PC, app User-Agent | 200 JSON, 460 articles, Spanish names |
 | 2026-11-24 | `GET images.bonarea.com/13_9103_1.png` with and without `?width=300&height=300` | 1.1 MB and 55 kB PNG |
+| 2026-11-24 | Full catalogue sync from the phone (debug app), search `leche`, photos | 2587 products, sizes, prices and photos correct. |

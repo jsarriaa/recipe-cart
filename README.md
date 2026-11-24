@@ -1,7 +1,7 @@
 # CocinaParaLechugones
 
 A private, non-commercial Android app for cooking at home with real supermarket products. It
-links recipes to Mercadona, Día, Carrefour, Aldi, bonÀrea, Ahorramás and Consum products, shows how much of each package a dish uses and what
+links recipes to Mercadona, Día, Carrefour, Aldi, bonÀrea, Ahorramás, Consum, Eroski and Caprabo products, shows how much of each package a dish uses and what
 it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
@@ -15,7 +15,7 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
 ## Features
 
 - **Supermarket catalogue**: one pluggable module per supermarket (Mercadona, Día,
-  Carrefour, Aldi, bonÀrea, Ahorramás and Consum; turn each on in Ajustes), plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
+  Carrefour, Aldi, bonÀrea, Ahorramás, Consum, Eroski and Caprabo; turn each on in Ajustes), plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
   back to cached prices when a shop fails. Optional "store brand only" filter.
 - **Recipes**: create, edit, duplicate, delete, scale servings, with a photo from the gallery or
   the camera. Every recipe stays editable, imported ones included. Each ingredient has a
@@ -50,7 +50,7 @@ No accounts, analytics, ads or AI features. All data stays on the phone.
 |---|---|
 | [docs/SPEC.md](docs/SPEC.md) | Full specification: architecture, features with acceptance criteria, domain rules, data model, phases, risks |
 | [docs/RECIPE_FORMAT.md](docs/RECIPE_FORMAT.md) | Exact recipe pack format `cpl-recipe/1`: fields, units, validation, canonical export |
-| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md), [Día](docs/providers/dia.md), [Carrefour](docs/providers/carrefour.md), [Aldi](docs/providers/aldi.md), [bonÀrea](docs/providers/bonarea.md), [Ahorramás](docs/providers/ahorramas.md), [Consum](docs/providers/consum.md) and [Lidl](docs/providers/lidl.md) (skipped) |
+| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md), [Día](docs/providers/dia.md), [Carrefour](docs/providers/carrefour.md), [Aldi](docs/providers/aldi.md), [bonÀrea](docs/providers/bonarea.md), [Ahorramás](docs/providers/ahorramas.md), [Consum](docs/providers/consum.md), [Eroski](docs/providers/eroski.md), [Caprabo](docs/providers/caprabo.md) and [Lidl](docs/providers/lidl.md) (skipped) |
 | [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md) | Phone and PC setup, adb over USB and Wi-Fi, logs, screenshots, data-safety rules |
 | [prompts/recipe-pack-generator.md](prompts/recipe-pack-generator.md) | Prompt to paste into an external Claude chat to get importable recipes |
 | [examples/recipe-packs/](examples/recipe-packs/) | Sample recipe pack (also used as a test fixture) |
@@ -98,6 +98,7 @@ Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 | `:provider:bonarea` | bonÀrea provider (shop search, session warm-up, mapper, fixtures) |
 | `:provider:ahorramas` | Ahorramás provider (HTML grid parsed with jsoup, mapper, fixtures) |
 | `:provider:consum` | Consum provider (shop API, category walk, mapper, fixtures) |
+| `:provider:tapestry` | Eroski and Caprabo providers (their shared Tapestry storefront's search fragments parsed with jsoup, mapper, fixtures) |
 | `build-logic/` | Gradle convention plugins |
 
 ## Installing the app (owner and friends)
@@ -237,7 +238,7 @@ as dependencies under their own licences) and the work ported from supermercapy.
 
 | Project | What was taken | Licence |
 |---|---|---|
-| [jtayped/supermercapy](https://github.com/jtayped/supermercapy), Copyright (c) 2024 Joel Taylor | Python library documenting Spanish supermarkets' storefront APIs. The Carrefour provider follows its docs (endpoint, parameters, field meanings) and translates its search-document parsing (sizes from the unit conversion factor, computed price per unit) to Kotlin. The Aldi provider follows its page parsing (`__NEXT_DATA__`, `apiData`, category children) and unit-price scales. The bonÀrea provider follows its endpoints (session warm-up, search, article lookup), its unit-price text rules and its image resizing. The Ahorramás provider follows its grid endpoint, tile fields, shown-price rule, weighed-product rule and unit vocabulary. The Consum provider follows its endpoints (category menu, listing, product by code), its offer rule, product types and unit vocabulary (dozens, per-100 units). Its recorded responses are used as test fixtures (`supermercapy-*.json`, `supermercapy-*.html`). Licence text in [third_party/supermercapy/LICENSE](third_party/supermercapy/LICENSE) | MIT |
+| [jtayped/supermercapy](https://github.com/jtayped/supermercapy), Copyright (c) 2024 Joel Taylor | Python library documenting Spanish supermarkets' storefront APIs. The Carrefour provider follows its docs (endpoint, parameters, field meanings) and translates its search-document parsing (sizes from the unit conversion factor, computed price per unit) to Kotlin. The Aldi provider follows its page parsing (`__NEXT_DATA__`, `apiData`, category children) and unit-price scales. The bonÀrea provider follows its endpoints (session warm-up, search, article lookup), its unit-price text rules and its image resizing. The Ahorramás provider follows its grid endpoint, tile fields, shown-price rule, weighed-product rule and unit vocabulary. The Consum provider follows its endpoints (category menu, listing, product by code), its offer rule, product types and unit vocabulary (dozens, per-100 units). The Eroski and Caprabo provider follows its Tapestry parser: the scroll fragment endpoint, tile fields, visible-price rule, weighed-produce rule, unit text, product page and reCAPTCHA detection. Its recorded responses are used as test fixtures (`supermercapy-*.json`, `supermercapy-*.html`). Licence text in [third_party/supermercapy/LICENSE](third_party/supermercapy/LICENSE) | MIT |
 
 ### Projects consulted during research
 
@@ -245,6 +246,10 @@ as dependencies under their own licences) and the work ported from supermercapy.
 |---|---|
 | [serrano1996/dia-scraper](https://github.com/serrano1996/dia-scraper) | Source of the Día endpoint paths, the postal-code session behaviour and the response field names documented (unverified) in [docs/providers/dia.md](docs/providers/dia.md). Read only; no code taken |
 | [vgvr0/dia-supermarket-scraper](https://github.com/vgvr0/dia-supermarket-scraper) | Read during the Día research. It scrapes HTML pages with a browser, so nothing from it is used |
+| [jgalea/grocery-cli](https://github.com/jgalea/grocery-cli) | Read during the Eroski research (it has a Go Eroski client). No code taken |
+| [LdMe/eroskrapi](https://github.com/LdMe/eroskrapi) | Read during the Eroski research. GPL-3.0, so no code taken |
+| [ArtudGabriel/cesta PR #74](https://github.com/ArtudGabriel/cesta/pull/74) | Confirmed that Eroski's tiles carry the `data-metrics` analytics JSON. No code taken |
+| [esRuedaUCM/chupchup-scrapers](https://github.com/esRuedaUCM/chupchup-scrapers) | Same confirmation for Eroski's tiles. No code taken |
 | [Dia Spain Scraper on Apify](https://apify.com/studio-amba/dia-es-scraper) (studio-amba/dia-es-scraper) | Public description read during the Día research. Nothing used |
 
 The Mercadona endpoints in [docs/providers/mercadona.md](docs/providers/mercadona.md) were
@@ -270,7 +275,7 @@ bundle (2026-11-18). No third-party code was involved.
 | [Coil](https://github.com/coil-kt/coil) (with `coil-network-okhttp`) | Showing recipe photos and product images | Apache-2.0 |
 | [Retrofit](https://github.com/square/retrofit) (with its kotlinx.serialization converter) | Supermarket JSON endpoints | Apache-2.0 |
 | [OkHttp](https://github.com/square/okhttp) (and MockWebServer in tests) | HTTP client with the app's User-Agent | Apache-2.0 |
-| [jsoup](https://github.com/jhy/jsoup) | Reading the HTML product grid of Ahorramás | MIT |
+| [jsoup](https://github.com/jhy/jsoup) | Reading the HTML product grid of Ahorramás and the Eroski and Caprabo tiles | MIT |
 | [AndroidX ExifInterface](https://developer.android.com/jetpack/androidx/releases/exifinterface) | Rotating camera photos correctly | Apache-2.0 |
 | [Okio](https://github.com/square/okio) (pulled in by kaml and DataStore) | I/O used by those libraries | Apache-2.0 |
 | [actions/checkout](https://github.com/actions/checkout), [actions/setup-java](https://github.com/actions/setup-java), [actions/upload-artifact](https://github.com/actions/upload-artifact), [gradle/actions](https://github.com/gradle/actions) | GitHub Actions CI | MIT |

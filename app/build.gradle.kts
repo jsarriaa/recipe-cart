@@ -88,6 +88,7 @@ dependencies {
     implementation(project(":provider:bonarea"))
     implementation(project(":provider:ahorramas"))
     implementation(project(":provider:consum"))
+    implementation(project(":provider:tapestry"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

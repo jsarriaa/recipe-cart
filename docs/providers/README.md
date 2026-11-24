@@ -10,11 +10,13 @@ never knows which supermarkets exist.
 |---|---|---|---|
 | Mercadona | `:provider:mercadona` | **Verified 2026-11-18.** Plain requests with a descriptive User-Agent work | [mercadona.md](mercadona.md) |
 | Día | `:provider:dia` | **Verified 2026-11-19 from the phone.** The development PC (Croatian IP) is blocked; the phone's Spanish connection gets JSON with the honest User-Agent. Search-based catalogue sync | [dia.md](dia.md) |
-| Carrefour | `:provider:carrefour` | **Verified 2026-11-24 from the PC.** Public search index only (the storefront admits only browsers), national prices, search-based sync. Ported from supermercapy | [carrefour.md](carrefour.md) |
-| Aldi | `:provider:aldi` | **Verified 2026-11-24 from the PC.** No online shop: its category pages embed the shelf assortment (no search key used), península prices. Ported from supermercapy | [aldi.md](aldi.md) |
-| bonÀrea | `:provider:bonarea` | **Verified 2026-11-24 from the PC.** National catalogue and prices, search-based sync (each search returns every hit). Ported from supermercapy | [bonarea.md](bonarea.md) |
-| Ahorramás | `:provider:ahorramas` | **Verified 2026-11-24 from the PC.** HTML product grid (jsoup), one price list (Madrid area), search-based sync; price refresh by searching the id. Ported from supermercapy | [ahorramas.md](ahorramas.md) |
+| Carrefour | `:provider:carrefour` | **Verified 2026-11-24 from the PC, synced from the phone.** Public search index only (the storefront admits only browsers), national prices, search-based sync. Ported from supermercapy | [carrefour.md](carrefour.md) |
+| Aldi | `:provider:aldi` | **Verified 2026-11-24 from the PC, synced from the phone.** No online shop: its category pages embed the shelf assortment (no search key used), península prices. Ported from supermercapy | [aldi.md](aldi.md) |
+| bonÀrea | `:provider:bonarea` | **Verified 2026-11-24 from the PC, synced from the phone.** National catalogue and prices, search-based sync (each search returns every hit). Ported from supermercapy | [bonarea.md](bonarea.md) |
+| Ahorramás | `:provider:ahorramas` | **Verified 2026-11-24 from the PC, synced from the phone.** HTML product grid (jsoup), one price list (Madrid area), search-based sync; price refresh by searching the id. Ported from supermercapy | [ahorramas.md](ahorramas.md) |
 | Consum | `:provider:consum` | **Verified 2026-11-24 from the phone.** The PC is refused (Imperva, foreign IP). Shop JSON API, national prices, walk of the food categories (100 rows per request). Ported from supermercapy | [consum.md](consum.md) |
+| Eroski | `:provider:tapestry` | **Verified 2026-11-24 from the phone.** The PC is refused (403). Tapestry search fragments (jsoup), Basque prices of the pinned shop, search-based sync; price refresh from the product page. Ported from supermercapy | [eroski.md](eroski.md) |
+| Caprabo | `:provider:tapestry` | **Verified 2026-11-24 from the phone.** Same storefront as Eroski, its own catalogue and Catalan prices. Ported from supermercapy | [caprabo.md](caprabo.md) |
 | Lidl | none | **Not implemented** (owner's decision): only weekly offers online | [lidl.md](lidl.md) |
 | Manual | built into `:core:data` | Always available. Products typed in by the user | this page, § Manual provider |
 
