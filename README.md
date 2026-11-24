@@ -1,7 +1,7 @@
 # CocinaParaLechugones
 
 A private, non-commercial Android app for cooking at home with real supermarket products. It
-links recipes to Mercadona, Día, Carrefour, Aldi and bonÀrea products, shows how much of each package a dish uses and what
+links recipes to Mercadona, Día, Carrefour, Aldi, bonÀrea and Ahorramás products, shows how much of each package a dish uses and what
 it costs, keeps a pantry, and builds a shopping list grouped by supermarket.
 
 It is a sideloaded APK for the owner and a few friends. It will never be published on the Play
@@ -15,7 +15,7 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
 ## Features
 
 - **Supermarket catalogue**: one pluggable module per supermarket (Mercadona, Día,
-  Carrefour, Aldi and bonÀrea; turn each on in Ajustes), plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
+  Carrefour, Aldi, bonÀrea and Ahorramás; turn each on in Ajustes), plus manual products. Cached locally, rate-limited, refreshed only on demand, and falling
   back to cached prices when a shop fails. Optional "store brand only" filter.
 - **Recipes**: create, edit, duplicate, delete, scale servings, with a photo from the gallery or
   the camera. Every recipe stays editable, imported ones included. Each ingredient has a
@@ -50,7 +50,7 @@ No accounts, analytics, ads or AI features. All data stays on the phone.
 |---|---|
 | [docs/SPEC.md](docs/SPEC.md) | Full specification: architecture, features with acceptance criteria, domain rules, data model, phases, risks |
 | [docs/RECIPE_FORMAT.md](docs/RECIPE_FORMAT.md) | Exact recipe pack format `cpl-recipe/1`: fields, units, validation, canonical export |
-| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md), [Día](docs/providers/dia.md), [Carrefour](docs/providers/carrefour.md), [Aldi](docs/providers/aldi.md), [bonÀrea](docs/providers/bonarea.md) and [Lidl](docs/providers/lidl.md) (skipped) |
+| [docs/providers/](docs/providers/README.md) | Provider contract, network etiquette, and the research notes for [Mercadona](docs/providers/mercadona.md), [Día](docs/providers/dia.md), [Carrefour](docs/providers/carrefour.md), [Aldi](docs/providers/aldi.md), [bonÀrea](docs/providers/bonarea.md), [Ahorramás](docs/providers/ahorramas.md) and [Lidl](docs/providers/lidl.md) (skipped) |
 | [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md) | Phone and PC setup, adb over USB and Wi-Fi, logs, screenshots, data-safety rules |
 | [prompts/recipe-pack-generator.md](prompts/recipe-pack-generator.md) | Prompt to paste into an external Claude chat to get importable recipes |
 | [examples/recipe-packs/](examples/recipe-packs/) | Sample recipe pack (also used as a test fixture) |
@@ -96,6 +96,7 @@ Details and the phone setup: [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md).
 | `:provider:carrefour` | Carrefour provider (public search index, search-based sync, mapper, fixtures) |
 | `:provider:aldi` | Aldi provider (category pages' embedded data, mapper, fixtures) |
 | `:provider:bonarea` | bonÀrea provider (shop search, session warm-up, mapper, fixtures) |
+| `:provider:ahorramas` | Ahorramás provider (HTML grid parsed with jsoup, mapper, fixtures) |
 | `build-logic/` | Gradle convention plugins |
 
 ## Installing the app (owner and friends)
@@ -235,7 +236,7 @@ as dependencies under their own licences) and the work ported from supermercapy.
 
 | Project | What was taken | Licence |
 |---|---|---|
-| [jtayped/supermercapy](https://github.com/jtayped/supermercapy), Copyright (c) 2024 Joel Taylor | Python library documenting Spanish supermarkets' storefront APIs. The Carrefour provider follows its docs (endpoint, parameters, field meanings) and translates its search-document parsing (sizes from the unit conversion factor, computed price per unit) to Kotlin. The Aldi provider follows its page parsing (`__NEXT_DATA__`, `apiData`, category children) and unit-price scales. The bonÀrea provider follows its endpoints (session warm-up, search, article lookup), its unit-price text rules and its image resizing. Its recorded responses are used as test fixtures (`supermercapy-*.json`). Licence text in [third_party/supermercapy/LICENSE](third_party/supermercapy/LICENSE) | MIT |
+| [jtayped/supermercapy](https://github.com/jtayped/supermercapy), Copyright (c) 2024 Joel Taylor | Python library documenting Spanish supermarkets' storefront APIs. The Carrefour provider follows its docs (endpoint, parameters, field meanings) and translates its search-document parsing (sizes from the unit conversion factor, computed price per unit) to Kotlin. The Aldi provider follows its page parsing (`__NEXT_DATA__`, `apiData`, category children) and unit-price scales. The bonÀrea provider follows its endpoints (session warm-up, search, article lookup), its unit-price text rules and its image resizing. The Ahorramás provider follows its grid endpoint, tile fields, shown-price rule, weighed-product rule and unit vocabulary. Its recorded responses are used as test fixtures (`supermercapy-*.json`, `supermercapy-*.html`). Licence text in [third_party/supermercapy/LICENSE](third_party/supermercapy/LICENSE) | MIT |
 
 ### Projects consulted during research
 
@@ -268,6 +269,7 @@ bundle (2026-11-18). No third-party code was involved.
 | [Coil](https://github.com/coil-kt/coil) (with `coil-network-okhttp`) | Showing recipe photos and product images | Apache-2.0 |
 | [Retrofit](https://github.com/square/retrofit) (with its kotlinx.serialization converter) | Supermarket JSON endpoints | Apache-2.0 |
 | [OkHttp](https://github.com/square/okhttp) (and MockWebServer in tests) | HTTP client with the app's User-Agent | Apache-2.0 |
+| [jsoup](https://github.com/jhy/jsoup) | Reading the HTML product grid of Ahorramás | MIT |
 | [AndroidX ExifInterface](https://developer.android.com/jetpack/androidx/releases/exifinterface) | Rotating camera photos correctly | Apache-2.0 |
 | [Okio](https://github.com/square/okio) (pulled in by kaml and DataStore) | I/O used by those libraries | Apache-2.0 |
 | [actions/checkout](https://github.com/actions/checkout), [actions/setup-java](https://github.com/actions/setup-java), [actions/upload-artifact](https://github.com/actions/upload-artifact), [gradle/actions](https://github.com/gradle/actions) | GitHub Actions CI | MIT |

@@ -2,6 +2,7 @@ package com.lechugones.cocina.di
 
 import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.provider.SupermarketProvider
+import com.lechugones.cocina.provider.ahorramas.AhorramasProvider
 import com.lechugones.cocina.provider.aldi.AldiProvider
 import com.lechugones.cocina.provider.bonarea.BonareaProvider
 import com.lechugones.cocina.provider.carrefour.CarrefourProvider
@@ -88,4 +89,13 @@ object ProviderModule {
         client: OkHttpClient,
         clock: Clock,
     ): SupermarketProvider = BonareaProvider.create(client, clock)
+
+    /** Ahorramás: its product grid (Madrid area, one price list) (docs/providers/ahorramas.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideAhorramas(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = AhorramasProvider.create(client, clock)
 }
