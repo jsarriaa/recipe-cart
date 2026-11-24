@@ -22,10 +22,10 @@ object CommunityLinks {
     const val INDEX_URL = RAW_BASE + "index.json"
 
     /**
-     * The owner's Cloudflare Worker that commits published recipes (community/worker/). Empty
-     * until it is deployed: "Publicar" then says publishing is not available yet.
+     * The owner's Cloudflare Worker that commits published recipes (community/worker/). If it is
+     * ever emptied, "Publicar" says publishing is not available.
      */
-    const val PUBLISH_URL = ""
+    const val PUBLISH_URL = "https://recetario.jeeaaanb13.workers.dev/publish"
 
     /** Recipe file paths come from the index; anything that could leave the book is refused. */
     private val SAFE_PATH = Regex("^recipes/[A-Za-z0-9._/-]+\\.md$")
