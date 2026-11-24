@@ -18,8 +18,11 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.FileUpload
+import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material.icons.outlined.SoupKitchen
 import androidx.compose.material3.CircularProgressIndicator
@@ -132,19 +135,24 @@ fun RecipesScreen(
             }
             Box {
                 IconButton(onClick = { menuOpen = true }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.action_more))
+                    Icon(Icons.Filled.Groups, contentDescription = stringResource(R.string.recipes_community_menu))
                 }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(text = { Text(stringResource(R.string.community_title)) }, onClick = {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.community_title)) }, leadingIcon = {
+                        Icon(Icons.Outlined.Groups, contentDescription = null)
+                    }, onClick = {
                         menuOpen = false
                         onCommunity()
                     })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.recipes_import)) }, onClick = {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.recipes_import)) }, leadingIcon = {
+                        Icon(Icons.Outlined.FileDownload, contentDescription = null)
+                    }, onClick = {
                         menuOpen = false
                         onImport()
                     })
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.recipes_export_all)) },
+                        leadingIcon = { Icon(Icons.Outlined.FileUpload, contentDescription = null) },
                         enabled = state.totalCount > 0,
                         onClick = {
                             menuOpen = false
