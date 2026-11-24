@@ -54,6 +54,9 @@ No accounts, analytics, ads or AI features. All data stays on the phone.
 | [docs/DEVICE_SETUP.md](docs/DEVICE_SETUP.md) | Phone and PC setup, adb over USB and Wi-Fi, logs, screenshots, data-safety rules |
 | [prompts/recipe-pack-generator.md](prompts/recipe-pack-generator.md) | Prompt to paste into an external Claude chat to get importable recipes |
 | [examples/recipe-packs/](examples/recipe-packs/) | Sample recipe pack (also used as a test fixture) |
+| [docs/COMMUNITY.md](docs/COMMUNITY.md) | Community recipe book: storage, index, searching and publishing |
+| [Editing the recipe book](#editing-the-community-recipe-book-on-github) | How to change, delete, add and restore recipes on GitHub |
+| [community/worker/](community/worker/README.md) | The publishing Worker and its Cloudflare setup |
 | [CLAUDE.md](CLAUDE.md) | Rules and workflow for development with Claude Code |
 
 ## Tech stack
@@ -114,6 +117,99 @@ The app is a sideloaded APK; it is never published on the Play Store.
 
 For testing the shrunk build on the development phone without touching the installed release
 app, `./gradlew :app:installMinified` installs the same R8 build as the debug app.
+
+## Editing the community recipe book on GitHub
+
+The recipes people see in "Recetas de la comunidad" are plain text files in
+[github.com/jsarriaa/recetario](https://github.com/jsarriaa/recetario), in the `recipes/`
+folder. Everything below works from a computer's browser, signed in as `jsarriaa`. On a phone,
+use the browser (not the GitHub app) and turn on "desktop site" in its menu.
+
+You never touch `index.json`: after every change, the **Build index** workflow rebuilds it by
+itself in about a minute. Phones see the change on their next search, up to 5 minutes later
+(GitHub's file cache).
+
+### Change a recipe
+
+1. Open [the `recipes/` folder](https://github.com/jsarriaa/recetario/tree/main/recipes) and
+   click the recipe's file.
+2. Click the **pencil icon** (✏️ "Edit this file") at the top right of the file.
+3. Change the text. The parts you will usually touch:
+
+   ```yaml
+   ---
+   format: cpl-recipe/1            # never change
+   uid: recetario-tortilla         # never change (the app uses it to spot re-imports)
+   title: Tortilla de patatas      # the name shown in the list
+   description: Jugosa por dentro. # one or two sentences, optional
+   author: Joan                    # shown as "por Joan"
+   servings: 4
+   prep_minutes: 15                # with cook_minutes, the "≤ 30 min" filters
+   cook_minutes: 35
+   tags: [española, cena, vegetariana]   # the filter chips: lowercase, comma separated
+   ingredients:
+     - name: patata
+       quantity: 700
+       unit: g
+   ---
+
+   ## Preparación
+
+   1. Steps go here, below the second `---`, as normal text.
+   ```
+
+   Keep the spaces at the start of the ingredient lines exactly as they are: they are what
+   tells an ingredient's fields apart. The full list of fields and units is in
+   [docs/RECIPE_FORMAT.md](docs/RECIPE_FORMAT.md).
+4. Click **Commit changes…** (green, top right). Leave "Commit directly to the `main` branch"
+   selected, optionally write what you changed, and click **Commit changes**.
+
+### Delete a recipe
+
+1. Open the recipe's file in `recipes/`.
+2. Click the **⋯** menu at the top right of the file and choose **Delete file**.
+3. Click **Commit changes…** and then **Commit changes**.
+
+It disappears from the app's search after the index rebuilds. People who already downloaded it
+keep their copy: it lives in their own app.
+
+### Add a recipe by hand
+
+1. In [the `recipes/` folder](https://github.com/jsarriaa/recetario/tree/main/recipes), click
+   **Add file → Create new file**.
+2. Name it like `lentejas-con-chorizo.md` (lowercase, dashes, ending in `.md`).
+3. Paste a recipe in the format above. The easiest source is a recipe exported from the app
+   (recipe ⋮ → Exportar); delete its `links:` blocks and the `image:` line first. The
+   [generator prompt](prompts/recipe-pack-generator.md) also produces valid recipes.
+4. Click **Commit changes…** and then **Commit changes**.
+
+### Check that it worked
+
+- Open the repository's **Actions** tab. The latest **Build index** run should have a green tick.
+- If a file has a mistake, the run still succeeds, but that recipe is **left out** of the app.
+  Click the run, then the **index** job: a yellow warning says which file and why (for example
+  "title, servings and ingredients are required"). Fix the file the same way and it comes back.
+- [index.json](https://github.com/jsarriaa/recetario/blob/main/index.json) lists everything the
+  app can see.
+
+### Undo a change
+
+1. Open the file and click **History** (top right).
+2. Click the change you want to undo to see the old text in red, or click the **<>** icon
+   ("View code at this point") on an older entry to see the whole file as it was then.
+3. Copy the old text, edit the current file, paste it back, and commit.
+
+A deleted file can be recovered the same way: open the repository's
+[commit list](https://github.com/jsarriaa/recetario/commits/main), find the "Delete …" or
+"chore: remove …" commit, open the file from the commit before it, copy its text, and add it
+again with **Add file → Create new file**.
+
+### Who can change what
+
+Only you (`jsarriaa`) and the publishing Worker can write to the repository. The Worker only
+adds new files, one per "Publicar"; editing and deleting are up to you. To stop all publishing,
+delete the Worker's token on GitHub (Settings → Developer settings → Fine-grained tokens) or
+disable the Worker in Cloudflare. Searching and downloading keep working.
 
 ## Contributing workflow
 

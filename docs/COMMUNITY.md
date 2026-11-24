@@ -45,7 +45,7 @@ scripts/build_index.py     builds index.json (PyYAML)
 Only `path`, `title` and `servings` are always present. Recipes are listed newest first (by
 the commit that added the file). Invalid files are left out with a warning in the workflow log.
 
-**Moderation**: the owner edits or deletes files on GitHub (web editor or git). The workflow
+**Moderation**: the owner edits or deletes files on GitHub (web editor or git; step by step in the [README](../README.md#editing-the-community-recipe-book-on-github)). The workflow
 rebuilds the index about a minute later; `raw.githubusercontent.com` may serve the old copy for
 up to 5 minutes.
 
