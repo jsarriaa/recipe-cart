@@ -10,6 +10,8 @@ never knows which supermarkets exist.
 |---|---|---|---|
 | Mercadona | `:provider:mercadona` | **Verified 2026-11-18.** Plain requests with a descriptive User-Agent work | [mercadona.md](mercadona.md) |
 | Día | `:provider:dia` | **Verified 2026-11-19 from the phone.** The development PC (Croatian IP) is blocked; the phone's Spanish connection gets JSON with the honest User-Agent. Search-based catalogue sync | [dia.md](dia.md) |
+| Carrefour | `:provider:carrefour` | **Verified 2026-11-24 from the PC.** Public search index only (the storefront admits only browsers), national prices, search-based sync. Ported from supermercapy | [carrefour.md](carrefour.md) |
+| Lidl | none | **Not implemented** (owner's decision): only weekly offers online | [lidl.md](lidl.md) |
 | Manual | built into `:core:data` | Always available. Products typed in by the user | this page, § Manual provider |
 
 ## Contract (`:provider:api`)
@@ -113,6 +115,11 @@ These rules apply to every provider and are enforced in shared code, not left to
    cached by Coil) at the smallest useful size.
 7. **No credentials.** We never log in to a shop account. We do not copy API keys found in a
    website's JavaScript into this repository or the app.
+8. **robots.txt.** Some shops' `robots.txt` lists the search path the app uses (Día's
+   `*/search/reduced?*`, Eroski's and Caprabo's search pages). The owner decided (2026-11-24)
+   that one paced, cached request per search or sync the user starts stays within the spirit of
+   those rules, which target crawlers. Each provider doc says plainly when its path is listed.
+   Bulk crawling of listed paths is never done.
 
 ## Adding a provider
 

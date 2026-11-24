@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     HTTPS only. The only hosts the app talks to are documented in docs/providers/:
-    tienda.mercadona.es (API), prod-mercadona.imgix.net (images) and www.dia.es (API and images).
+    tienda.mercadona.es (API), prod-mercadona.imgix.net (images), www.dia.es (API and images),
+    api.empathy.co (Carrefour's search index) and static.carrefour.es (Carrefour images).
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />

@@ -2,6 +2,7 @@ package com.lechugones.cocina.di
 
 import com.lechugones.cocina.BuildConfig
 import com.lechugones.cocina.provider.SupermarketProvider
+import com.lechugones.cocina.provider.carrefour.CarrefourProvider
 import com.lechugones.cocina.provider.dia.DiaProvider
 import com.lechugones.cocina.provider.mercadona.MercadonaProvider
 import dagger.Module
@@ -58,4 +59,13 @@ object ProviderModule {
         client: OkHttpClient,
         clock: Clock,
     ): SupermarketProvider = MercadonaProvider.create(client, clock)
+
+    /** Carrefour: its public search index only, national prices (docs/providers/carrefour.md). */
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideCarrefour(
+        client: OkHttpClient,
+        clock: Clock,
+    ): SupermarketProvider = CarrefourProvider.create(client, clock)
 }

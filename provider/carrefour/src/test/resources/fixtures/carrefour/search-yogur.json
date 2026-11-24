@@ -1,0 +1,288 @@
+{
+ "catalog": {
+  "content": [
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 1,
+    "active_marketplace": false,
+    "sms_size_color": "4856960000",
+    "ean13": "3560071246136",
+    "unit_short_name": "kg",
+    "average_weight": 1000,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/485696_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/yogur-estilo-griego-natural-con-azucar-de-cana-carrefour-1-kg/R-VC4AECOMM-485696/p"
+    },
+    "product_id": "VC4AECOMM-485696",
+    "parent_category": {
+     "food": "cat360003"
+    },
+    "sms": "485696",
+    "brand": "CARREFOUR",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15040",
+    "info_tags": [
+     {
+      "message": "Congelado",
+      "color_code": "#50A7FD"
+     }
+    ],
+    "catalog_ref_id": "4856960000",
+    "start_date_food": "2021-11-20T09:50:47.341+01:00",
+    "color_rollup": "VC4AECOMM-485696",
+    "active_price": 2.09,
+    "active": false,
+    "end_date_food": "2126-11-20T09:50:47.341+01:00",
+    "display_name": "Yogur estilo griego natural con azucar de caña Carrefour 1 kg.",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/yogur-estilo-griego-natural-con-azucar-de-cana-carrefour-1-kg/R-VC4AECOMM-485696/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/485696_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "1 kg.",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.6,
+    "active_marketplace": false,
+    "sms_size_color": "4154090000",
+    "ean13": "8435257054988",
+    "unit_short_name": "kg",
+    "average_weight": 600,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/415409_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/kefir-liquido-natural-nestle-sin-gluten-pack-de-6-unidades-de-100-g/R-fprod1490097/p"
+    },
+    "product_id": "fprod1490097",
+    "parent_category": {
+     "food": "cat32625883"
+    },
+    "sms": "415409",
+    "brand": "NESTLE",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15052",
+    "info_tags": [
+     {
+      "message": "Sin gluten",
+      "color_code": "#f9e9de"
+     }
+    ],
+    "catalog_ref_id": "4154090000",
+    "start_date_food": "2021-11-20T09:51:50.844+01:00",
+    "color_rollup": "fprod1490097",
+    "active_price": 3.05,
+    "active": false,
+    "end_date_food": "2126-11-20T09:51:50.844+01:00",
+    "display_name": "Kéfir líquido natural Nestlé sin gluten pack de 6 unidades de 100 g.",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/kefir-liquido-natural-nestle-sin-gluten-pack-de-6-unidades-de-100-g/R-fprod1490097/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/415409_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "pack 6x100 g.",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.44,
+    "active_marketplace": false,
+    "sms_size_color": "1550290000",
+    "ean13": "8410500028794",
+    "unit_short_name": "kg",
+    "average_weight": 440,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/155029_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/yogur-griego-natural-danone-pack-de-4-unidades-de-110-g/R-VC4AECOMM-155029/p"
+    },
+    "product_id": "VC4AECOMM-155029",
+    "parent_category": {
+     "food": "cat360003"
+    },
+    "sms": "155029",
+    "brand": "DANONE",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15040",
+    "catalog_ref_id": "1550290000",
+    "start_date_food": "2021-11-20T09:50:47.159+01:00",
+    "color_rollup": "VC4AECOMM-155029",
+    "active_price": 1.62,
+    "active": false,
+    "end_date_food": "2126-11-20T09:50:47.159+01:00",
+    "display_name": "Yogur griego natural Danone pack de 4 unidades de 110 g.",
+    "num_images": 1,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/yogur-griego-natural-danone-pack-de-4-unidades-de-110-g/R-VC4AECOMM-155029/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/155029_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "pack 4x110 g.",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.9,
+    "active_marketplace": false,
+    "sms_size_color": "1004570000",
+    "ean13": "8410500028268",
+    "unit_short_name": "kg",
+    "average_weight": 900,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/100457_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/yogur-griego-natural-danone-oikos-sin-gluten-y-sin-azucar-anadido-900-g/R-VC4AECOMM-100457/p"
+    },
+    "product_id": "VC4AECOMM-100457",
+    "parent_category": {
+     "food": "cat32989566"
+    },
+    "sms": "100457",
+    "brand": "OIKOS",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15040",
+    "info_tags": [
+     {
+      "message": "Sin gluten",
+      "color_code": "#f9e9de"
+     }
+    ],
+    "catalog_ref_id": "1004570000",
+    "start_date_food": "2021-11-20T10:08:34.831+01:00",
+    "color_rollup": "VC4AECOMM-100457",
+    "active_price": 4.49,
+    "active": false,
+    "end_date_food": "2126-11-20T10:08:34.831+01:00",
+    "display_name": "Yogur griego natural Danone Oikos sin gluten y sin azúcar añadido 900 g.",
+    "num_images": 6,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/yogur-griego-natural-danone-oikos-sin-gluten-y-sin-azucar-anadido-900-g/R-VC4AECOMM-100457/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/100457_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "900 g",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.6,
+    "active_marketplace": false,
+    "sms_size_color": "3544420000",
+    "ean13": "8410500006020",
+    "unit_short_name": "kg",
+    "average_weight": 600,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/354442_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/leche-fermentada-liquida-desnatada-natural-sin-azucar-anadido-danone-actimel-sin-gluten-pack-de-6-unidades-de-100-g/R-521029649/p"
+    },
+    "product_id": "521029649",
+    "parent_category": {
+     "food": "cat360012"
+    },
+    "sms": "354442",
+    "brand": "ACTIMEL",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15050",
+    "info_tags": [
+     {
+      "message": "Sin gluten",
+      "color_code": "#f9e9de"
+     }
+    ],
+    "catalog_ref_id": "3544420000",
+    "start_date_food": "2021-11-19T10:40:21.087+01:00",
+    "color_rollup": "521029649",
+    "active_price": 3.99,
+    "active": false,
+    "end_date_food": "2126-11-19T10:40:21.087+01:00",
+    "display_name": "Leche fermentada líquida desnatada natural sin azúcar añadido Danone Actimel sin gluten pack de 6 unidades de 100 g.",
+    "num_images": 3,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/leche-fermentada-liquida-desnatada-natural-sin-azucar-anadido-danone-actimel-sin-gluten-pack-de-6-unidades-de-100-g/R-521029649/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/354442_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "pack 6x100 g.",
+    "secondary_eans": [
+     "8410500011727"
+    ]
+   },
+   {
+    "end_date": "0001-01-01T00:00:00.000Z",
+    "unit_conversion_factor": 0.5,
+    "active_marketplace": false,
+    "sms_size_color": "8432890000",
+    "ean13": "8435257045672",
+    "unit_short_name": "kg",
+    "average_weight": 500,
+    "image_for_play_service": "https://static.carrefour.es/hd_350x_/img_pim_food/843289_00_1.jpg",
+    "urls": {
+     "food": "/supermercado/kefir-liquido-natural-nestle-500-g/R-prod630059/p"
+    },
+    "product_id": "prod630059",
+    "parent_category": {
+     "food": "cat32625883"
+    },
+    "sms": "843289",
+    "brand": "NESTLE",
+    "document_type": [
+     "food"
+    ],
+    "start_date": "0001-01-01T00:00:00.000Z",
+    "logistic_analytics": "15052",
+    "catalog_ref_id": "8432890000",
+    "start_date_food": "2021-11-20T09:51:58.304+01:00",
+    "color_rollup": "prod630059",
+    "active_price": 1.99,
+    "active": false,
+    "end_date_food": "2126-11-20T09:51:58.304+01:00",
+    "display_name": "Kéfir líquido natural Nestlé 500 g.",
+    "num_images": 2,
+    "measure_unit": "kg",
+    "url_for_play_service": "/supermercado/kefir-liquido-natural-nestle-500-g/R-prod630059/p",
+    "image_path": {
+     "food": "https://static.carrefour.es/hd_350x_/img_pim_food/843289_00_1.jpg"
+    },
+    "active_food": true,
+    "recipient": "500 g.",
+    "secondary_eans": [
+     "0000000000000"
+    ]
+   }
+  ],
+  "numFound": 609,
+  "pagination": {
+   "rows": 6,
+   "start": 0,
+   "total": 609
+  }
+ }
+}
