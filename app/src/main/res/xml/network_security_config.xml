@@ -2,7 +2,8 @@
 <!--
     HTTPS only. The only hosts the app talks to are documented in docs/providers/:
     tienda.mercadona.es (API), prod-mercadona.imgix.net (images), www.dia.es (API and images),
-    api.empathy.co (Carrefour's search index) and static.carrefour.es (Carrefour images).
+    api.empathy.co (Carrefour's search index), static.carrefour.es (Carrefour images),
+    www.aldi.es (Aldi's pages) and s7g10.scene7.com (Aldi images).
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />

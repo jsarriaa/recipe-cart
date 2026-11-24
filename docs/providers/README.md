@@ -11,6 +11,7 @@ never knows which supermarkets exist.
 | Mercadona | `:provider:mercadona` | **Verified 2026-11-18.** Plain requests with a descriptive User-Agent work | [mercadona.md](mercadona.md) |
 | Día | `:provider:dia` | **Verified 2026-11-19 from the phone.** The development PC (Croatian IP) is blocked; the phone's Spanish connection gets JSON with the honest User-Agent. Search-based catalogue sync | [dia.md](dia.md) |
 | Carrefour | `:provider:carrefour` | **Verified 2026-11-24 from the PC.** Public search index only (the storefront admits only browsers), national prices, search-based sync. Ported from supermercapy | [carrefour.md](carrefour.md) |
+| Aldi | `:provider:aldi` | **Verified 2026-11-24 from the PC.** No online shop: its category pages embed the shelf assortment (no search key used), península prices. Ported from supermercapy | [aldi.md](aldi.md) |
 | Lidl | none | **Not implemented** (owner's decision): only weekly offers online | [lidl.md](lidl.md) |
 | Manual | built into `:core:data` | Always available. Products typed in by the user | this page, § Manual provider |
 
