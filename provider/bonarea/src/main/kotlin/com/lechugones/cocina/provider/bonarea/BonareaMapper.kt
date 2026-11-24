@@ -78,7 +78,7 @@ object BonareaMapper {
             val count = m.groupValues[1].toInt()
             val each = base(m.groupValues[2], m.groupValues[3])
             if (each != null && count in 1..MAX_UNITS) {
-                return Quantity(Amount.of(each.amount.toBigDecimal().multiply(BigDecimal(count))), each.unit) to count.takeIf { it > 1 }
+                return checkNotNull(base(m.groupValues[2], m.groupValues[3], BigDecimal(count))) { "pack size" } to count.takeIf { it > 1 }
             }
         }
         size.find(text)?.let { m -> base(m.groupValues[1], m.groupValues[2])?.let { return it to null } }
@@ -94,9 +94,11 @@ object BonareaMapper {
             ?.toIntOrNull()
             ?.takeIf { it in 2..MAX_UNITS }
 
+    /** [times] multiplies before rounding: 2 x 112,5 g is 225 g, not 2 x 113 g. */
     private fun base(
         value: String,
         unit: String,
+        times: BigDecimal = BigDecimal.ONE,
     ): Quantity? {
         val (base, factor) =
             when (unit.lowercase(Locale.ROOT)) {
@@ -107,7 +109,7 @@ object BonareaMapper {
                 "l" -> MeasureUnit.ML to BigDecimal(1000)
                 else -> return null
             }
-        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).setScale(0, RoundingMode.HALF_UP)
+        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).multiply(times).setScale(0, RoundingMode.HALF_UP)
         return if (amount.signum() > 0) Quantity(Amount.of(amount), base) else null
     }
 

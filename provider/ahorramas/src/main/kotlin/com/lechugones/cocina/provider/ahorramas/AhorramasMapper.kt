@@ -40,6 +40,15 @@ object AhorramasMapper {
         val price = tile.price?.toBigDecimalOrNull()?.takeIf { it.signum() > 0 } ?: return null
         val reference = reference(tile.unitPrice)
         val fromName = sizeFromName(tile.name)
+        val fromPrice = reference?.let { sizeFromPrice(price, it) }
+        val pack = packCount(tile.name)
+        // "Atún 52G pack 3": the size is one piece's. Trust the total when the unit price agrees.
+        val packTotal =
+            fromName
+                ?.takeIf { it.second == null && pack != null }
+                ?.first
+                ?.let { Quantity(Amount.of(it.amount.toBigDecimal().multiply(BigDecimal(checkNotNull(pack)))), it.unit) }
+                ?.takeIf { total -> fromPrice != null && fromPrice.unit == total.unit && close(total, fromPrice) }
         val net: Quantity
         val approx: Boolean
         when {
@@ -49,15 +58,19 @@ object AhorramasMapper {
                 approx = true
             }
 
+            packTotal != null -> {
+                net = packTotal
+                approx = false
+            }
+
             fromName != null -> {
-                val fromPrice = reference?.let { sizeFromPrice(price, it) }
                 net = fromName.first
                 // Only a disagreeing size in the same unit makes the name's size doubtful.
                 approx = fromPrice != null && fromPrice.unit == fromName.first.unit && !close(fromName.first, fromPrice)
             }
 
             else -> {
-                net = reference?.let { sizeFromPrice(price, it) } ?: return null
+                net = fromPrice ?: return null
                 approx = true
             }
         }
@@ -69,7 +82,7 @@ object AhorramasMapper {
                 price = Money.ofEuros(price),
                 brand = brandName(tile.brand),
                 brandKind = brandKind(tile.brand),
-                unitCount = if (tile.pricePerKilo) null else (fromName?.second ?: packCount(tile.name)),
+                unitCount = if (tile.pricePerKilo) null else (fromName?.second ?: pack),
                 approx = approx,
                 fetchedAt = fetchedAt,
                 available = tile.available,
@@ -152,10 +165,9 @@ object AhorramasMapper {
     private fun sizeFromName(name: String): Pair<Quantity, Int?>? {
         packOf.find(name)?.let { m ->
             val count = m.groupValues[1].toInt()
-            val each = base(m.groupValues[2], m.groupValues[3])
-            if (each != null && count in 1..MAX_UNITS) {
-                return Quantity(Amount.of(each.amount.toBigDecimal().multiply(BigDecimal(count))), each.unit) to count.takeIf { it > 1 }
-            }
+            // Multiply before rounding: 2 x 112,5 g is 225 g, not 2 x 113 g.
+            val total = if (count in 1..MAX_UNITS) base(m.groupValues[2], m.groupValues[3], BigDecimal(count)) else null
+            if (total != null) return total to count.takeIf { it > 1 }
         }
         size.find(name)?.let { m -> base(m.groupValues[1], m.groupValues[2])?.let { return it to null } }
         pieces.find(name)?.let { m ->
@@ -176,6 +188,7 @@ object AhorramasMapper {
     private fun base(
         value: String,
         unit: String,
+        times: BigDecimal = BigDecimal.ONE,
     ): Quantity? {
         val (base, factor) =
             when (unit.lowercase(Locale.ROOT)) {
@@ -186,7 +199,7 @@ object AhorramasMapper {
                 "l" -> MeasureUnit.ML to BigDecimal(1000)
                 else -> return null
             }
-        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).setScale(0, RoundingMode.HALF_UP)
+        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).multiply(times).setScale(0, RoundingMode.HALF_UP)
         return if (amount.signum() > 0) Quantity(Amount.of(amount), base) else null
     }
 

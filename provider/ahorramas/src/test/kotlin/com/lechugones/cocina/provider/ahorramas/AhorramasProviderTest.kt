@@ -122,6 +122,30 @@ class AhorramasProviderTest {
     }
 
     @Test
+    fun `a size followed by pack 3 is one tin's when the unit price says so`() {
+        // Seen on the phone on 2026-11-24: 2,10 € at 13,46 €/kg is 156 g, three 52 g tins.
+        val tile =
+            AhorramasTile(
+                id = "1",
+                name = "Atún Alipende 52G pack 3 en tomate",
+                brand = "ALIPENDE",
+                price = "2.10",
+                unitPrice = "13,46€/KG.PESO ESC",
+                pricePerKilo = false,
+                mediumWeight = null,
+                available = true,
+                imageUrl = null,
+                path = null,
+                category1 = null,
+                category2 = null,
+            )
+        val p = checkNotNull(AhorramasMapper.map(tile, now))
+        assertEquals(Quantity(Amount.of(156), MeasureUnit.G), p.product.net)
+        assertEquals(3, p.product.unitCount)
+        assertFalse(p.product.approx)
+    }
+
+    @Test
     fun `a discounted tile uses the price it shows, not the struck-through one`() {
         val water = mapped("supermercapy-search.html", "52028")
         assertEquals(Money(48), water.product.price)

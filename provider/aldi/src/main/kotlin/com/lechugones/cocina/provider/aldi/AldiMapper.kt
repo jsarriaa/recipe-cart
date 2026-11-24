@@ -137,7 +137,7 @@ object AldiMapper {
             val each = base(m.groupValues[2], m.groupValues[3]) ?: return@let
             if (count in 1..MAX_UNITS) {
                 return Parsed(
-                    Quantity(Amount.of(each.amount.toBigDecimal().multiply(BigDecimal(count))), each.unit),
+                    checkNotNull(base(m.groupValues[2], m.groupValues[3], BigDecimal(count))) { "pack size" },
                     count.takeIf { it > 1 },
                 )
             }
@@ -150,9 +150,11 @@ object AldiMapper {
         return null
     }
 
+    /** [times] multiplies before rounding: 2 x 112,5 g is 225 g, not 2 x 113 g. */
     private fun base(
         value: String,
         unit: String,
+        times: BigDecimal = BigDecimal.ONE,
     ): Quantity? {
         val (base, factor) =
             when (unit.lowercase(Locale.ROOT)) {
@@ -163,7 +165,7 @@ object AldiMapper {
                 "l" -> MeasureUnit.ML to BigDecimal(1000)
                 else -> return null
             }
-        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).setScale(0, RoundingMode.HALF_UP)
+        val amount = BigDecimal(value.replace(',', '.')).multiply(factor).multiply(times).setScale(0, RoundingMode.HALF_UP)
         return if (amount.signum() > 0) Quantity(Amount.of(amount), base) else null
     }
 
