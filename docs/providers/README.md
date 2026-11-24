@@ -13,6 +13,7 @@ never knows which supermarkets exist.
 | Carrefour | `:provider:carrefour` | **Verified 2026-11-24 from the PC.** Public search index only (the storefront admits only browsers), national prices, search-based sync. Ported from supermercapy | [carrefour.md](carrefour.md) |
 | Aldi | `:provider:aldi` | **Verified 2026-11-24 from the PC.** No online shop: its category pages embed the shelf assortment (no search key used), península prices. Ported from supermercapy | [aldi.md](aldi.md) |
 | bonÀrea | `:provider:bonarea` | **Verified 2026-11-24 from the PC.** National catalogue and prices, search-based sync (each search returns every hit). Ported from supermercapy | [bonarea.md](bonarea.md) |
+| Ahorramás | `:provider:ahorramas` | **Verified 2026-11-24 from the PC.** HTML product grid (jsoup), one price list (Madrid area), search-based sync; price refresh by searching the id. Ported from supermercapy | [ahorramas.md](ahorramas.md) |
 | Lidl | none | **Not implemented** (owner's decision): only weekly offers online | [lidl.md](lidl.md) |
 | Manual | built into `:core:data` | Always available. Products typed in by the user | this page, § Manual provider |
 

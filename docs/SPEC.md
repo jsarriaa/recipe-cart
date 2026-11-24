@@ -47,7 +47,7 @@ files are the only ways to move data between phones.
 
 | UI (es-ES) | Code (English) | Meaning |
 |---|---|---|
-| Supermercado | `Provider` | A product source: Mercadona, Día, Carrefour, Aldi, bonÀrea, or Manual |
+| Supermercado | `Provider` | A product source: Mercadona, Día, Carrefour, Aldi, bonÀrea, Ahorramás, or Manual |
 | Producto | `Product` | A sellable item at one provider, with package size and price |
 | Envase / paquete | `Package` | One sellable unit of a product (paquete, bandeja, bote, pieza…) |
 | Marca blanca | `StoreBrand` | The provider's own brand (Hacendado, Dia…) |
@@ -83,6 +83,7 @@ files are the only ways to move data between phones.
 :provider:carrefour     Same for Carrefour (after 1.4.0; its public search index only).
 :provider:aldi          Same for Aldi (after 1.4.0; the data its category pages embed).
 :provider:bonarea       Same for bonÀrea (after 1.4.0; its shop's search).
+:provider:ahorramas     Same for Ahorramás (after 1.4.0; HTML grid parsed with jsoup).
 build-logic/            Gradle convention plugins (android-app, android-library, jvm-library, hilt, room).
 ```
 
@@ -162,6 +163,8 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
     península region ([providers/aldi.md](providers/aldi.md)). Ported from supermercapy.
   - **bonÀrea** (after 1.4.0): national catalogue and prices, search-based sync
     ([providers/bonarea.md](providers/bonarea.md)). Ported from supermercapy.
+  - **Ahorramás** (after 1.4.0): its HTML product grid, one price list, search-based sync
+    ([providers/ahorramas.md](providers/ahorramas.md)). Ported from supermercapy.
   - **Manual**: built in, always available. The user types a product (name, brand, store-brand
     flag, package size, price, shop name). This covers shops without an API and providers that
     are down or refuse us. Manual products are stored in the catalogue table with provider id

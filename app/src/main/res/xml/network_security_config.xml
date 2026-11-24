@@ -4,7 +4,8 @@
     tienda.mercadona.es (API), prod-mercadona.imgix.net (images), www.dia.es (API and images),
     api.empathy.co (Carrefour's search index), static.carrefour.es (Carrefour images),
     www.aldi.es (Aldi's pages), s7g10.scene7.com (Aldi images), www.bonarea-online.com
-    (bonÀrea's shop) and images.bonarea.com (bonÀrea images).
+    (bonÀrea's shop), images.bonarea.com (bonÀrea images) and www.ahorramas.com (Ahorramás's
+    grid and images).
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
