@@ -246,6 +246,8 @@ fun RecipeDetailScreen(
     if (sheet != null && loaded != null) {
         LinkProductSheet(
             state = sheet,
+            providers = loaded.providers,
+            onProvider = viewModel::switchLinkProvider,
             current =
                 sheet.ingredient.links
                     .filter { it.product.providerId == sheet.providerId }
