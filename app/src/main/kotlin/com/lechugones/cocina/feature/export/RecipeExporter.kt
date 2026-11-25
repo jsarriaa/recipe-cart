@@ -61,6 +61,7 @@ class RecipeExporter
             const val EXPORT_DIRECTORY = "exports"
             const val MIME_MARKDOWN = "text/markdown"
             const val MIME_ZIP = "application/zip"
+            const val MIME_PDF = "application/pdf"
         }
     }
 

@@ -1,7 +1,9 @@
 package com.lechugones.cocina.ui.format
 
+import android.content.res.Resources
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import com.lechugones.cocina.R
 import com.lechugones.cocina.domain.format.SpanishNumberFormat
@@ -36,21 +38,28 @@ object Dates {
 fun quantityText(
     value: BigDecimal?,
     unit: MeasureUnit,
+): String = quantityText(LocalResources.current, value, unit)
+
+/** [quantityText] outside composition (the shared PDF). */
+fun quantityText(
+    resources: Resources,
+    value: BigDecimal?,
+    unit: MeasureUnit,
 ): String =
     when (val display = QuantityDisplay.friendly(value, unit)) {
         is DisplayQuantity.NoQuantity -> {
-            stringResource(R.string.unit_al_gusto)
+            resources.getString(R.string.unit_al_gusto)
         }
 
         is DisplayQuantity.Decimal -> {
             val plural = display.value > BigDecimal.ONE
-            "${SpanishNumberFormat.decimal(display.value)} ${unitLabel(display.unit, plural)}"
+            "${SpanishNumberFormat.decimal(display.value)} ${unitLabel(resources, display.unit, plural)}"
         }
 
         is DisplayQuantity.Fraction -> {
             val fraction = display.value
             val plural = fraction.whole > 1 || (fraction.whole == 1 && fraction.numerator > 0)
-            "${SpanishNumberFormat.mixedFraction(fraction)} ${unitLabel(display.unit, plural)}"
+            "${SpanishNumberFormat.mixedFraction(fraction)} ${unitLabel(resources, display.unit, plural)}"
         }
     }
 
@@ -58,8 +67,14 @@ fun quantityText(
 fun unitLabel(
     unit: MeasureUnit,
     plural: Boolean,
+): String = unitLabel(LocalResources.current, unit, plural)
+
+fun unitLabel(
+    resources: Resources,
+    unit: MeasureUnit,
+    plural: Boolean,
 ): String =
-    stringResource(
+    resources.getString(
         when (unit) {
             MeasureUnit.G -> R.string.unit_g
             MeasureUnit.KG -> R.string.unit_kg

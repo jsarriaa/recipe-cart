@@ -312,6 +312,21 @@ vincular" is also available when suggestions exist; links that came in the file 
 - Exports include `uid` and the confirmed `links` (provider + product id + name snapshot), so a
   re-import on the same or another phone restores the links when those products are cached.
 
+#### Compartir en PDF (1.7.0)
+
+A recipe's ⋮ menu has "Compartir en PDF" (owner's request): an A4 PDF to send to anyone, not
+meant for re-import. It is laid out in the app's look (tomato band with the logo and "Cocina para
+Lechugones" on every page, the photo across the page, title, description, servings and times as
+tags, numbered steps) and lists each ingredient at the servings shown with the product the
+recipe shows for it (the cost card's mode) and its supermarket, **never a price**. Each product
+links to its page at the supermarket when the catalogue has one. It goes through the same
+share-or-save dialog as exports.
+
+`android.graphics.pdf.PdfDocument` draws it, so no library is added. It cannot make links, so
+`PdfLinks` appends them to the finished file as an incremental update (PDF 1.4 § 3.4.5); a file it
+does not understand is shared without links. Bold is drawn as filled-and-outlined text, because
+the PDF keeps only the default instance of a variable system font.
+
 #### AC
 
 - AC3.1 **Round trip**: for every recipe `r`, `import(export(r))` equals `r` in all fields

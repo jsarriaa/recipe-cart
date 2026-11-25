@@ -31,6 +31,8 @@ import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.settings.AppSettings
 import com.lechugones.cocina.feature.export.ExportFile
 import com.lechugones.cocina.feature.export.RecipeExporter
+import com.lechugones.cocina.feature.export.RecipePdfWriter
+import com.lechugones.cocina.feature.export.RecipePrintout
 import com.lechugones.cocina.provider.ProviderProduct
 import com.lechugones.cocina.ui.navigation.RecipeDetailRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -145,6 +147,7 @@ class RecipeDetailViewModel
         savedStateHandle: SavedStateHandle,
         private val library: RecipeLibrary,
         private val exporter: RecipeExporter,
+        private val pdfWriter: RecipePdfWriter,
         private val linker: ProductLinker,
         private val catalogue: CatalogueRepository,
         private val settings: SettingsRepository,
@@ -564,6 +567,14 @@ class RecipeDetailViewModel
         fun export() {
             viewModelScope.launch {
                 val file = exporter.export(listOf(id), allFileName = "")
+                eventChannel.send(if (file == null) RecipeDetailEvent.ExportFailed else RecipeDetailEvent.Exported(file))
+            }
+        }
+
+        /** "Compartir en PDF": [printout] is built by the screen, which resolves the words. */
+        fun sharePdf(printout: RecipePrintout) {
+            viewModelScope.launch {
+                val file = pdfWriter.write(printout)
                 eventChannel.send(if (file == null) RecipeDetailEvent.ExportFailed else RecipeDetailEvent.Exported(file))
             }
         }

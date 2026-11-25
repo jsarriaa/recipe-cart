@@ -311,6 +311,10 @@
     <string name="export_dialog_body">Puedes compartir el archivo o guardarlo en el móvil.</string>
     <string name="export_share">Compartir</string>
     <string name="export_save">Guardar en el móvil</string>
+    <string name="recipe_share_pdf">Compartir en PDF</string>
+    <!-- The brand on the shared PDF; app_name is "Cocina (debug)" in debug builds. -->
+    <string name="pdf_brand" translatable="false">Cocina para Lechugones</string>
+    <string name="pdf_footer">%1$s · página %2$d</string>
     <string name="export_saved">Archivo guardado.</string>
     <string name="export_error">No se pudo exportar.</string>
     <string name="export_all_file_name">recetas-%1$s.zip</string>

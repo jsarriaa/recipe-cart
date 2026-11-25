@@ -34,6 +34,7 @@ fun ExportDialog(
     }
     val saveMarkdown = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(RecipeExporter.MIME_MARKDOWN), onCreated)
     val saveZip = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(RecipeExporter.MIME_ZIP), onCreated)
+    val savePdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(RecipeExporter.MIME_PDF), onCreated)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -47,7 +48,11 @@ fun ExportDialog(
         },
         dismissButton = {
             TextButton(onClick = {
-                if (export.mimeType == RecipeExporter.MIME_ZIP) saveZip.launch(export.name) else saveMarkdown.launch(export.name)
+                when (export.mimeType) {
+                    RecipeExporter.MIME_ZIP -> saveZip.launch(export.name)
+                    RecipeExporter.MIME_PDF -> savePdf.launch(export.name)
+                    else -> saveMarkdown.launch(export.name)
+                }
             }) { Text(stringResource(R.string.export_save)) }
         },
     )

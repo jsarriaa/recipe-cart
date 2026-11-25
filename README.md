@@ -25,6 +25,8 @@ Store. The app UI is in Spanish (es-ES); code and docs are in English.
   images. On import the app suggests products to link, and "Aceptar todo" confirms them in one
   tap. Export round-trips. Recipes can be generated in an external Claude chat with
   [the generator prompt](prompts/recipe-pack-generator.md).
+- **Compartir en PDF**: a recipe as a good-looking A4 PDF with its photo, the ingredients with
+  where to buy each one (linked to the supermarket's page, no prices) and the steps.
 - **Quantities and cost**: "1/2 paquete de ñoquis, 250 g de 500 g", dish cost, cost of whole
   packages, and a comparison across supermarkets.
 - **Pantry**: what is at home. A package can be marked "Abierto", and opened packages are used
