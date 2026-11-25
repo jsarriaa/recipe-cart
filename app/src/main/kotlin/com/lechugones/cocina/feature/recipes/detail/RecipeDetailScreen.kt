@@ -50,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +62,7 @@ import com.lechugones.cocina.R
 import com.lechugones.cocina.domain.cost.IngredientCostLine
 import com.lechugones.cocina.domain.cost.LineStatus
 import com.lechugones.cocina.domain.format.SpanishNumberFormat
+import com.lechugones.cocina.domain.product.ManualProducts
 import com.lechugones.cocina.domain.recipe.Ingredient
 import com.lechugones.cocina.domain.recipe.Recipe
 import com.lechugones.cocina.domain.recipe.RecipeOrigin
@@ -69,7 +71,11 @@ import com.lechugones.cocina.feature.community.PublishDialogs
 import com.lechugones.cocina.feature.community.PublishViewModel
 import com.lechugones.cocina.feature.export.ExportDialog
 import com.lechugones.cocina.feature.export.ExportFile
+import com.lechugones.cocina.feature.export.PrintWords
+import com.lechugones.cocina.feature.export.RecipePrintout
+import com.lechugones.cocina.feature.export.RecipePrintouts
 import com.lechugones.cocina.provider.ProviderProduct
+import com.lechugones.cocina.ui.components.LocalSupermarketNames
 import com.lechugones.cocina.ui.components.ManualProductDialog
 import com.lechugones.cocina.ui.components.MarkdownText
 import com.lechugones.cocina.ui.components.ProductImage
@@ -104,6 +110,26 @@ fun RecipeDetailScreen(
     val publishState by publisher.uiState.collectAsStateWithLifecycle()
     val exportError = stringResource(R.string.export_error)
     val copyTitle = stringResource(R.string.recipe_copy_title, "%s")
+    val context = LocalContext.current
+    val shopNames = LocalSupermarketNames.current
+    val manualShop = stringResource(R.string.cost_provider_manual)
+    val pdfResources = LocalResources.current
+    val printout: (RecipeDetailUiState.Loaded) -> RecipePrintout = { current ->
+        val lines =
+            current.cost
+                ?.lines
+                .orEmpty()
+                .associateBy { it.ingredient.id }
+        RecipePrintouts.build(
+            words = PrintWords.fromResources(pdfResources),
+            recipe = current.recipe,
+            servings = current.servings,
+            photo = RecipePrintouts.photo(context.filesDir, current.recipe.imagePath),
+            // The products the screen shows, in the cost card's mode.
+            productFor = { shownProduct(it, current, lines[it.id]) },
+            shopName = { id -> if (id == ManualProducts.PROVIDER_ID) manualShop else shopNames[id] },
+        )
+    }
 
     // Runs again when the screen comes back from the editor, so edits show up.
     LaunchedEffect(Unit) { viewModel.load() }
@@ -179,6 +205,10 @@ fun RecipeDetailScreen(
                         DropdownMenuItem(text = { Text(stringResource(R.string.publish_menu)) }, onClick = {
                             menuOpen = false
                             publisher.start()
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.recipe_share_pdf)) }, onClick = {
+                            menuOpen = false
+                            viewModel.sharePdf(printout(loaded))
                         })
                         DropdownMenuItem(text = { Text(stringResource(R.string.action_export)) }, onClick = {
                             menuOpen = false
