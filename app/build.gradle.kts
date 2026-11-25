@@ -22,8 +22,8 @@ android {
     defaultConfig {
         // Never change once real data exists (CLAUDE.md, hard rule 6).
         applicationId = "com.lechugones.cocina"
-        versionCode = 16
-        versionName = "1.6.0"
+        versionCode = 17
+        versionName = "1.7.0"
     }
 
     signingConfigs {
