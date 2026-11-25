@@ -111,7 +111,7 @@ data class LinkingState(
     val manualErrors: Set<ManualProductField> = emptySet(),
     val options: List<LinkOption> = emptyList(),
     val loading: Boolean = true,
-    /** No product of the primary provider is cached yet: the catalogue must be downloaded first. */
+    /** No product of [providerId] is cached yet: its catalogue must be downloaded first. */
     val catalogueEmpty: Boolean = false,
 )
 
@@ -441,9 +441,27 @@ class RecipeDetailViewModel
 
         /** Opens the sheet with suggestions for [ingredient] at the supermarket being viewed. */
         fun openLinking(ingredient: Ingredient) {
-            searchJob?.cancel()
             val loaded = state.value as? RecipeDetailUiState.Loaded
-            val primary = loaded?.let(::viewedProvider).orEmpty()
+            showSuggestions(ingredient, loaded?.let(::viewedProvider).orEmpty())
+        }
+
+        /** Switches the open sheet to another supermarket, keeping what was typed. */
+        fun switchLinkProvider(providerId: String) {
+            val current = linkingState.value ?: return
+            if (current.providerId == providerId) return
+            if (current.query.isBlank()) {
+                showSuggestions(current.ingredient, providerId)
+            } else {
+                linkingState.value = current.copy(providerId = providerId, options = emptyList(), loading = true, catalogueEmpty = false)
+                onLinkQuery(current.query)
+            }
+        }
+
+        private fun showSuggestions(
+            ingredient: Ingredient,
+            primary: String,
+        ) {
+            searchJob?.cancel()
             linkingState.value = LinkingState(ingredient, query = "", providerId = primary)
             searchJob =
                 viewModelScope.launch {
@@ -462,7 +480,7 @@ class RecipeDetailViewModel
             val current = linkingState.value ?: return
             linkingState.value = current.copy(query = query)
             if (query.isBlank()) {
-                openLinking(current.ingredient)
+                showSuggestions(current.ingredient, current.providerId.orEmpty())
                 return
             }
             searchJob?.cancel()
@@ -473,7 +491,8 @@ class RecipeDetailViewModel
                     val storeBrandOnly = settings.settings.first().storeBrandOnly
                     val provider = linkingState.value?.providerId
                     val found = catalogue.search(query, storeBrandOnly, onlyProvider = provider).first().map { LinkOption(it, null) }
-                    linkingState.update { it?.copy(options = found, loading = false) }
+                    val empty = provider != null && catalogue.status(provider).first().products == 0
+                    linkingState.update { it?.copy(options = found, loading = false, catalogueEmpty = empty) }
                 }
         }
 

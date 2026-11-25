@@ -1,5 +1,6 @@
 package com.lechugones.cocina.feature.recipes.detail
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +44,9 @@ import com.lechugones.cocina.ui.components.ProductListItem
 @Composable
 fun LinkProductSheet(
     state: LinkingState,
+    /** Supermarkets to link in, primary first; the sheet can switch between them. */
+    providers: List<String>,
+    onProvider: (String) -> Unit,
     current: ProviderProduct?,
     onQuery: (String) -> Unit,
     onPick: (ProviderProduct) -> Unit,
@@ -55,13 +61,31 @@ fun LinkProductSheet(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            state.providerId?.let { LocalSupermarketNames.current[it] }?.let { name ->
-                Text(
-                    stringResource(R.string.link_in_supermarket, name),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
+            val names = LocalSupermarketNames.current
+            val shops = providers.filter { it in names }
+            if (shops.size > 1) {
+                // Link in any active supermarket without leaving the sheet.
+                Row(
+                    Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    shops.forEach { id ->
+                        FilterChip(
+                            selected = id == state.providerId,
+                            onClick = { onProvider(id) },
+                            label = { Text(names.getValue(id)) },
+                        )
+                    }
+                }
+            } else {
+                state.providerId?.let { names[it] }?.let { name ->
+                    Text(
+                        stringResource(R.string.link_in_supermarket, name),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
             }
             if (current != null) {
                 Row(

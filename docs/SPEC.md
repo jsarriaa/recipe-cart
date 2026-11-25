@@ -243,7 +243,10 @@ Each feature lists behaviour and **acceptance criteria (AC)**. Phases are in § 
   nueva".
 - **Linking**: tapping an ingredient in the recipe detail opens "Vincular producto": the
   current link (with "Quitar vínculo"), suggestions from link memory and the cached catalogue
-  (§ 5.4, primary supermarket), a search box, and "Añadir un producto a mano". Picking a product
+  (§ 5.4, in the supermarket the cost card is viewing), a search box, and "Añadir un producto a
+  mano". With more than one active supermarket, chips at the top switch the sheet to another one
+  (keeping the typed search), so every supermarket can be linked without leaving the recipe or
+  changing the cost card's mode (owner's request, 1.6.0). Picking a product
   stores it as the preferred link of its provider, first in the list, so it is the product the
   recipe shows; links to other providers stay. It updates the **link memory** for the
   ingredient's normalised name (§ 5.4). A link change counts as an edit (re-import protection,
